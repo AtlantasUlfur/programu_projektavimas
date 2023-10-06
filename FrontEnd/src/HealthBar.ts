@@ -91,4 +91,9 @@ export class HealthBar {
         this.bar.fillRect(pos_x + 2, pos_y + 2, d, 12);
     }
 
+    setAlpha(value : number)
+    {
+        this.bar.setAlpha(value);
+    }
+
 }

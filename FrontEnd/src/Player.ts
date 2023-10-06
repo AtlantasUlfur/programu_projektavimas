@@ -104,6 +104,7 @@ export class Player {
   setPlayerVisible(value: number) {
     this.sprite.setAlpha(value);
     this.playerName.setAlpha(value);
+    this.health.setAlpha(value);
   }
 
   setTilePos(tilePosition: Phaser.Math.Vector2): void {
