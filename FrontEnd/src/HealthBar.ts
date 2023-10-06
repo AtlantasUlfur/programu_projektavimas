@@ -1,3 +1,8 @@
+export enum HealthEnum {
+    INIT = 100,
+    BASIC_ATTACK = 10,
+    BASIC_HEAL = 10,
+}
 export class HealthBar {
     private bar : Phaser.GameObjects.Graphics
     private x : integer
@@ -11,8 +16,8 @@ export class HealthBar {
 
         this.x = x;
         this.y = y;
-        this.healthValue = 100;
-        this.p = 76 / 100;
+        this.healthValue = HealthEnum.INIT;
+        this.p = 76 / 100; //smth for width
 
         this.draw();
 
@@ -31,6 +36,18 @@ export class HealthBar {
         this.draw();
 
         return (this.healthValue === 0);
+    }
+
+    increase (amount)
+    {
+        this.healthValue += amount;
+
+        if (this.healthValue > 100)
+        {
+            this.healthValue = 100;
+        }
+
+        this.draw();
     }
 
     draw ()
@@ -69,6 +86,9 @@ export class HealthBar {
         //  BG
         this.bar.fillStyle(0x000000);
         this.bar.fillRect(pos_x, pos_y, 80, 16);
+
+        this.x = pos_x;
+        this.y = pos_y;
 
         //  Health
 
