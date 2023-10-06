@@ -86,9 +86,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   public update(_time: number, delta: number) {
-    this.gridControls.update(_time);
+    if(this.gridControls.update(_time))
+    {
+      this.player.health.drawByPos(this.player.getTilePos().x * GameScene.TILE_SIZE - 11, this.player.getTilePos().y * GameScene.TILE_SIZE - 100);
+    }
+    // this.gridPhysics.update(delta);
     this.updateGrid();
-    //this.gridPhysics.update(delta);
   }
 
   public preload() {

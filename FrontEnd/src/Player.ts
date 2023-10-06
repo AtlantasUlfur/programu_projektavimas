@@ -1,8 +1,10 @@
 import { Direction } from "./Direction";
 import { GameScene } from "./main";
+import { HealthBar } from "./HealthBar";
 
 export class Player {
   private playerName: Phaser.GameObjects.Text;
+  public health : HealthBar
 
   constructor(
     private sprite: Phaser.GameObjects.Sprite,
@@ -73,6 +75,7 @@ export class Player {
       tilePos.x * GameScene.TILE_SIZE + offsetX,
       tilePos.y * GameScene.TILE_SIZE - offsetY
     );
+    this.health = new HealthBar(scene,  tilePos.x * GameScene.TILE_SIZE - 11, tilePos.y * GameScene.TILE_SIZE - 100)
   }
 
   setPlayerName(name: string) {
