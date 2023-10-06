@@ -77,6 +77,7 @@ export class GameScene extends Phaser.Scene {
       self.otherPlayers[message.playerId]?.setTilePos(
         new Phaser.Math.Vector2(message.x, message.y)
       );
+      self.otherPlayers[message.playerId]?.health.drawByPos(self.otherPlayers[message.playerId]?.getTilePos().x * GameScene.TILE_SIZE - 11, self.otherPlayers[message.playerId]?.getTilePos().y * GameScene.TILE_SIZE - 100)
       console.log(self.otherPlayers);
     });
 

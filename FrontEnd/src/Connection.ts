@@ -19,7 +19,7 @@ export class Connection
         }
     }
 
-    private getSocket(): Socket | null {
+    public getSocket(): Socket | null {
         return this.socket;
     }
 }
