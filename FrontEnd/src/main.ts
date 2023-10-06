@@ -6,6 +6,8 @@ import { Direction } from "./Direction";
 import { io } from "socket.io-client";
 import _ from "lodash";
 
+
+
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
   visible: false,
@@ -16,6 +18,7 @@ const CANVAS_WIDTH = 720;
 const CANVAS_HEIGHT = 528;
 
 export class GameScene extends Phaser.Scene {
+  
   private gridControls: GridControls;
   private gridPhysics: GridPhysics;
   private socket;
@@ -30,8 +33,11 @@ export class GameScene extends Phaser.Scene {
 
   public create() {
     const self = this;
+    
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
+
+    
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
       const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
       layer.setDepth(i);
@@ -88,7 +94,6 @@ export class GameScene extends Phaser.Scene {
   public preload() {
     this.load.image("tiles", "assets/cloud_tileset.png");
     this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
-
     this.load.spritesheet("player", "assets/characters.png", {
       frameWidth: 26,
       frameHeight: 36,
@@ -106,7 +111,8 @@ export class GameScene extends Phaser.Scene {
 
     this.player = new Player(
       playerSprite,
-      new Phaser.Math.Vector2(playerInfo.x, playerInfo.y)
+      new Phaser.Math.Vector2(playerInfo.x, playerInfo.y), self
+     
     );
 
     this.gridPhysics = new GridPhysics(this.player, cloudCityTilemap, this.socket);
@@ -121,7 +127,7 @@ export class GameScene extends Phaser.Scene {
     this.otherPlayers[playerInfo.playerId] =
       new Player(
         enemySprite,
-        new Phaser.Math.Vector2(playerInfo.x, playerInfo.y)
+        new Phaser.Math.Vector2(playerInfo.x, playerInfo.y), self
       )
     
   }
@@ -141,6 +147,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   },
   parent: "game",
   backgroundColor: "#48C4F8",
+  
 };
 
 export const game = new Phaser.Game(gameConfig);
