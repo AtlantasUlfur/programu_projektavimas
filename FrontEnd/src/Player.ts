@@ -1,84 +1,27 @@
 import { Direction } from "./Direction";
 import { GameScene } from "./main";
 import { HealthBar } from "./HealthBar";
-import { HealthEnum } from "./HealthBar";
 
 export class Player {
   public Id;
   private playerName: Phaser.GameObjects.Text;
   public health : HealthBar
+  public sprite: Phaser.GameObjects.Sprite
 
   constructor(
     private id,
-    private sprite: Phaser.GameObjects.Sprite,
+    private spriteNew: Phaser.GameObjects.Sprite,
     private tilePos: Phaser.Math.Vector2,
     private scene: GameScene
   ) {
     const offsetX = GameScene.TILE_SIZE / 2;
     const offsetY = GameScene.TILE_SIZE;
     this.Id = id;
+    this.sprite = spriteNew;
     this.sprite.setInteractive();
     const self = this;
     this.health = new HealthBar(scene,  tilePos.x * GameScene.TILE_SIZE - 11, tilePos.y * GameScene.TILE_SIZE - 100)
 
-    var selfEventInit = false;
-    var eventInit = false;
-    sprite.on("pointerdown", function (pointer) {
-      if (self.playerName.text != "YOU") {
-        this.setTint(0xff0000);
-        console.log(this);
-        let element = document.getElementById("input-box2");
-        if (element && element.style.display === "none") {
-          element.style.display = "block";
-          if(!eventInit)
-          {
-            for (let i = 0; i < element.children.length; i++) {
-              if (element.children[i].tagName === "INPUT") {
-                element.children[i].addEventListener("input", () => {});
-              } else {
-                let element_next = document.getElementById("input-box");
-                element_next.style.display = "none";
-                element.children[i].addEventListener("click", () => {
-                  if(element.children[i].textContent == "Attack #1")
-                    this.scene.player.health.decrease(HealthEnum.BASIC_ATTACK)
-                  if(element.children[i].textContent == "Attack #2")
-                    this.scene.player.health.decrease(HealthEnum.BASIC_ATTACK * 2);
-                  element.style.display = "none";
-                });
-              }
-            }
-            eventInit = true;
-          }
-        }
-      } else {
-        let element = document.getElementById("input-box");
-        if (element && element.style.display === "none") {
-          element.style.display = "block";
-          if(!selfEventInit)
-          {
-            for (let i = 0; i < element.children.length; i++) {
-              if (element.children[i].tagName === "INPUT") {
-                element.children[i].addEventListener("input", () => {});
-              } else {
-                let element_next = document.getElementById("input-box2");
-                element_next.style.display = "none";
-                element.children[i].addEventListener("click", () => {
-                  if(element.children[i].textContent == "Action #1")
-                    self.health.increase(HealthEnum.BASIC_HEAL);
-                  if(element.children[i].textContent == "Action #2")
-                    self.health.decrease(HealthEnum.BASIC_ATTACK);
-                  element.style.display = "none";
-                });
-              }
-            }
-            selfEventInit = true; 
-          }
-        }
-      }
-    });
-    sprite.on("pointerup", function (pointer) {
-      this.clearTint();
-    });
     this.sprite.setOrigin(0.5, 1);
     this.sprite.setPosition(
       tilePos.x * GameScene.TILE_SIZE + offsetX,

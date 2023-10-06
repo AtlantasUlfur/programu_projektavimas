@@ -35,7 +35,7 @@ export class HealthBar {
 
         this.draw();
 
-        return (this.healthValue === 0);
+        return this.healthValue
     }
 
     increase (amount)
@@ -48,6 +48,23 @@ export class HealthBar {
         }
 
         this.draw();
+
+        return this.healthValue
+    }
+
+    setHealth(value){
+
+        this.healthValue = value;
+        if (this.healthValue > 100)
+        {
+            this.healthValue = 100;
+        }
+        if (this.healthValue < 0)
+        {
+            this.healthValue = 0;
+        }
+        this.draw();
+        console.log(this.healthValue)
     }
 
     draw ()

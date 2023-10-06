@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+import { HealthEnum } from "./HealthBar";
 import { Player } from "./Player";
 import { GridControls } from "./GridControls";
 import { GridPhysics } from "./GridPhysics";
@@ -81,6 +82,18 @@ export class GameScene extends Phaser.Scene {
       console.log(self.otherPlayers);
     });
 
+    this.socket.on("updateHealth", function (message) {
+      console.log(message);
+      Object.keys(message.players).forEach(function (player) {
+      if(self.player.Id == player){
+          self.player.health.setHealth(message.players[player].health);
+        }
+        else{
+          self.otherPlayers[player].health.setHealth(message.players[player].health);
+        }
+      });
+    });
+
     this.gridPhysics = new GridPhysics(this.player, this.tileMap, this.socket);
     this.gridControls = new GridControls(this.input, this.gridPhysics);
 
@@ -93,13 +106,8 @@ export class GameScene extends Phaser.Scene {
   public update(_time: number, delta: number) {
     if(this.gridControls.update(_time))
     {
-      console.log("Other")
-      console.log(this.otherPlayers)
-      console.log("Current")
-      console.log(this.player)
       this.player.health.drawByPos(this.player.getTilePos().x * GameScene.TILE_SIZE - 11, this.player.getTilePos().y * GameScene.TILE_SIZE - 100);
     }
-    // this.gridPhysics.update(delta);
     this.updateGrid();
   }
 
@@ -148,6 +156,16 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  changePlayerHealth(self, playerId, value){
+    if(self.player.Id == playerId){
+      self.player.health.setHealth(value);
+    }
+    else{
+      self.otherPlayers[playerId].health.setHealth(value);
+    }  
+    this.socket.emit("healthChange", {targetId: playerId, healthUpdate: value})
+  }
+
   addPlayer(self, playerInfo, cloudCityTilemap) {
     const playerSprite = self.add.sprite(0, 0, "player");
     playerSprite.setDepth(2);
@@ -171,6 +189,36 @@ export class GameScene extends Phaser.Scene {
       this.socket
     );
     this.gridControls = new GridControls(this.input, this.gridPhysics);
+
+    var selfEventInit = false;
+    this.player.sprite.on("pointerdown", function (pointer) {
+      let element = document.getElementById("input-box");
+      if (element && element.style.display === "none") {
+        element.style.display = "block";
+        if(!selfEventInit)
+        {
+          for (let i = 0; i < element.children.length; i++) {
+            if (element.children[i].tagName === "INPUT") {
+              element.children[i].addEventListener("input", () => {});
+            } else {
+              let element_next = document.getElementById("input-box2");
+              element_next.style.display = "none";
+              element.children[i].addEventListener("click", () => {
+                if(element.children[i].textContent == "Action #1")
+                  self.changePlayerHealth(self, self.player.Id, self.player.health.increase(10))
+                if(element.children[i].textContent == "Action #2")
+                  self.changePlayerHealth(self, self.player.Id, self.player.health.increase(20))
+                element.style.display = "none";
+              });
+            }
+          }
+          selfEventInit = true; 
+        }
+      }
+    });
+  this.player.sprite.on("pointerup", function (pointer) {
+    this.clearTint();
+  });
   }
 
   addOtherPlayers(self, playerInfo) {
@@ -184,6 +232,38 @@ export class GameScene extends Phaser.Scene {
       new Phaser.Math.Vector2(playerInfo.x, playerInfo.y),
       self
     );
+
+    var eventInit = false;
+    this.otherPlayers[playerInfo.playerId]
+      .sprite.on("pointerdown", function (pointer) {
+        let element = document.getElementById("input-box2");
+        if (element && element.style.display === "none") {
+          element.style.display = "block";
+          if(!eventInit)
+          {
+            for (let i = 0; i < element.children.length; i++) {
+              if (element.children[i].tagName === "INPUT") {
+                element.children[i].addEventListener("input", () => {});
+              } else {
+                let element_next = document.getElementById("input-box2");
+                element_next.style.display = "none";
+                element.children[i].addEventListener("click", () => {
+                  if(element.children[i].textContent == "Attack #1")
+                    self.changePlayerHealth(self, playerInfo.playerId, self.otherPlayers[playerInfo.playerId].health.decrease(10))
+                  if(element.children[i].textContent == "Attack #2")
+                    self.changePlayerHealth(self, playerInfo.playerId, self.otherPlayers[playerInfo.playerId].health.decrease(20))
+                  element.style.display = "none";
+                });
+              }
+            }
+            eventInit = true; 
+          }
+        }
+    });
+    this.otherPlayers[playerInfo.playerId]
+      .sprite.on("pointerup", function (pointer) {
+        this.clearTint();
+      });
   }
 }
 
