@@ -3,7 +3,7 @@ import { Player } from "./Player";
 import { GridControls } from "./GridControls";
 import { GridPhysics } from "./GridPhysics";
 import { Direction } from "./Direction";
-import { io } from "socket.io-client";
+import { Connection } from "./Connection";
 import _ from "lodash";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -18,6 +18,7 @@ const CANVAS_HEIGHT = 528;
 export class GameScene extends Phaser.Scene {
   private gridControls: GridControls;
   private gridPhysics: GridPhysics;
+  private socketInstance;
   private socket;
   private tileMap: Phaser.Tilemaps.Tilemap;
 
@@ -42,7 +43,10 @@ export class GameScene extends Phaser.Scene {
     }
     console.log("0");
 
-    this.socket = io("http://localhost:8081");
+    this.socketInstance = Connection.getInstance();
+    this.socketInstance.connect("http://localhost:8081")
+
+    this.socket = this.socketInstance.getSocket();
 
     this.socket.on("currentPlayers", function (players) {
       const socketId = this.id;
