@@ -6,8 +6,6 @@ import { Direction } from "./Direction";
 import { io } from "socket.io-client";
 import _ from "lodash";
 
-
-
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
   visible: false,
@@ -18,7 +16,6 @@ const CANVAS_WIDTH = 720;
 const CANVAS_HEIGHT = 528;
 
 export class GameScene extends Phaser.Scene {
-  
   private gridControls: GridControls;
   private gridPhysics: GridPhysics;
   private socket;
@@ -33,11 +30,10 @@ export class GameScene extends Phaser.Scene {
 
   public create() {
     const self = this;
-    
+
     const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
     cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
 
-    
     for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
       const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
       layer.setDepth(i);
@@ -63,7 +59,7 @@ export class GameScene extends Phaser.Scene {
       self.addOtherPlayers(self, playerInfo);
     });
     this.socket.on("disconnect", function (playerId) {
-      console.log('disc')
+      console.log("disc");
       self.otherPlayers.forEach(function (otherPlayer) {
         if (playerId === otherPlayer.playerId) {
           otherPlayer.destroy();
@@ -72,12 +68,18 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.socket.on("move", function (message) {
-      console.log(message)
-      self.otherPlayers[message.playerId]?.setTilePos(new Phaser.Math.Vector2(message.x, message.y));
-      console.log(self.otherPlayers)
+      console.log(message);
+      self.otherPlayers[message.playerId]?.setTilePos(
+        new Phaser.Math.Vector2(message.x, message.y)
+      );
+      console.log(self.otherPlayers);
     });
 
-    this.gridPhysics = new GridPhysics(this.player, cloudCityTilemap, this.socket);
+    this.gridPhysics = new GridPhysics(
+      this.player,
+      cloudCityTilemap,
+      this.socket
+    );
     this.gridControls = new GridControls(this.input, this.gridPhysics);
 
     // this.createPlayerAnimation(Direction.UP, 90, 92);
@@ -87,7 +89,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   public update(_time: number, delta: number) {
-      this.gridControls.update(_time);
+    this.gridControls.update(_time);
     // this.gridPhysics.update(delta);
   }
 
@@ -111,11 +113,16 @@ export class GameScene extends Phaser.Scene {
 
     this.player = new Player(
       playerSprite,
-      new Phaser.Math.Vector2(playerInfo.x, playerInfo.y), self
-     
+      new Phaser.Math.Vector2(playerInfo.x, playerInfo.y),
+      self
     );
+    this.player.setPlayerName("YOU");
 
-    this.gridPhysics = new GridPhysics(this.player, cloudCityTilemap, this.socket);
+    this.gridPhysics = new GridPhysics(
+      this.player,
+      cloudCityTilemap,
+      this.socket
+    );
     this.gridControls = new GridControls(this.input, this.gridPhysics);
   }
 
@@ -124,12 +131,11 @@ export class GameScene extends Phaser.Scene {
     enemySprite.setDepth(2);
     enemySprite.scale = 3;
 
-    this.otherPlayers[playerInfo.playerId] =
-      new Player(
-        enemySprite,
-        new Phaser.Math.Vector2(playerInfo.x, playerInfo.y), self
-      )
-    
+    this.otherPlayers[playerInfo.playerId] = new Player(
+      enemySprite,
+      new Phaser.Math.Vector2(playerInfo.x, playerInfo.y),
+      self
+    );
   }
 }
 
@@ -147,7 +153,6 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   },
   parent: "game",
   backgroundColor: "#48C4F8",
-  
 };
 
 export const game = new Phaser.Game(gameConfig);

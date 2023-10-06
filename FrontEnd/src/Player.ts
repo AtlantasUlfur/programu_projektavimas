@@ -2,6 +2,9 @@ import { Direction } from "./Direction";
 import { GameScene } from "./main";
 
 export class Player {
+ 
+  private playerName: Phaser.GameObjects.Text;
+
   constructor(
     private sprite: Phaser.GameObjects.Sprite,
     private tilePos: Phaser.Math.Vector2,
@@ -56,6 +59,29 @@ export class Player {
       tilePos.y * GameScene.TILE_SIZE + offsetY
     );
     this.sprite.setFrame(55);
+
+    this.playerName = this.sprite.scene.add.text(0, 0, 'ENEMY', {
+      fontFamily: 'Arial',
+      fontSize: 16,
+      fontStyle: 'bold',
+      color: '#FF0000',
+    });
+    this.playerName.setDepth(10);
+    this.playerName.setOrigin(0.5, 1);
+    this.playerName.setPosition(
+      tilePos.x * GameScene.TILE_SIZE + offsetX,
+      tilePos.y * GameScene.TILE_SIZE - offsetY
+    );
+  }
+
+  setPlayerName(name: string) {
+    this.playerName.setText(name);
+    this.playerName.setStyle({
+      fontFamily: 'Arial',
+      fontSize: 16,
+      fontStyle: 'bold',
+      color: '#008000',
+    })
   }
   
   getPosition(): Phaser.Math.Vector2 {
@@ -64,10 +90,16 @@ export class Player {
 
   setPosition(position: Phaser.Math.Vector2): void {
     this.sprite.setPosition(position.x, position.y);
+    this.playerName.setPosition(position.x, position.y - 96);
   }
 
   getTilePos(): Phaser.Math.Vector2 {
     return this.tilePos.clone();
+  }
+
+  setPlayerVisible(isVisible: boolean) {
+    this.sprite.setVisible(isVisible);
+    this.playerName.setVisible(isVisible);
   }
 
   setTilePos(tilePosition: Phaser.Math.Vector2): void {
