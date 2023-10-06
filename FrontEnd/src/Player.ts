@@ -4,16 +4,19 @@ import { HealthBar } from "./HealthBar";
 import { HealthEnum } from "./HealthBar";
 
 export class Player {
+  public Id;
   private playerName: Phaser.GameObjects.Text;
   public health : HealthBar
 
   constructor(
+    private id,
     private sprite: Phaser.GameObjects.Sprite,
     private tilePos: Phaser.Math.Vector2,
     private scene: GameScene
   ) {
     const offsetX = GameScene.TILE_SIZE / 2;
     const offsetY = GameScene.TILE_SIZE;
+    this.Id = id;
     this.sprite.setInteractive();
     const self = this;
     this.health = new HealthBar(scene,  tilePos.x * GameScene.TILE_SIZE - 11, tilePos.y * GameScene.TILE_SIZE - 100)

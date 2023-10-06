@@ -93,6 +93,10 @@ export class GameScene extends Phaser.Scene {
   public update(_time: number, delta: number) {
     if(this.gridControls.update(_time))
     {
+      console.log("Other")
+      console.log(this.otherPlayers)
+      console.log("Current")
+      console.log(this.player)
       this.player.health.drawByPos(this.player.getTilePos().x * GameScene.TILE_SIZE - 11, this.player.getTilePos().y * GameScene.TILE_SIZE - 100);
     }
     // this.gridPhysics.update(delta);
@@ -154,6 +158,7 @@ export class GameScene extends Phaser.Scene {
     console.log(playerInfo);
 
     this.player = new Player(
+      playerInfo.playerId,
       playerSprite,
       new Phaser.Math.Vector2(playerInfo.x, playerInfo.y),
       self
@@ -174,6 +179,7 @@ export class GameScene extends Phaser.Scene {
     enemySprite.scale = 3;
 
     this.otherPlayers[playerInfo.playerId] = new Player(
+      playerInfo.playerId,
       enemySprite,
       new Phaser.Math.Vector2(playerInfo.x, playerInfo.y),
       self
