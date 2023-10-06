@@ -98,9 +98,9 @@ export class Player {
     return this.tilePos.clone();
   }
 
-  setPlayerVisible(isVisible: boolean) {
-    this.sprite.setVisible(isVisible);
-    this.playerName.setVisible(isVisible);
+  setPlayerVisible(value: number) {
+    this.sprite.setAlpha(value);
+    this.playerName.setAlpha(value);
   }
 
   setTilePos(tilePosition: Phaser.Math.Vector2): void {

@@ -17,8 +17,12 @@ export class GridPhysics {
   };
   private tileSizePixelsWalked: number = 0;
   private lastUpdate = 0;
-  private lastMovementIntent = Direction.NONE
-  constructor(private player: Player, private tileMap: Phaser.Tilemaps.Tilemap, private socket) {}
+  private lastMovementIntent = Direction.NONE;
+  constructor(
+    private player: Player,
+    private tileMap: Phaser.Tilemaps.Tilemap,
+    private socket
+  ) {}
 
   private isBlockingDirection(direction: Direction): boolean {
     return this.hasBlockingTile(this.tilePosInDirection(direction));
@@ -46,15 +50,12 @@ export class GridPhysics {
 
   movePlayer(direction: Direction, time): void {
     if (this.isBlockingDirection(direction) || time - this.lastUpdate < 200) {
-
     } else {
-      this.lastUpdate = time
-        this.player.setTilePos(
-          this.player
-            .getTilePos()
-            .add(this.movementDirectionVectors[direction])
-        );
-        this.socket.emit('move', this.player.getTilePos());
+      this.lastUpdate = time;
+      this.player.setTilePos(
+        this.player.getTilePos().add(this.movementDirectionVectors[direction])
+      );
+      this.socket.emit("move", this.player.getTilePos());
     }
   }
 
@@ -96,9 +97,8 @@ export class GridPhysics {
   }
 
   private movePlayerSprite(pixelsToMove: number) {
-    const directionVec = this.movementDirectionVectors[
-      this.movementDirection
-    ].clone();
+    const directionVec =
+      this.movementDirectionVectors[this.movementDirection].clone();
     const movementDistance = directionVec.multiply(new Vector2(pixelsToMove));
     const newPlayerPos = this.player.getPosition().add(movementDistance);
     this.player.setPosition(newPlayerPos);
@@ -110,7 +110,6 @@ export class GridPhysics {
     this.player.stopAnimation(this.movementDirection);
     this.movementDirection = Direction.NONE;
   }
-  
 
   private getPixelsToWalkThisUpdate(delta: number): number {
     const deltaInSeconds = delta / 1000;
@@ -131,6 +130,6 @@ export class GridPhysics {
         .getTilePos()
         .add(this.movementDirectionVectors[this.movementDirection])
     );
-    this.socket.emit('move', this.player.getTilePos());
+    this.socket.emit("move", this.player.getTilePos());
   }
 }

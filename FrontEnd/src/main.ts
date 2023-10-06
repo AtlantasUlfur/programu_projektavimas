@@ -19,6 +19,7 @@ export class GameScene extends Phaser.Scene {
   private gridControls: GridControls;
   private gridPhysics: GridPhysics;
   private socket;
+  private tileMap: Phaser.Tilemaps.Tilemap;
 
   private otherPlayers = [];
   private player: Player;
@@ -31,11 +32,11 @@ export class GameScene extends Phaser.Scene {
   public create() {
     const self = this;
 
-    const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-    cloudCityTilemap.addTilesetImage("Cloud City", "tiles");
+    self.tileMap = this.make.tilemap({ key: "cloud-city-map" });
+    self.tileMap.addTilesetImage("Cloud City", "tiles");
 
-    for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-      const layer = cloudCityTilemap.createLayer(i, "Cloud City", 0, 0);
+    for (let i = 0; i < self.tileMap.layers.length; i++) {
+      const layer = self.tileMap.createLayer(i, "Cloud City", 0, 0);
       layer.setDepth(i);
       layer.scale = 3;
     }
@@ -48,7 +49,7 @@ export class GameScene extends Phaser.Scene {
       Object.keys(players).forEach(function (id) {
         if (id == socketId) {
           console.log("3");
-          self.addPlayer(self, players[id], cloudCityTilemap);
+          self.addPlayer(self, players[id], self.tileMap);
         } else {
           console.log("4");
           self.addOtherPlayers(self, players[id]);
@@ -75,11 +76,7 @@ export class GameScene extends Phaser.Scene {
       console.log(self.otherPlayers);
     });
 
-    this.gridPhysics = new GridPhysics(
-      this.player,
-      cloudCityTilemap,
-      this.socket
-    );
+    this.gridPhysics = new GridPhysics(this.player, this.tileMap, this.socket);
     this.gridControls = new GridControls(this.input, this.gridPhysics);
 
     // this.createPlayerAnimation(Direction.UP, 90, 92);
@@ -90,7 +87,8 @@ export class GameScene extends Phaser.Scene {
 
   public update(_time: number, delta: number) {
     this.gridControls.update(_time);
-    // this.gridPhysics.update(delta);
+    this.updateGrid();
+    //this.gridPhysics.update(delta);
   }
 
   public preload() {
@@ -100,6 +98,42 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 26,
       frameHeight: 36,
     });
+  }
+
+  updateGrid() {
+    const self = this;
+    if (this.player) {
+      const self = this;
+      var pos_x = this.player.getPosition().x;
+      var pos_y = this.player.getPosition().y;
+      var origin = self.tileMap.getTileAtWorldXY(pos_x, pos_y, true);
+      //console.log(origin)
+      self.tileMap.forEachTile((tile) => {
+        const dist_full = Phaser.Math.Distance.Snake(
+          origin.x,
+          origin.y,
+          tile.x,
+          tile.y
+        );
+        tile.setAlpha(1 - 0.16 * dist_full);
+      });
+      Object.keys(this.otherPlayers).forEach(function (otherPlayer) {
+        var other_x = self.otherPlayers[otherPlayer].getPosition().x;
+        var other_y = self.otherPlayers[otherPlayer].getPosition().y;
+        var origin_other = self.tileMap.getTileAtWorldXY(
+          other_x,
+          other_y,
+          true
+        );
+        const dist_other = Phaser.Math.Distance.Snake(
+          origin.x,
+          origin.y,
+          origin_other.x,
+          origin_other.y
+        );
+        self.otherPlayers[otherPlayer].setPlayerVisible(1 - 0.13 * dist_other);
+      });
+    }
   }
 
   addPlayer(self, playerInfo, cloudCityTilemap) {
