@@ -44,6 +44,7 @@ io.on("connection", function (socket) {
     x: x,
     y: y,
     playerId: socket.id,
+    health: 100,
   };
 
   console.log(players);
@@ -65,6 +66,14 @@ io.on("connection", function (socket) {
     delete players[socket.id];
     // emit a message to all players to remove this player
     io.emit("disconnectPlayer", socket.id);
+  });
+  socket.on("healthChange", function (message) {
+    console.log("healthChange")
+    console.log(message)
+    //console.log(`user ${message.targetId} health from ${players[message.targetId].health} to ${message.healthUpdate}`);
+    players[message.targetId].health = message.healthUpdate;
+    // emit a message to all players to remove this player
+    socket.broadcast.emit("updateHealth", {players});
   });
 });
 server.listen(8081, function () {
