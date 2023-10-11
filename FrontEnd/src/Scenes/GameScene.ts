@@ -1,10 +1,9 @@
 import * as Phaser from "phaser";
-import { HealthEnum } from "../HealthBar";
 import { Player } from "../Player";
 import { GridControls } from "../GridControls";
 import { GridPhysics } from "../GridPhysics";
-import { Direction } from "../Direction";
 import { Connection } from "../Connection";
+import { Socket } from 'socket.io-client';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
     active: false,
@@ -15,10 +14,9 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 export class GameScene extends Phaser.Scene {
     private gridControls: GridControls;
     private gridPhysics: GridPhysics;
-    private socketInstance;
-    private socket;
+    private socketInstance: Connection | null;
+    private socket: Socket | null;
     private tileMap: Phaser.Tilemaps.Tilemap;
-  
     private otherPlayers = [];
     private player: Player;
     constructor() {
@@ -60,9 +58,11 @@ export class GameScene extends Phaser.Scene {
           }
         });
       });
+
       this.socket.on("newPlayer", function (playerInfo) {
         self.addOtherPlayers(self, playerInfo);
       });
+
       this.socket.on("disconnect", function (playerId) {
         console.log("disc");
         self.otherPlayers.forEach(function (otherPlayer) {
