@@ -34,16 +34,17 @@ export class StartMenuScene extends Phaser.Scene {
         const self = this;
         self.load.image("cloud_backround", "../../assets/cloud_backround.png")
         self.load.image("play_button", "../../assets/play_button.png")
-    }
-    public create() {
-        let self = this;
-        this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, "cloud_backround").setDepth(0)
         this.text = this.add.text(
             CANVAS_WIDTH/2 - 120,
             20,
             `Players in Queue: ${this.playersInQueue} / 4`,
             { color: "black"}
         );
+    }
+    public create() {
+        let self = this;
+        this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, "cloud_backround").setDepth(0)
+        
         
         this.start_game_text = this.add.text(
             CANVAS_WIDTH/2 - 120,
@@ -159,17 +160,15 @@ export class StartMenuScene extends Phaser.Scene {
        
     }
 
-    private addPlayerToQueue(id: string){
+    public addPlayerToQueue(id: string){
         this.playersInQueue += 1;
-        // tekstas dubliuojasi galit pabandyti pataisyti
-        this.text.text = `Players in Queue: ${this.playersInQueue} / 4`,
-        this.otherPlayerIds.push(id)
+        this.text.setText(`Players in Queue: ${this.playersInQueue} / 4`);
+        this.otherPlayerIds.push(id);
     }
     
-    private removePlayerFromQueue(id: string){
+    public removePlayerFromQueue(id: string){
         this.playersInQueue -= 1;
-        // tekstas dubliuojasi galit pabandyti pataisyti
-        this.text.text = `Players in Queue: ${this.playersInQueue} / 4`,
+        this.text.setText(`Players in Queue: ${this.playersInQueue} / 4`);
         this.otherPlayerIds = this.otherPlayerIds.filter(_id => _id != id)
     }
 }
