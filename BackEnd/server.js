@@ -93,6 +93,11 @@ io.on("connection", function (socket) {
     players[socket.id].y = message.y;
     io.emit("move", {...message, playerId: socket.id});
   });
+  socket.on("getPlayerPos", (message, callback) => {
+    var playerPos = {x: players[message['playerId']].x, y:players[message['playerId']].y}
+    console.log(`Get Player ${message['playerId']} Position X:${playerPos.x} Y:${playerPos.y}`);
+    callback({playerPos})
+  });
   // when a player disconnects, remove them from our players object
   socket.on("disconnect", function () {
     console.log("user disconnected");

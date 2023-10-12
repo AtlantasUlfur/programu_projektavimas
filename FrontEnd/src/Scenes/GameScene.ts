@@ -16,7 +16,7 @@ export class GameScene extends Phaser.Scene {
     private gridPhysics: GridPhysics;
     private socketInstance: Connection | null;
     private socket: Socket | null;
-    private tileMap: Phaser.Tilemaps.Tilemap;
+    public tileMap: Phaser.Tilemaps.Tilemap;
     private otherPlayers = [];
     private player: Player;
     constructor() {
@@ -26,26 +26,42 @@ export class GameScene extends Phaser.Scene {
     static readonly TILE_SIZE = 48;
     
     public init(data){
-        console.log(data)
-    }
-    public create() {
       const self = this;
-  
-      self.tileMap = this.make.tilemap({ key: "cloud-city-map" });
-      self.tileMap.addTilesetImage("Cloud City", "tiles");
-  
-      for (let i = 0; i < self.tileMap.layers.length; i++) {
-        const layer = self.tileMap.createLayer(i, "Cloud City", 0, 0);
+      this.socketInstance = Connection.getInstance();
+      this.socketInstance.connect("http://localhost:8081")
+
+      this.tileMap = this.make.tilemap({ key: "cloud-city-map" });
+      this.tileMap.addTilesetImage("Cloud City", "tiles");
+
+      for (let i = 0; i < this.tileMap.layers.length; i++) {
+        const layer = this.tileMap.createLayer(i, "Cloud City", 0, 0);
         layer.setDepth(i);
         layer.scale = 3;
       }
-      console.log("0");
-  
-      this.socketInstance = Connection.getInstance();
-      this.socketInstance.connect("http://localhost:8081")
   
       this.socket = this.socketInstance.getSocket();
-  
+        console.log(data)
+        //Initialise players
+        var playerId = data['player_id'];
+        this.socket.emit("getPlayerPos", {playerId}, (response) =>{
+          var x = response['playerPos'].x
+          var y = response['playerPos'].y
+          this.addPlayer(self, {playerId, x, y}, self.tileMap);
+          this.gridPhysics = new GridPhysics(this.player, this.tileMap, this.socket);
+          this.gridControls = new GridControls(this.input, this.gridPhysics);
+        });
+
+        for(let i = 0; i < data['player_ids'].length; i++){
+          playerId = data['player_ids'][i];
+          this.socket.emit("getPlayerPos", {playerId}, (response) =>{
+            var x = response['playerPos'].x
+            var y = response['playerPos'].y
+            this.addOtherPlayers(self, {playerId, x, y});
+          });
+        }
+    }
+    public create() {
+      const self = this;
       this.socket.on("currentPlayers", function (players) {
         const socketId = this.id;
         Object.keys(players).forEach(function (id) {
@@ -93,8 +109,7 @@ export class GameScene extends Phaser.Scene {
         });
       });
   
-      this.gridPhysics = new GridPhysics(this.player, this.tileMap, this.socket);
-      this.gridControls = new GridControls(this.input, this.gridPhysics);
+    
   
       // this.createPlayerAnimation(Direction.UP, 90, 92);
       // this.createPlayerAnimation(Direction.RIGHT, 78, 80);
