@@ -93,8 +93,15 @@ io.on("connection", function (socket) {
     players[socket.id].y = message.y;
     io.emit("move", {...message, playerId: socket.id});
   });
+  socket.on("startOtherPlayers", function (message) {
+
+    socket.broadcast.emit("startOthers");
+  });
   socket.on("getPlayerPos", (message, callback) => {
-    var playerPos = {x: players[message['playerId']].x, y:players[message['playerId']].y}
+    console.log(players);
+    var id = message['playerId'];
+    console.log(id);
+    var playerPos = {x: players[id].x, y:players[id].y}
     console.log(`Get Player ${message['playerId']} Position X:${playerPos.x} Y:${playerPos.y}`);
     callback({playerPos})
   });

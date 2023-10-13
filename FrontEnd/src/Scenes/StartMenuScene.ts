@@ -91,6 +91,7 @@ export class StartMenuScene extends Phaser.Scene {
         playButton.on("pointerdown", () => {
             if(self.playersInQueue > 1 && self.session_host){
                 this.scene.start("Game", {"player_id": self.socket.id, "player_ids" : self.otherPlayerIds})
+                this.socket.emit("startOtherPlayers");
             }
         });
         
@@ -112,6 +113,10 @@ export class StartMenuScene extends Phaser.Scene {
                 self.wait_for_players_text.setVisible(true);
               }
         })
+
+        this.socket.on("startOthers", function (){
+            self.scene.start("Game", {"player_id": self.socket.id, "player_ids" : self.otherPlayerIds})
+        });
 
         this.socket.on("currentPlayers", function (players) {
           const socketId = this.id;

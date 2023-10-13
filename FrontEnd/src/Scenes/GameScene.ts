@@ -47,40 +47,40 @@ export class GameScene extends Phaser.Scene {
       }
   
       this.socket = this.socketInstance.getSocket();
-        console.log(this.initData)
-        //Initialise players
-        var playerId = this.initData['player_id'];
-        this.socket.emit("getPlayerPos", {playerId}, (response) =>{
-          var x = response['playerPos'].x
-          var y = response['playerPos'].y
-          this.addPlayer(self, {playerId, x, y}, self.tileMap);
-          
-        });
+      console.log(this.initData)
+      //Initialise players
+      var playerId = this.initData['player_id'];
+      this.socket.emit("getPlayerPos", {playerId}, (response) =>{
+        var x = response['playerPos'].x
+        var y = response['playerPos'].y
+        this.addPlayer(self, {playerId, x, y}, self.tileMap);
+      });
 
-        for(let i = 0; i < this.initData['player_ids'].length; i++){
-          playerId = this.initData['player_ids'][i];
-          this.socket.emit("getPlayerPos", {playerId}, (response) =>{
-            var x = response['playerPos'].x
+      for(let i = 0; i < this.initData['player_ids'].length; i++){
+        var otherPlayerId = self.initData['player_ids'][i];
+        this.socket.emit("getPlayerPos", {playerId: otherPlayerId}, (response) =>{
+        debugger;
+        var x = response['playerPos'].x
             var y = response['playerPos'].y
-            this.addOtherPlayers(self, {playerId, x, y});
+            this.addOtherPlayers(self, {otherPlayerId, x, y});
           });
-        }
-      this.socket.on("currentPlayers", function (players) {
-        const socketId = this.id;
-        Object.keys(players).forEach(function (id) {
-          if (id == socketId) {
-            console.log("3");
-            self.addPlayer(self, players[id], self.tileMap);
-          } else {
-            console.log("4");
-            self.addOtherPlayers(self, players[id]);
-          }
-        });
-      });
+      }
+      // this.socket.on("currentPlayers", function (players) {
+      //   const socketId = this.id;
+      //   Object.keys(players).forEach(function (id) {
+      //     if (id == socketId) {
+      //       console.log("3");
+      //       self.addPlayer(self, players[id], self.tileMap);
+      //     } else {
+      //       console.log("4");
+      //       self.addOtherPlayers(self, players[id]);
+      //     }
+      //   });
+      // });
 
-      this.socket.on("newPlayer", function (playerInfo) {
-        self.addOtherPlayers(self, playerInfo);
-      });
+      // this.socket.on("newPlayer", function (playerInfo) {
+      //   self.addOtherPlayers(self, playerInfo);
+      // });
 
       this.socket.on("disconnect", function (playerId) {
         console.log("disc");
@@ -103,6 +103,7 @@ export class GameScene extends Phaser.Scene {
       this.socket.on("updateHealth", function (message) {
         console.log(message);
         Object.keys(message.players).forEach(function (player) {
+          debugger;
         if(self.player.Id == player){
             self.player.health.setHealth(message.players[player].health);
           }
@@ -169,6 +170,7 @@ export class GameScene extends Phaser.Scene {
     }
   
     changePlayerHealth(self, playerId, value){
+      debugger;
       if(self.player.Id == playerId){
         self.player.health.setHealth(value);
       }
@@ -214,7 +216,8 @@ export class GameScene extends Phaser.Scene {
                 element.children[i].addEventListener("input", () => {});
               } else {
                 let element_next = document.getElementById("input-box2");
-                element_next.style.display = "none";
+                  debugger;
+                  element_next.style.display = "none";
                 element.children[i].addEventListener("click", () => {
                   if(element.children[i].textContent == "Action #1")
                     self.changePlayerHealth(self, self.player.Id, self.player.health.increase(10))
@@ -234,6 +237,7 @@ export class GameScene extends Phaser.Scene {
     }
   
     addOtherPlayers(self, playerInfo) {
+      debugger;
       const enemySprite = self.add.sprite(1, 1, "player");
       enemySprite.setDepth(2);
       enemySprite.scale = 3;
@@ -259,6 +263,7 @@ export class GameScene extends Phaser.Scene {
                 } else {
                   let element_next = document.getElementById("input-box2");
                   element_next.style.display = "none";
+                  debugger;
                   element.children[i].addEventListener("click", () => {
                     if(element.children[i].textContent == "Attack #1")
                       self.changePlayerHealth(self, playerInfo.playerId, self.otherPlayers[playerInfo.playerId].health.decrease(10))
