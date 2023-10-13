@@ -16,52 +16,55 @@ export class GameScene extends Phaser.Scene {
     private gridPhysics: GridPhysics;
     private socketInstance: Connection | null;
     private socket: Socket | null;
-    public tileMap: Phaser.Tilemaps.Tilemap;
+    private tileMap: Phaser.Tilemaps.Tilemap;
     private otherPlayers = [];
     private player: Player;
+    public initData;
     constructor() {
       super(sceneConfig);
     }
   
     static readonly TILE_SIZE = 48;
-    
     public init(data){
+      this.initData = data;
+  
+      // this.createPlayerAnimation(Direction.UP, 90, 92);
+      // this.createPlayerAnimation(Direction.RIGHT, 78, 80);
+      // this.createPlayerAnimation(Direction.DOWN, 54, 56);
+      // this.createPlayerAnimation(Direction.LEFT, 66, 68);
+    }
+    public create() {
       const self = this;
       this.socketInstance = Connection.getInstance();
       this.socketInstance.connect("http://localhost:8081")
 
       this.tileMap = this.make.tilemap({ key: "cloud-city-map" });
       this.tileMap.addTilesetImage("Cloud City", "tiles");
-
       for (let i = 0; i < this.tileMap.layers.length; i++) {
-        const layer = this.tileMap.createLayer(i, "Cloud City", 0, 0);
+        const layer = self.tileMap.createLayer(i, "Cloud City", 0, 0);
         layer.setDepth(i);
         layer.scale = 3;
       }
   
       this.socket = this.socketInstance.getSocket();
-        console.log(data)
+        console.log(this.initData)
         //Initialise players
-        var playerId = data['player_id'];
+        var playerId = this.initData['player_id'];
         this.socket.emit("getPlayerPos", {playerId}, (response) =>{
           var x = response['playerPos'].x
           var y = response['playerPos'].y
           this.addPlayer(self, {playerId, x, y}, self.tileMap);
-          this.gridPhysics = new GridPhysics(this.player, this.tileMap, this.socket);
-          this.gridControls = new GridControls(this.input, this.gridPhysics);
+          
         });
 
-        for(let i = 0; i < data['player_ids'].length; i++){
-          playerId = data['player_ids'][i];
+        for(let i = 0; i < this.initData['player_ids'].length; i++){
+          playerId = this.initData['player_ids'][i];
           this.socket.emit("getPlayerPos", {playerId}, (response) =>{
             var x = response['playerPos'].x
             var y = response['playerPos'].y
             this.addOtherPlayers(self, {playerId, x, y});
           });
         }
-    }
-    public create() {
-      const self = this;
       this.socket.on("currentPlayers", function (players) {
         const socketId = this.id;
         Object.keys(players).forEach(function (id) {
@@ -108,13 +111,8 @@ export class GameScene extends Phaser.Scene {
           }
         });
       });
-  
-    
-  
-      // this.createPlayerAnimation(Direction.UP, 90, 92);
-      // this.createPlayerAnimation(Direction.RIGHT, 78, 80);
-      // this.createPlayerAnimation(Direction.DOWN, 54, 56);
-      // this.createPlayerAnimation(Direction.LEFT, 66, 68);
+      this.gridPhysics = new GridPhysics(this.player, this.tileMap, this.socket);
+      this.gridControls = new GridControls(this.input, this.gridPhysics);
     }
   
     public update(_time: number, delta: number) {
@@ -126,9 +124,9 @@ export class GameScene extends Phaser.Scene {
     }
   
     public preload() {
-      this.load.image("tiles", "assets/cloud_tileset.png");
-      this.load.tilemapTiledJSON("cloud-city-map", "assets/cloud_city.json");
-      this.load.spritesheet("player", "assets/characters.png", {
+      this.load.image("tiles", "../../assets/cloud_tileset.png");
+      this.load.tilemapTiledJSON("cloud-city-map", "../../assets/cloud_city.json");
+      this.load.spritesheet("player", "../../assets/characters.png", {
         frameWidth: 26,
         frameHeight: 36,
       });
