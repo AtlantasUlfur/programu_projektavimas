@@ -59,10 +59,11 @@ export class GameScene extends Phaser.Scene {
       for(let i = 0; i < this.initData['player_ids'].length; i++){
         var otherPlayerId = self.initData['player_ids'][i];
         this.socket.emit("getPlayerPos", {playerId: otherPlayerId}, (response) =>{
-        debugger;
+        console.log("BBBB")
+        console.log(response)
         var x = response['playerPos'].x
             var y = response['playerPos'].y
-            this.addOtherPlayers(self, {otherPlayerId, x, y});
+            this.addOtherPlayers(self, {playerId: otherPlayerId, x, y});
           });
       }
       // this.socket.on("currentPlayers", function (players) {
@@ -242,15 +243,15 @@ export class GameScene extends Phaser.Scene {
       enemySprite.setDepth(2);
       enemySprite.scale = 3;
   
-      this.otherPlayers[playerInfo.playerId] = new Player(
+      self.otherPlayers[playerInfo.playerId] = new Player(
         playerInfo.playerId,
         enemySprite,
         new Phaser.Math.Vector2(playerInfo.x, playerInfo.y),
         self
       );
-  
+      
       var eventInit = false;
-      this.otherPlayers[playerInfo.playerId]
+      self.otherPlayers[playerInfo.playerId]
         .sprite.on("pointerdown", function (pointer) {
           let element = document.getElementById("input-box2");
           if (element && element.style.display === "none") {
@@ -277,7 +278,7 @@ export class GameScene extends Phaser.Scene {
             }
           }
       });
-      this.otherPlayers[playerInfo.playerId]
+      self.otherPlayers[playerInfo.playerId]
         .sprite.on("pointerup", function (pointer) {
           this.clearTint();
         });
