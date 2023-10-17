@@ -20,46 +20,6 @@ app.use(
   })
 );
 
-type Entity = {
-  id: String;
-  x?: Number;
-  y?: Number;
-};
-
-type Obstacle = Entity & {
-  isBlocking: Boolean;
-  isDestructable: Boolean;
-};
-
-type Player = Entity & {
-  socketId: string;
-  sessionId: string;
-  name?: string;
-  currentHP?: Number;
-  currentAttack?: Number;
-  currentMoveCount?: Number;
-  leftMoveCount?: Number;
-  isAlive?: Boolean;
-  isTurn?: Boolean;
-  isWinner?: Boolean;
-};
-
-type Tile = {
-  entity?: Entity;
-  x: Number;
-  y: Number;
-};
-
-type GameMap = {
-  sessionId: string;
-  tileMap: Tile[];
-};
-
-type Session = {
-  name: string;
-  id: string;
-};
-
 const getDefaultTileMap: () => Tile[] = () => {
   const tileMap: Tile[] = [];
 
@@ -97,12 +57,42 @@ io.on("connection", function (socket: Socket) {
     sessions.push({ id: sessionId, name: payload.name });
 
     players.push({ id: "player", socketId: socket.id, sessionId });
+
+    socket.emit("playerCount", 1);
   });
 
   socket.on("joinLobby", function (payload) {
     console.log("Join lobby");
 
-    players.push({ id: "player", socketId: socket.id, sessionId: payload.sessionId });
+    const sessionId = payload.sessionId;
+
+    players.push({
+      id: "player",
+      socketId: socket.id,
+      sessionId,
+    });
+
+    //NOTE(HB) collect players in updated session
+    const sessionPlayers: Player[] = [];
+
+    //NOTE(HB) find player count in current session
+    const playerCount = _.reduce(
+      players,
+      function (count: number, player: Player) {
+        if (player.sessionId === sessionId) {
+          sessionPlayers.push(player);
+          count++;
+        }
+        return count;
+      },
+      0
+    );
+
+    //NOTE(HB) emit player count to all connected players
+    _.forEach(sessionPlayers, function (player: Player) {
+      const playerSocket = sockets[player.socketId];
+      playerSocket.emit("playerCount", playerCount);
+    });
   });
 
   socket.on("getLobbies", function () {
@@ -111,7 +101,75 @@ io.on("connection", function (socket: Socket) {
     socket.emit("lobbiesList", sessions);
   });
 
-  
+  socket.on("startGame", function (payload) {
+    console.log("Start game");
+
+    const sessionId = payload.sessionId;
+
+    const sessionPlayers: Player[] = [];
+
+    const playerCount = _.reduce(
+      players,
+      function (count: number, player: Player) {
+        if (player.sessionId === sessionId) {
+          sessionPlayers.push(player);
+          count++;
+        }
+        return count;
+      },
+      0
+    );
+
+    const tileMap = getDefaultTileMap();
+
+    const playerTiles: Tile[] = [];
+
+    switch (playerCount) {
+      case 4:
+        playerTiles.push({
+          x: 17,
+          y: 17,
+          entity: { id: "player", x: 17, y: 17 },
+        });
+      case 3:
+        playerTiles.push({
+          x: 17,
+          y: 2,
+          entity: { id: "player", x: 17, y: 2 },
+        });
+      default:
+        playerTiles.push({
+          x: 2,
+          y: 2,
+          entity: { id: "player", x: 2, y: 2 },
+        });
+        playerTiles.push({
+          x: 2,
+          y: 17,
+          entity: { id: "player", x: 2, y: 17 },
+        });
+        break;
+    }
+
+    _.forEach(playerTiles, function (playerTile: Tile) {
+      const tileIndex = _.findIndex(
+        tileMap,
+        (tile: Tile) => tile.x === playerTile.x && tile.y === playerTile.y
+      );
+      tileMap[tileIndex] = playerTile;
+    });
+
+    const map = { sessionId, tileMap };
+
+    maps.push(map);
+
+    _.forEach(players, function (player: Player) {
+      if (player.sessionId === sessionId) {
+        const playerSocket = sockets[player.socketId];
+        playerSocket.emit("gameStart", map);
+      }
+    });
+  });
 });
 
 server.listen(8081, function () {
