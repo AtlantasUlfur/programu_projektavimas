@@ -1,12 +1,13 @@
 import * as Phaser from "phaser";
-import { Connection } from "../Connection";
+import SocketController from "../SocketController";
 import { Button } from "../Models/Button";
 
 export class MainMenuScene extends Phaser.Scene {
-    private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
-    private buttons: Button[] = []
-	private selectedButtonIndex = 0
-    private buttonSelector!: Phaser.GameObjects.Image
+    private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+    private buttons: Button[] = [];
+	private selectedButtonIndex = 0;
+    private buttonSelector!: Phaser.GameObjects.Image;
+    private socketInstance : SocketController;
 
     constructor()
     {
@@ -16,6 +17,10 @@ export class MainMenuScene extends Phaser.Scene {
     init()
 	{
 		this.cursors = this.input.keyboard.createCursorKeys()
+
+        // //Socket initialise
+        this.socketInstance = SocketController.getInstance();
+        this.socketInstance.connect("http://localhost:8081")
 	}
 
 	preload()
@@ -27,10 +32,13 @@ export class MainMenuScene extends Phaser.Scene {
     create()
     {
         const scene = this;
+
+        
+
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             createButtonImage.off('selected')
-            // ...
         })
+
         const { width, height } = this.scale
 
         //Title
@@ -136,7 +144,8 @@ export class MainMenuScene extends Phaser.Scene {
 
     buttonClick(scene : this, index : number){
 
-        var userName = prompt("Please enter your player name:", "Lebron");
+        var lobbyName = prompt("Please enter lobby name:", "Lebron's Room");
+
         //Hide Buttons
         scene.buttons.forEach( element => {
             element.Image.visible = false;
@@ -150,10 +159,13 @@ export class MainMenuScene extends Phaser.Scene {
             .setOrigin(0.5)
             scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, 'Waiting for players... 1/4')
             .setOrigin(0.5)
+
+            scene.socketInstance.createLobby(lobbyName);
         }
         else{
-            scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, 'Waiting for players... 1/4')
+            scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, 'Waiting for players... 2/4')
             .setOrigin(0.5)
+
         }
     }
 }

@@ -33,7 +33,8 @@ export default {
             'typeof EXPERIMENTAL': JSON.stringify(true),
             'typeof PLUGIN_CAMERA3D': JSON.stringify(false),
             'typeof PLUGIN_FBINSTANT': JSON.stringify(false),
-            'typeof FEATURE_SOUND': JSON.stringify(true)
+            'typeof FEATURE_SOUND': JSON.stringify(true),
+            "process.env.NODE_ENV": JSON.stringify("development")
         }),
 
         //  Parse our .ts source files
@@ -45,14 +46,18 @@ export default {
         commonjs({
             include: [
                 'node_modules/eventemitter3/**',
-                'node_modules/phaser/**'
+                'node_modules/phaser/**',
+                'node_modules/socket.io-client/**',
+                'node_modules/ws/**',
+                'node_modules/engine.io-client/**',
             ],
             exclude: [ 
                 'node_modules/phaser/src/polyfills/requestAnimationFrame.js',
                 'node_modules/phaser/src/phaser-esm.js'
             ],
             sourceMap: true,
-            ignoreGlobal: true
+            ignoreGlobal: true,
+            requireReturnsDefault: "auto"
         }),
 
         //  See https://github.com/rollup/plugins/tree/master/packages/typescript for config options

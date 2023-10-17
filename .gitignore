@@ -12,3 +12,5 @@ FrontEnd/node_modules/*
 # Build
 /npm-debug.log
 node_modules
+dist
+/BackEnd/dist
