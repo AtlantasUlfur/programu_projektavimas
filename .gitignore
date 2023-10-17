@@ -8,7 +8,7 @@ Thumbs.db
 
 # Vendors
 **/node_modules/*
-FrontEnd/node_modules/
+FrontEnd/node_modules/*
 # Build
 /npm-debug.log
 node_modules
