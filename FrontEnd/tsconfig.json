@@ -1,24 +1,9 @@
 {
     "compilerOptions": {
-      "target": "es5",
-      "module": "commonjs",
-      "sourceMap": true,
-      "strict": false,
-      "noImplicitAny": false,
-      "strictPropertyInitialization": false,
-      "esModuleInterop": true,
-      "types": [],
-      "skipLibCheck": true,
-      "typeRoots": [
-        "./node_modules/@types",
-      ]
+        "target": "es5",
+        "moduleResolution": "node"
     },
-    "include": ["src/*"],
-    "exclude": [
-        "node_modules",
-        "./node_modules",
-        "./node_modules/*",
-        "./node_modules/@types/node/index.d.ts",
-      ]
-  }
-  
+    "include": [
+        "./src/**/*"
+    ]
+}

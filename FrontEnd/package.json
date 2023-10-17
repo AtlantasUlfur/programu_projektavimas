@@ -1,28 +1,24 @@
 {
-  "name": "testproject",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "webpack",
-    "dev": "webpack-dev-server"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "socket.io-client": "^4.7.2",
-    "ts-loader": "^9.4.2",
-    "typescript": "^3.9.5",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.11.1"
-  },
-  "dependencies": {
-    "@types/socket.io": "^3.0.2",
-    "copy-webpack-plugin": "^6.0.3",
-    "lodash": "^4.17.21",
-    "phaser": "^3.52.0",
-    "socket.io": "^4.7.2",
-    "websocket": "^1.0.34"
-  }
+    "name": "Projektavimas",
+    "version": "1.2.0",
+    "description": "Projektavimas",
+    "main": "src/game.ts",
+    "scripts": {
+        "dev": "rollup --config rollup.config.dev.mjs",
+        "build": "rollup --config rollup.config.dist.mjs",
+        "watch": "rollup --watch --config rollup.config.dev.mjs"
+    },
+
+
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^24.0.1",
+        "@rollup/plugin-node-resolve": "^15.0.2",
+        "@rollup/plugin-replace": "^5.0.2",
+        "@rollup/plugin-terser": "^0.4.0",
+        "@rollup/plugin-typescript": "^11.1.0",
+        "phaser": "^3.60.0",
+        "rollup": "^3.20.2",
+        "rollup-plugin-serve": "^2.0.2",
+        "typescript": "^5.0.3"
+    }
 }
