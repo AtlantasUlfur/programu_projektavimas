@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import { Tile, Entity, Session, GameMap, Player } from "./models";
 const { uuid } = require("uuidv4");
 const express = require("express");
 const _ = require("lodash");
