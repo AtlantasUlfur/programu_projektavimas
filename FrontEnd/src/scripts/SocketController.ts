@@ -28,13 +28,12 @@ export default class  SocketController
             });
             this.socket.on("lobbyStatus", (payload) =>{
                 const mainMenuScene = this.scene as MainMenuScene
-                console.log(payload);
                 mainMenuScene.lobbyStatus = payload;
             });
             this.socket.on("gameStart", (payload) =>{
                 const mainMenuScene = this.scene as MainMenuScene
                 console.log(payload);
-                mainMenuScene.scene.start("MainScene", payload.tileMap)
+                mainMenuScene.scene.start("MainScene", payload)
             });
         }
     }
@@ -52,7 +51,6 @@ export default class  SocketController
     }
 
     public startGame(name : string | null){
-        console.log(name);
         this.socket?.emit("startGame", {name})
     }
 

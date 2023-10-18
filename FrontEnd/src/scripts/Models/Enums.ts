@@ -6,8 +6,13 @@ export enum LobbiesEnum {
 }
 
 export enum TileTypeEnum {
-    GROUND = 0,
+    GROUND = 373,
     WALL = 92,
     PLAYER = 100,
+}
+
+export enum SizeEnum {
+    TILE_SIZE = 16,
+    PLAYER_NAME_OFFSET = 15
 }
     

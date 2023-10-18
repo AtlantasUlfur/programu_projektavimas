@@ -161,7 +161,7 @@ export class MainMenuScene extends Phaser.Scene {
 
     buttonClick(scene : this, index : number){
 
-        var lobbyName = prompt("Please enter lobby name:", "Lebron's Room");
+        var lobbyName = prompt("Please enter lobby name:", "Lebron Lobby");
 
         //Hide Buttons
         scene.buttons.forEach( element => {
@@ -187,6 +187,10 @@ export class MainMenuScene extends Phaser.Scene {
                 .setOrigin(0.5)
 
             scene.buttons.push(new Button(startGameButtonImage, startGameButtonText))
+            this.selectButton(0);
+            scene.buttonSelector.visible = true;
+
+
             startGameButtonImage.on('selected', () => {
                 console.log("Start game pressed");
                 scene.socketInstance.startGame(lobbyName);
