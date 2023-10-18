@@ -106,8 +106,15 @@ io.on("connection", function (socket: Socket) {
 
   socket.on("startGame", function (payload) {
     console.log("Start game");
+    const name = payload.name;
 
-    const sessionId = payload.sessionId;
+    const session = _.find(sessions, (session: Session) => session.name === name);
+    if (!session) {
+        socket.emit("lobbyStatus", 3);
+        return;
+    }
+
+    const sessionId = session.sessionId;
 
     const sessionPlayers: Player[] = [];
 

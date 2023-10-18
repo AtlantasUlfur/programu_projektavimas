@@ -78,7 +78,13 @@ io.on("connection", function (socket) {
     });
     socket.on("startGame", function (payload) {
         console.log("Start game");
-        const sessionId = payload.sessionId;
+        const name = payload.name;
+        const session = _.find(sessions, (session) => session.name === name);
+        if (!session) {
+            socket.emit("lobbyStatus", 3);
+            return;
+        }
+        const sessionId = session.sessionId;
         const sessionPlayers = [];
         const playerCount = _.reduce(players, function (count, player) {
             if (player.sessionId === sessionId) {
