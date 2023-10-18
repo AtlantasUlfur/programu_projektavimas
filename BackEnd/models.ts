@@ -20,6 +20,7 @@ export type Player = Entity & {
   isAlive?: Boolean;
   isTurn?: Boolean;
   isWinner?: Boolean;
+  moveOrder?: number;
 };
 
 export type Tile = {

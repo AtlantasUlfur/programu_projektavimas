@@ -81,13 +81,15 @@ io.on("connection", function (socket) {
         const session = _.find(sessions, (session) => session.name === name);
         if (!session) {
             socket.emit("lobbyStatus", 3);
-            console.log("payload");
             return;
         }
         const sessionId = session.id;
         const sessionPlayers = [];
+        let moveOrder = 1;
         const playerCount = _.reduce(players, function (count, player) {
             if (player.sessionId === sessionId) {
+                player.moveOrder = moveOrder;
+                moveOrder = moveOrder + 1;
                 sessionPlayers.push(player);
                 count++;
             }
@@ -97,18 +99,26 @@ io.on("connection", function (socket) {
         const playerTiles = [];
         switch (playerCount) {
             case 4:
+                sessionPlayers[3].x = 17;
+                sessionPlayers[3].y = 17;
                 playerTiles.push({
                     x: 17,
                     y: 17,
                     entity: { id: "player", x: 17, y: 17 },
                 });
             case 3:
+                sessionPlayers[2].x = 17;
+                sessionPlayers[2].y = 2;
                 playerTiles.push({
                     x: 17,
                     y: 2,
                     entity: { id: "player", x: 17, y: 2 },
                 });
             default:
+                sessionPlayers[1].x = 2;
+                sessionPlayers[1].y = 2;
+                sessionPlayers[0].x = 2;
+                sessionPlayers[0].y = 17;
                 playerTiles.push({
                     x: 2,
                     y: 2,
@@ -129,7 +139,7 @@ io.on("connection", function (socket) {
         maps.push(map);
         _.forEach(sessionPlayers, function (player) {
             const playerSocket = sockets[player.socketId];
-            playerSocket.emit("gameStart", map);
+            playerSocket.emit("gameStart", map, player);
         });
     });
 });
