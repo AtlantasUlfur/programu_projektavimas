@@ -31,6 +31,11 @@ export default class  SocketController
                 console.log(payload);
                 mainMenuScene.lobbyStatus = payload;
             });
+            this.socket.on("gameStart", (payload) =>{
+                // const mainMenuScene = this.scene as MainScene
+                // console.log(payload);
+                // mainMenuScene.lobbyStatus = payload;
+            });
         }
     }
 
@@ -42,12 +47,12 @@ export default class  SocketController
         this.socket?.emit("createLobby", {name})
     }
 
-    public getLobbies(){
-        this.socket?.emit("getLobbies");
-    }
-
     public joinLobby(name : string | null){
         this.socket?.emit("joinLobby", {name})
+    }
+
+    public startGame(lobbyName){
+        this.socket?.emit("startGame", {lobbyName})
     }
 
 }

@@ -9,7 +9,7 @@ export class MainMenuScene extends Phaser.Scene {
 	private selectedButtonIndex = 0;
     private buttonSelector!: Phaser.GameObjects.Image;
     private socketInstance : SocketController;
-    public playerCount : number;
+    public playerCount : number = 0;
     private checkPlayerCount: boolean = false;
     private playerCountText : Phaser.GameObjects.Text;
     public lobbyStatus : LobbiesEnum = LobbiesEnum.MENU;
@@ -168,6 +168,7 @@ export class MainMenuScene extends Phaser.Scene {
             element.Image.visible = false;
             element.Text.visible = false;
         });
+        scene.buttons = [];
         scene.buttonSelector.visible = false;
         //Index = 0 -> Create Game; index = 1 -> Join Game
         
@@ -179,6 +180,18 @@ export class MainMenuScene extends Phaser.Scene {
             .setOrigin(0.5)
             scene.playerCountText = scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, `Waiting for players... ${scene.playerCount}/4`)
             .setOrigin(0.5)
+
+            var startGameButtonImage = this.add.image(scene.scale.width * 0.5, scene.scale.height * 0.7, 'glass-panel')
+            .setDisplaySize(150, 50)
+            var startGameButtonText = this.add.text(startGameButtonImage.x, startGameButtonImage.y, 'Start Game')
+                .setOrigin(0.5)
+
+            scene.buttons.push(new Button(startGameButtonImage, startGameButtonText))
+            startGameButtonImage.on('selected', () => {
+                console.log("Start game pressed");
+                scene.socketInstance.startGame(lobbyName);
+                this.scene.start()
+            })
         }
         else{
             
