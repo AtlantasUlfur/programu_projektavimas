@@ -189,7 +189,7 @@ io.on("connection", function (socket: Socket) {
 
     _.forEach(sessionPlayers, function (player: Player) {
       const playerSocket = sockets[player.socketId];
-      playerSocket.emit("gameStart", map, player, sessionPlayers);
+      playerSocket.emit("gameStart", {map, player, sessionPlayers});
     });
   });
 });
