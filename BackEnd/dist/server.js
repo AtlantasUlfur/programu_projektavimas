@@ -38,7 +38,6 @@ const players = [];
 const sockets = {};
 io.on("connection", function (socket) {
     sockets[socket.id] = socket;
-    console.log("User connected");
     socket.on("createLobby", function (payload) {
         console.log("New lobby");
         const sessionId = uuid();
@@ -82,9 +81,10 @@ io.on("connection", function (socket) {
         const session = _.find(sessions, (session) => session.name === name);
         if (!session) {
             socket.emit("lobbyStatus", 3);
+            console.log("payload");
             return;
         }
-        const sessionId = session.sessionId;
+        const sessionId = session.id;
         const sessionPlayers = [];
         const playerCount = _.reduce(players, function (count, player) {
             if (player.sessionId === sessionId) {
@@ -127,11 +127,9 @@ io.on("connection", function (socket) {
         });
         const map = { sessionId, tileMap };
         maps.push(map);
-        _.forEach(players, function (player) {
-            if (player.sessionId === sessionId) {
-                const playerSocket = sockets[player.socketId];
-                playerSocket.emit("gameStart", map);
-            }
+        _.forEach(sessionPlayers, function (player) {
+            const playerSocket = sockets[player.socketId];
+            playerSocket.emit("gameStart", map);
         });
     });
 });

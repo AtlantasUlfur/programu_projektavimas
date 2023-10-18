@@ -49,7 +49,6 @@ const sockets: { [key: string]: Socket } = {};
 
 io.on("connection", function (socket: Socket) {
   sockets[socket.id] = socket;
-  console.log("User connected");
 
   socket.on("createLobby", function (payload) {
     console.log("New lobby");
@@ -67,7 +66,10 @@ io.on("connection", function (socket: Socket) {
 
     const name = payload.name;
 
-    const session = _.find(sessions, (session: Session) => session.name === name);
+    const session = _.find(
+      sessions,
+      (session: Session) => session.name === name
+    );
 
     if (!session) {
       socket.emit("lobbyStatus", 3);
@@ -107,14 +109,16 @@ io.on("connection", function (socket: Socket) {
   socket.on("startGame", function (payload) {
     console.log("Start game");
     const name = payload.name;
-
-    const session = _.find(sessions, (session: Session) => session.name === name);
+    const session = _.find(
+      sessions,
+      (session: Session) => session.name === name
+    );
     if (!session) {
-        socket.emit("lobbyStatus", 3);
-        return;
+      socket.emit("lobbyStatus", 3);
+      console.log("payload");
+      return;
     }
-
-    const sessionId = session.sessionId;
+    const sessionId = session.id;
 
     const sessionPlayers: Player[] = [];
 
@@ -173,11 +177,9 @@ io.on("connection", function (socket: Socket) {
 
     maps.push(map);
 
-    _.forEach(players, function (player: Player) {
-      if (player.sessionId === sessionId) {
-        const playerSocket = sockets[player.socketId];
-        playerSocket.emit("gameStart", map);
-      }
+    _.forEach(sessionPlayers, function (player: Player) {
+      const playerSocket = sockets[player.socketId];
+      playerSocket.emit("gameStart", map);
     });
   });
 });
