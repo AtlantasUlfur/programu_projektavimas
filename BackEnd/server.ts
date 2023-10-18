@@ -99,7 +99,12 @@ io.on("connection", function (socket: Socket) {
   socket.on("getLobbies", function () {
     console.log("Get lobbies");
 
-    socket.emit("lobbiesList", sessions);
+    const playersMap = _.keyBy(players, (player: Player) => player.sessionId);
+    const sessionsWithPlayerCounts = _.map(sessions, (session: Session) => {
+      return {session, playerCount: playersMap[session.id].length};
+    });
+
+    socket.emit("lobbiesList", sessionsWithPlayerCounts);
   });
 
   socket.on("startGame", function (payload) {
