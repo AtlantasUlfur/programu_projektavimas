@@ -75,7 +75,6 @@ io.on("connection", function (socket: Socket) {
     }
 
     socket.emit("lobbyStatus", 1);
-
     players.push({
       id: "player",
       socketId: socket.id,

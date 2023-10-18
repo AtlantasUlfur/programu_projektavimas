@@ -48,17 +48,23 @@ io.on("connection", function (socket) {
     });
     socket.on("joinLobby", function (payload) {
         console.log("Join lobby");
-        const sessionId = payload.sessionId;
+        const name = payload.name;
+        const session = _.find(sessions, (session) => session.name === name);
+        if (!session) {
+            socket.emit("lobbyStatus", 3);
+            return;
+        }
+        socket.emit("lobbyStatus", 1);
         players.push({
             id: "player",
             socketId: socket.id,
-            sessionId,
+            sessionId: session.id,
         });
         //NOTE(HB) collect players in updated session
         const sessionPlayers = [];
         //NOTE(HB) find player count in current session
         const playerCount = _.reduce(players, function (count, player) {
-            if (player.sessionId === sessionId) {
+            if (player.sessionId === session.id) {
                 sessionPlayers.push(player);
                 count++;
             }
@@ -69,14 +75,6 @@ io.on("connection", function (socket) {
             const playerSocket = sockets[player.socketId];
             playerSocket.emit("playerCount", playerCount);
         });
-    });
-    socket.on("getLobbies", function () {
-        console.log("Get lobbies");
-        const playersMap = _.keyBy(players, (player) => player.sessionId);
-        const sessionsWithPlayerCounts = _.map(sessions, (session) => {
-            return { session, playerCount: playersMap[session.id].length };
-        });
-        socket.emit("lobbiesList", sessionsWithPlayerCounts);
     });
     socket.on("startGame", function (payload) {
         console.log("Start game");
