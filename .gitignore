@@ -7,7 +7,10 @@ Thumbs.db
 *.sublime-workspace
 
 # Vendors
-**/node_modules
-
+**/node_modules/*
+FrontEnd/node_modules/*
 # Build
 /npm-debug.log
+node_modules
+dist
+/BackEnd/dist
