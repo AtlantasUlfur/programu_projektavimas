@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import SocketController from "../SocketController";
 import { Button } from "../Models/Button";
+import { LobbiesEnum } from "../Models/Enums";
 
 export class MainMenuScene extends Phaser.Scene {
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -8,6 +9,10 @@ export class MainMenuScene extends Phaser.Scene {
 	private selectedButtonIndex = 0;
     private buttonSelector!: Phaser.GameObjects.Image;
     private socketInstance : SocketController;
+    public playerCount : number;
+    private checkPlayerCount: boolean = false;
+    private playerCountText : Phaser.GameObjects.Text;
+    public lobbyStatus : LobbiesEnum = LobbiesEnum.MENU;
 
     constructor()
     {
@@ -20,7 +25,7 @@ export class MainMenuScene extends Phaser.Scene {
 
         // //Socket initialise
         this.socketInstance = SocketController.getInstance();
-        this.socketInstance.connect("http://localhost:8081")
+        this.socketInstance.connect("http://localhost:8081", this)
 	}
 
 	preload()
@@ -32,8 +37,6 @@ export class MainMenuScene extends Phaser.Scene {
     create()
     {
         const scene = this;
-
-        
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             createButtonImage.off('selected')
@@ -140,6 +143,20 @@ export class MainMenuScene extends Phaser.Scene {
 		{
             this.confirmSelection()
 		}
+
+        switch (this.lobbyStatus) {
+            case LobbiesEnum.IN_LOBBY:
+                this.playerCountText?.setText(`Waiting for players... ${this.playerCount}/4`);
+                break;
+            case LobbiesEnum.WAITING:
+                this.playerCountText?.setText(`Joining lobby...`);
+                break;
+            case LobbiesEnum.DENIED:
+                this.scene.restart();
+                break;
+            default:
+                break;
+        }
 	}
 
     buttonClick(scene : this, index : number){
@@ -152,20 +169,24 @@ export class MainMenuScene extends Phaser.Scene {
             element.Text.visible = false;
         });
         scene.buttonSelector.visible = false;
-
         //Index = 0 -> Create Game; index = 1 -> Join Game
+        
         if(0 == index){ 
+            scene.socketInstance.createLobby(lobbyName);
+            scene.lobbyStatus = LobbiesEnum.IN_LOBBY;
+
             scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.5, 'You are host')
             .setOrigin(0.5)
-            scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, 'Waiting for players... 1/4')
+            scene.playerCountText = scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, `Waiting for players... ${scene.playerCount}/4`)
             .setOrigin(0.5)
-
-            scene.socketInstance.createLobby(lobbyName);
         }
         else{
-            scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, 'Waiting for players... 2/4')
-            .setOrigin(0.5)
+            
+            scene.socketInstance.joinLobby(lobbyName);
+            scene.lobbyStatus = LobbiesEnum.WAITING;
 
+            scene.playerCountText = scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.6, `Joining lobby...`)
+            .setOrigin(0.5)
         }
     }
 }

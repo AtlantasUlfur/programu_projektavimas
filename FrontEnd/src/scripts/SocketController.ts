@@ -1,12 +1,13 @@
 import { io, Socket } from "socket.io-client";
+import { MainMenuScene } from "./scenes/MainMenuScene";
+import MainScene from "./scenes/MainScene";
 
 //Singleton
 export default class  SocketController
 {
     private static _instance : SocketController | null = null;
     private socket : Socket | null = null;
-
-    private playerCount : integer = 0;
+    private scene : MainMenuScene | MainScene;
 
     private constructor(){}
 
@@ -17,12 +18,18 @@ export default class  SocketController
         return SocketController._instance;
     }
     
-    public connect(url: string): void {
+    public connect(url: string, Scene : MainMenuScene | MainScene): void {
         if (!this.socket) {
             this.socket = io(url);
+            this.scene = Scene;
 
-            this.socket.on("getPlayers", (payload) =>{
-                this.playerCount = payload.playerCount;
+            this.socket.on("playerCount", (payload) =>{
+                this.scene.playerCount = payload;
+            });
+            this.socket.on("lobbyStatus", (payload) =>{
+                const mainMenuScene = this.scene as MainMenuScene
+                console.log(payload);
+                mainMenuScene.lobbyStatus = payload;
             });
         }
     }
@@ -35,7 +42,12 @@ export default class  SocketController
         this.socket?.emit("createLobby", {name})
     }
 
-    public getPlayers(){
-        return this.playerCount;
+    public getLobbies(){
+        this.socket?.emit("getLobbies");
     }
+
+    public joinLobby(name : string | null){
+        this.socket?.emit("joinLobby", {name})
+    }
+
 }

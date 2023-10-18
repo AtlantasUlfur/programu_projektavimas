@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 
 export default class MainScene extends Phaser.Scene{
     private tileMap: Phaser.Tilemaps.Tilemap;
+    public playerCount : number;
     constructor(){
         super("MainScene");
     }
