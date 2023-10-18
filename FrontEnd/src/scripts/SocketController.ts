@@ -51,9 +51,9 @@ export default class  SocketController
         this.socket?.emit("joinLobby", {name})
     }
 
-    public startGame(lobbyName){
-        console.log("GIVE:" + lobbyName);
-        this.socket?.emit("startGame", {lobbyName})
+    public startGame(name : string | null){
+        console.log(name);
+        this.socket?.emit("startGame", {name})
     }
 
 }
