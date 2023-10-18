@@ -4,4 +4,10 @@ export enum LobbiesEnum {
     DENIED = 3,
     MENU = 4
 }
+
+export enum TileTypeEnum {
+    GROUND = 0,
+    WALL = 92,
+    PLAYER = 100,
+}
     

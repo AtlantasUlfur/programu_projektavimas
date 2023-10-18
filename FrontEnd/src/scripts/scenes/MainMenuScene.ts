@@ -190,7 +190,6 @@ export class MainMenuScene extends Phaser.Scene {
             startGameButtonImage.on('selected', () => {
                 console.log("Start game pressed");
                 scene.socketInstance.startGame(lobbyName);
-                this.scene.start()
             })
         }
         else{
