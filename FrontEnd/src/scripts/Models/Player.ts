@@ -7,7 +7,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   private currentHealth: integer;
   private waitText: Phaser.GameObjects.Text;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, key: string, name: string, hp: number | undefined, socketId : string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, key: string, frame: number, name: string, hp: number | undefined, socketId : string) {
     super(scene, 0, 0, key)
 
     this.id = socketId;
@@ -20,6 +20,7 @@ export class Player extends Phaser.GameObjects.Sprite {
 
     //Self explanitory
     this.setTexture('player');
+    this.setFrame(frame);
     this.setDepth(0);
     this.setPosition(x, y);
 

@@ -172,16 +172,14 @@ io.on("connection", function (socket: Socket) {
       player.moveOrder = moveOrder;
 
       const playerSocket = sockets[player.socketId];
-      playerSocket.emit("gameStart", { map, player, sessionPlayers });
 
       if (moveOrder === 1) {
         firstPlayer = player;
         firstPlayer.isTurn = true;
       }
-      
-      console.log(firstPlayer?.socketId);
 
-      playerSocket.emit("turn", firstPlayer?.socketId ?? null);
+      playerSocket.emit("gameStart", { map, player, sessionPlayers, playersTurnId: firstPlayer?.socketId });
+
       moveOrder = moveOrder + 1;
     });
   });
