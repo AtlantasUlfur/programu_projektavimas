@@ -152,6 +152,8 @@ export class MainMenuScene extends Phaser.Scene {
                 this.playerCountText?.setText(`Joining lobby...`);
                 break;
             case LobbiesEnum.DENIED:
+                alert("Lobby not found");
+                this.lobbyStatus = LobbiesEnum.MENU;
                 this.scene.restart();
                 break;
             default:
@@ -162,6 +164,8 @@ export class MainMenuScene extends Phaser.Scene {
     buttonClick(scene : this, index : number){
 
         var lobbyName = prompt("Please enter lobby name:", "Lebron Lobby");
+        if(lobbyName == "" || lobbyName == null || lobbyName == undefined)
+            return;
 
         //Hide Buttons
         scene.buttons.forEach( element => {
@@ -184,7 +188,7 @@ export class MainMenuScene extends Phaser.Scene {
             var startGameButtonImage = this.add.image(scene.scale.width * 0.5, scene.scale.height * 0.7, 'glass-panel')
             .setDisplaySize(150, 50)
             var startGameButtonText = this.add.text(startGameButtonImage.x, startGameButtonImage.y, 'Start Game')
-                .setOrigin(0.5)
+            .setOrigin(0.5)
 
             scene.buttons.push(new Button(startGameButtonImage, startGameButtonText))
             this.selectButton(0);
