@@ -17,7 +17,7 @@ export default class MainScene extends Phaser.Scene{
     //Players
     private playerList : Player[] = [];
     private player : Player;
-    public playersTurnId : string;
+    public playersTurnId :string = "";
 
     constructor(){
         super("MainScene");
@@ -26,6 +26,9 @@ export default class MainScene extends Phaser.Scene{
     init(data){
         this.currentPlayerData = data.player;
         this.allPlayerData = data.sessionPlayers;
+        this.playersTurnId = data.playersTurnId;
+        this.socketInstance = SocketController.getInstance();
+        this.socketInstance.setScene(this);
 
         //Fill map data disgusting
         this.mapData = [
@@ -79,7 +82,6 @@ export default class MainScene extends Phaser.Scene{
         const scene = this;
         this.scene.run('UIScene')
         sceneEvents.emit('start', 100)      
-        this.socketInstance = SocketController.getInstance();
 
         //Map Render
         this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, "background").setDepth(0)
@@ -115,8 +117,10 @@ export default class MainScene extends Phaser.Scene{
     {
         this.player.update(time, delta)
 
+        console.log(this.playersTurnId)
         if(this.playersTurnId == this.player.id)
         {
+            console.log("TURN ENDED");
 
             //Handle player turn
             this.socketInstance.endTurn()

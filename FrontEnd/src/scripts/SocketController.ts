@@ -34,11 +34,12 @@ export default class  SocketController
             this.socket.on("gameStart", (payload) =>{
                 const mainMenuScene = this.scene as MainMenuScene
                 console.log(payload);
-                mainMenuScene.scene.start("MainScene", payload)
+                mainMenuScene.scene.start("MainScene", payload);
             });
             this.socket.on("turn", (payload) =>{
                 const mainScene = this.scene as MainScene;
                 console.log(payload);
+                console.log(mainScene);
                 mainScene.playersTurnId = payload;
             });
         }
@@ -46,6 +47,10 @@ export default class  SocketController
 
     public getSocket(): Socket | null {
         return this.socket;
+    }
+
+    public setScene(Scene : MainMenuScene | MainScene){
+        this.scene = Scene;
     }
 
     public createLobby(name : string | null){
