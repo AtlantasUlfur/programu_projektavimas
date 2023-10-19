@@ -24,7 +24,8 @@ export default class  SocketController
             this.scene = Scene;
 
             this.socket.on("playerCount", (payload) =>{
-                this.scene.playerCount = payload;
+                const mainMenuScene = this.scene as MainMenuScene
+                mainMenuScene.playerCount = payload;
             });
             this.socket.on("lobbyStatus", (payload) =>{
                 const mainMenuScene = this.scene as MainMenuScene
@@ -34,6 +35,11 @@ export default class  SocketController
                 const mainMenuScene = this.scene as MainMenuScene
                 console.log(payload);
                 mainMenuScene.scene.start("MainScene", payload)
+            });
+            this.socket.on("turn", (payload) =>{
+                const mainScene = this.scene as MainScene;
+                console.log(payload);
+                mainScene.playersTurnId = payload;
             });
         }
     }
@@ -52,6 +58,10 @@ export default class  SocketController
 
     public startGame(name : string | null){
         this.socket?.emit("startGame", {name})
+    }
+
+    public endTurn(){
+        this.socket?.emit("endTurn");
     }
 
 }
