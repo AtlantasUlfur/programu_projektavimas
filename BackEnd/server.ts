@@ -153,6 +153,7 @@ io.on("connection", function (socket: Socket) {
         });
         break;
     }
+    let firstPlayer : Player | null = null;
 
     _.forEach(playerTiles, function (playerTile: Tile) {
       const tileIndex = _.findIndex(
@@ -172,13 +173,14 @@ io.on("connection", function (socket: Socket) {
 
       const playerSocket = sockets[player.socketId];
       playerSocket.emit("gameStart", { map, player, sessionPlayers });
-      let firstPlayer = null;
-
 
       if (moveOrder === 1) {
         firstPlayer = player;
         firstPlayer.isTurn = true;
       }
+      
+      console.log(firstPlayer?.socketId);
+
       playerSocket.emit("turn", firstPlayer?.socketId ?? null);
       moveOrder = moveOrder + 1;
     });
