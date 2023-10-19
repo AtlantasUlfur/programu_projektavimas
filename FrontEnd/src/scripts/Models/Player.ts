@@ -6,7 +6,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   private currentHealth: integer
   private waitText: Phaser.GameObjects.Text
 
-  constructor(scene: Phaser.Scene, x: number, y: number, key: string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, key: string, name: string) {
     super(scene, 0, 0, key)
 
     this.currentHealth = 100
@@ -23,15 +23,18 @@ export class Player extends Phaser.GameObjects.Sprite {
 
     this.setPosition(x, y)
 
-    this.playerName = this.scene.add.text(0, 0, 'YOU', {
+
+
+    this.playerName = this.scene.add.text(0, 0, name, {
       fontFamily: 'Arial',
       fontSize: '16',
       fontStyle: 'bold',
-      color: '#008000'
+      color: name == 'YOU' ? '#008000' : 'red'
     })
     this.playerName.setDepth(10)
     this.playerName.setOrigin(0.5, 1.5)
     this.playerName.setResolution(7)
+    this.showPlayerNickname();
   }
 
   update(time: number, delta: number) {

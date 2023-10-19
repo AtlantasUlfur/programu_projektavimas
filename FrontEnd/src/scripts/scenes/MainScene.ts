@@ -8,8 +8,10 @@ export default class MainScene extends Phaser.Scene{
     private tileMap: Phaser.Tilemaps.Tilemap;
     public playerCount : number;
     private player : Player;
+    private playerList : Player[] = [];
     private mapData;
     private currentPlayerData : PlayerServer;
+    private allPlayerData : PlayerServer[];
 
     constructor(){
         super("MainScene");
@@ -17,6 +19,7 @@ export default class MainScene extends Phaser.Scene{
 
     init(data){
         this.currentPlayerData = data.player;
+        this.allPlayerData = data.sessionPlayers;
 
         //Fill map data disgusting
         this.mapData = [
@@ -68,22 +71,36 @@ export default class MainScene extends Phaser.Scene{
     }
 
     create(){
+        const scene = this;
+
         //Map Render
         this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, "background").setDepth(0)
         this.tileMap = this.make.tilemap({data: this.mapData, tileWidth: 16, tileHeight: 16})
         const tiles = this.tileMap.addTilesetImage('tile-set', "tiles");
         const layer = this.tileMap.createLayer(0, tiles, 0, 0);
 
-        var tile = this.tileMap.getTileAt(Number(this.currentPlayerData.x), Number(this.currentPlayerData.y));
-        //Player create
-        this.player = new Player(this, tile.x * SizeEnum.TILE_SIZE, tile.y * SizeEnum.TILE_SIZE, 'player');
+        //Create all players
+        this.allPlayerData.forEach(playerData => {
+            let spawnPoint = this.tileMap.getTileAt(Number(playerData.x), Number(playerData.y));
+            if(playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y)
+            {
+                //Create current player
+                this.player = new Player(scene, spawnPoint.x * SizeEnum.TILE_SIZE, spawnPoint.y * SizeEnum.TILE_SIZE, 'player', 'YOU')
+                scene.playerList.push(this.player);
 
-        //Camera follow player
-        this.cameras.main.startFollow(this.player);
-        this.cameras.main.roundPixels = true;
-        this.cameras.main.zoom = 2;
+                //Camera follow this player
+                this.cameras.main.startFollow(this.player);
+                this.cameras.main.roundPixels = true;
+                this.cameras.main.zoom = 1;
+            }
+            else
+            {
+                //Create other player   
+                let otherPlayer = new Player(scene, spawnPoint.x * SizeEnum.TILE_SIZE, spawnPoint.y * SizeEnum.TILE_SIZE, 'player', 'ENEMY')
+                scene.playerList.push(otherPlayer);
+            }
 
-        //TODO: DRAW OTHER PLAYERS
+        });
     }
 
     update(time : number, delta : number)
