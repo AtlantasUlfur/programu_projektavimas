@@ -1,3 +1,4 @@
+import { Textures } from 'phaser';
 import { SizeEnum, DirectionEnum } from './Enums'
 export class Player extends Phaser.GameObjects.Sprite {
   public id : string;
@@ -7,7 +8,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   private currentHealth: integer;
   private waitText: Phaser.GameObjects.Text;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, key: string, name: string, hp: number | undefined, socketId : string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, key: string, frame: number, name: string, hp: number | undefined, socketId : string) {
     super(scene, 0, 0, key)
 
     this.id = socketId;
@@ -20,6 +21,7 @@ export class Player extends Phaser.GameObjects.Sprite {
 
     //Self explanitory
     this.setTexture('player');
+    this.setFrame(frame);
     this.setDepth(0);
     this.setPosition(x, y);
 
@@ -78,7 +80,9 @@ export class Player extends Phaser.GameObjects.Sprite {
   onDamage(damage: integer) {
     this.currentHealth -= damage
   }
-
+  getTexture(){
+    return this.texture
+  }
   isDead(): boolean {
     return this.currentHealth <= 0
   }
@@ -93,7 +97,9 @@ export class Player extends Phaser.GameObjects.Sprite {
       })
       .setVisible(false)
   }
-
+  getPlayerName() : string{
+    return this.playerName.text
+  }
   setFinishedText() {
     this.waitText.setX(this.x)
     this.waitText.setY(this.y)
