@@ -131,16 +131,13 @@ io.on("connection", function (socket) {
         maps.push(map);
         let moveOrder = 1;
         _.forEach(sessionPlayers, function (player) {
-            var _a;
             player.moveOrder = moveOrder;
             const playerSocket = sockets[player.socketId];
-            playerSocket.emit("gameStart", { map, player, sessionPlayers });
             if (moveOrder === 1) {
                 firstPlayer = player;
                 firstPlayer.isTurn = true;
             }
-            console.log(firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId);
-            playerSocket.emit("turn", (_a = firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId) !== null && _a !== void 0 ? _a : null);
+            playerSocket.emit("gameStart", { map, player, sessionPlayers, playersTurnId: firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId });
             moveOrder = moveOrder + 1;
         });
     });
