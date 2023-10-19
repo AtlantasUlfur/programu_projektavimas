@@ -211,6 +211,22 @@ io.on("connection", function (socket: Socket) {
       playerSocket.emit("turn", nextPlayer.socketId);
     });
   });
+
+  socket.on("movePlayer", function (x: number, y: number) {
+    console.log("Move");
+
+    const player = getPlayerBySocketId(socket.id);
+    player.x = x;
+    player.y = y;
+    const sessionId = player.sessionId;
+
+    const sessionPlayers = getSessionPlayers(sessionId);
+
+    _.forEach(sessionPlayers, function (player: Player) {
+      const playerSocket = sockets[player.socketId];
+      playerSocket.emit("playerMove", {player: socket.id, x: player.x, y: player.y});
+    });
+  });
 });
 
 server.listen(8081, function () {
