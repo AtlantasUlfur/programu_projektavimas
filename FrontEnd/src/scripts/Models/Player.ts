@@ -93,7 +93,9 @@ export class Player extends Phaser.GameObjects.Sprite {
       })
       .setVisible(false)
   }
-
+  getPlayerName() : string{
+    return "YOU"
+  }
   setFinishedText() {
     this.waitText.setX(this.x)
     this.waitText.setY(this.y)

@@ -77,8 +77,8 @@ export default class MainScene extends Phaser.Scene{
 
     create(){
         const scene = this;
-        this.scene.run('UIScene')
-        sceneEvents.emit('start', 100)      
+        
+
         this.socketInstance = SocketController.getInstance();
 
         //Map Render
@@ -107,14 +107,16 @@ export default class MainScene extends Phaser.Scene{
                 let otherPlayer = new Player(scene, spawnPoint.x * SizeEnum.TILE_SIZE, spawnPoint.y * SizeEnum.TILE_SIZE, 'player', 'ENEMY', playerData.currentHP, playerData.socketId)
                 scene.playerList.push(otherPlayer);
             }
+           
         });
-
+        
+        this.scene.run('UIScene', this.player)
     }
 
     update(time : number, delta : number)
     {
         this.player.update(time, delta)
-
+       
         if(this.playersTurnId == this.player.id)
         {
 
