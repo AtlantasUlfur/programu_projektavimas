@@ -3,7 +3,7 @@ import * as Phaser from "phaser";
 export const config = {
     type: Phaser.AUTO,
     backgroundColor: '#00000',
-    width: 800,
+    width: 1000,
     height: 600,
     
     render: {

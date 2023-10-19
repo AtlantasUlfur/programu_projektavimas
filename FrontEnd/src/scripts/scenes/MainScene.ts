@@ -3,6 +3,7 @@ import SocketController from "../SocketController";
 import { TileTypeEnum, SizeEnum } from '../Models/Enums';
 import { PlayerServer } from '../Models/ServerModels';
 import { Player } from '../Models/Player';
+import { sceneEvents } from '../Events/EventsController'
 
 export default class MainScene extends Phaser.Scene{
     private tileMap: Phaser.Tilemaps.Tilemap;
@@ -72,7 +73,8 @@ export default class MainScene extends Phaser.Scene{
 
     create(){
         const scene = this;
-
+        this.scene.run('UIScene')
+        sceneEvents.emit('start', 100)
         //Map Render
         this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, "background").setDepth(0)
         this.tileMap = this.make.tilemap({data: this.mapData, tileWidth: 16, tileHeight: 16})
@@ -91,7 +93,7 @@ export default class MainScene extends Phaser.Scene{
                 //Camera follow this player
                 this.cameras.main.startFollow(this.player);
                 this.cameras.main.roundPixels = true;
-                this.cameras.main.zoom = 1;
+                this.cameras.main.zoom = 2;
             }
             else
             {
