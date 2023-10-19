@@ -103,6 +103,7 @@ io.on("connection", function (socket: Socket) {
   socket.on("startGame", function (payload) {
     console.log("Start game");
     const name = payload.name;
+
     const session = getSession(name);
     if (!session) {
       socket.emit("lobbyStatus", 3);
@@ -166,21 +167,20 @@ io.on("connection", function (socket: Socket) {
     maps.push(map);
 
     let moveOrder = 1;
-
     _.forEach(sessionPlayers, function (player: Player) {
       player.moveOrder = moveOrder;
-      moveOrder = moveOrder + 1;
+
       const playerSocket = sockets[player.socketId];
       playerSocket.emit("gameStart", { map, player, sessionPlayers });
-
       let firstPlayer = null;
+
 
       if (moveOrder === 1) {
         firstPlayer = player;
         firstPlayer.isTurn = true;
       }
-
       playerSocket.emit("turn", firstPlayer?.socketId ?? null);
+      moveOrder = moveOrder + 1;
     });
   });
 
@@ -199,7 +199,7 @@ io.on("connection", function (socket: Socket) {
       moveOrder = 1;
     }
 
-    const nextPlayer = _.find(
+    const nextPlayer = _.find( 
       sessionPlayers,
       (player: Player) => player.moveOrder === moveOrder
     );

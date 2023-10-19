@@ -38,6 +38,12 @@ const players = [];
 const sockets = {};
 io.on("connection", function (socket) {
     sockets[socket.id] = socket;
+    socket.on("disconnect", function () {
+        console.log("user disconnected");
+        // remove this player from our players object
+        _.remove(players, (player) => player.socketId === socket.id);
+        _.remove(sockets, (scoket) => scoket.id === socket.id);
+    });
     socket.on("createLobby", function (payload) {
         console.log("New lobby");
         const sessionId = uuid();
@@ -48,7 +54,7 @@ io.on("connection", function (socket) {
     socket.on("joinLobby", function (payload) {
         console.log("Join lobby");
         const name = payload.name;
-        const session = _.find(sessions, (session) => session.name === name);
+        const session = getSession(name);
         if (!session) {
             socket.emit("lobbyStatus", 3);
             return;
@@ -60,15 +66,9 @@ io.on("connection", function (socket) {
             sessionId: session.id,
         });
         //NOTE(HB) collect players in updated session
-        const sessionPlayers = [];
+        const sessionPlayers = getSessionPlayers(session.id);
         //NOTE(HB) find player count in current session
-        const playerCount = _.reduce(players, function (count, player) {
-            if (player.sessionId === session.id) {
-                sessionPlayers.push(player);
-                count++;
-            }
-            return count;
-        }, 0);
+        const playerCount = sessionPlayers.length;
         //NOTE(HB) emit player count to all connected players
         _.forEach(sessionPlayers, function (player) {
             const playerSocket = sockets[player.socketId];
@@ -78,23 +78,14 @@ io.on("connection", function (socket) {
     socket.on("startGame", function (payload) {
         console.log("Start game");
         const name = payload.name;
-        const session = _.find(sessions, (session) => session.name === name);
+        const session = getSession(name);
         if (!session) {
             socket.emit("lobbyStatus", 3);
             return;
         }
         const sessionId = session.id;
-        const sessionPlayers = [];
-        let moveOrder = 1;
-        const playerCount = _.reduce(players, function (count, player) {
-            if (player.sessionId === sessionId) {
-                player.moveOrder = moveOrder;
-                moveOrder = moveOrder + 1;
-                sessionPlayers.push(player);
-                count++;
-            }
-            return count;
-        }, 0);
+        const sessionPlayers = getSessionPlayers(sessionId);
+        const playerCount = sessionPlayers.length;
         const tileMap = getDefaultTileMap();
         const playerTiles = [];
         switch (playerCount) {
@@ -137,12 +128,57 @@ io.on("connection", function (socket) {
         });
         const map = { sessionId, tileMap };
         maps.push(map);
+        let moveOrder = 1;
         _.forEach(sessionPlayers, function (player) {
+            var _a;
+            player.moveOrder = moveOrder;
             const playerSocket = sockets[player.socketId];
             playerSocket.emit("gameStart", { map, player, sessionPlayers });
+            let firstPlayer = null;
+            if (moveOrder === 1) {
+                firstPlayer = player;
+                firstPlayer.isTurn = true;
+            }
+            playerSocket.emit("turn", (_a = firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId) !== null && _a !== void 0 ? _a : null);
+            moveOrder = moveOrder + 1;
+        });
+    });
+    socket.on("endTurn", function () {
+        var _a;
+        console.log("End Turn");
+        const player = getPlayerBySocketId(socket.id);
+        const sessionId = player.sessionId;
+        let moveOrder = (_a = player.moveOrder) !== null && _a !== void 0 ? _a : 0;
+        const sessionPlayers = getSessionPlayers(sessionId);
+        if (moveOrder < sessionPlayers.length) {
+            moveOrder = moveOrder + 1;
+        }
+        else {
+            moveOrder = 1;
+        }
+        const nextPlayer = _.find(sessionPlayers, (player) => player.moveOrder === moveOrder);
+        player.isTurn = false;
+        nextPlayer.isTurn = true;
+        _.forEach(sessionPlayers, function (player) {
+            const playerSocket = sockets[player.socketId];
+            playerSocket.emit("turn", nextPlayer.socketId);
         });
     });
 });
 server.listen(8081, function () {
     console.log(`Listening on ${server.address().port}`);
 });
+function getSession(name) {
+    return _.find(sessions, (session) => session.name === name);
+}
+function getSessionPlayers(sessionId) {
+    return _.reduce(players, function (sessionPlayers, player) {
+        if (player.sessionId === sessionId) {
+            sessionPlayers.push(player);
+        }
+        return sessionPlayers;
+    }, []);
+}
+function getPlayerBySocketId(socketId) {
+    return _.find(players, (player) => player.socketId === socketId);
+}
