@@ -76,7 +76,8 @@ export default class GameUI extends Phaser.Scene
         this.nameLabel.setPosition(870, 50)
 
         this.nameLabel.text = this.player.getPlayerName()
-        
+
+        this.add.sprite(850, 100, this.player.getTexture())
 	}
 
 

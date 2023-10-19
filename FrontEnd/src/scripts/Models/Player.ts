@@ -1,3 +1,4 @@
+import { Textures } from 'phaser';
 import { SizeEnum, DirectionEnum } from './Enums'
 export class Player extends Phaser.GameObjects.Sprite {
   public id : string;
@@ -79,7 +80,9 @@ export class Player extends Phaser.GameObjects.Sprite {
   onDamage(damage: integer) {
     this.currentHealth -= damage
   }
-
+  getTexture(){
+    return this.texture
+  }
   isDead(): boolean {
     return this.currentHealth <= 0
   }
@@ -95,7 +98,7 @@ export class Player extends Phaser.GameObjects.Sprite {
       .setVisible(false)
   }
   getPlayerName() : string{
-    return "YOU"
+    return this.playerName.text
   }
   setFinishedText() {
     this.waitText.setX(this.x)

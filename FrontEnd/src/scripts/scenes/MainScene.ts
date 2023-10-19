@@ -82,8 +82,8 @@ export default class MainScene extends Phaser.Scene{
     create(){
         const scene = this;
         this.socketInstance = SocketController.getInstance()
-        this.scene.run('UIScene')
-        sceneEvents.emit('start', 100)      
+
+
 
     //Map Render
     this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, 'background').setDepth(0)
@@ -123,6 +123,7 @@ export default class MainScene extends Phaser.Scene{
         scene.playerList.push(otherPlayer)
       }
     })
+    this.scene.run('UIScene', this.player)
   }
 
     update(time : number, delta : number)
