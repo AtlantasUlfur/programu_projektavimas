@@ -129,37 +129,12 @@ io.on("connection", function (socket) {
         });
         const map = { sessionId, tileMap };
         maps.push(map);
-        let moveOrder = 1;
         _.forEach(sessionPlayers, function (player) {
+            var _a;
             player.moveOrder = moveOrder;
-            const playerSocket = sockets[player.socketId];
-            if (moveOrder === 1) {
-                firstPlayer = player;
-                firstPlayer.isTurn = true;
-            }
-            playerSocket.emit("gameStart", { map, player, sessionPlayers, playersTurnId: firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId });
             moveOrder = moveOrder + 1;
-        });
-    });
-    socket.on("endTurn", function () {
-        var _a;
-        console.log("End Turn");
-        const player = getPlayerBySocketId(socket.id);
-        const sessionId = player.sessionId;
-        let moveOrder = (_a = player.moveOrder) !== null && _a !== void 0 ? _a : 0;
-        const sessionPlayers = getSessionPlayers(sessionId);
-        if (moveOrder < sessionPlayers.length) {
-            moveOrder = moveOrder + 1;
-        }
-        else {
-            moveOrder = 1;
-        }
-        const nextPlayer = _.find(sessionPlayers, (player) => player.moveOrder === moveOrder);
-        player.isTurn = false;
-        nextPlayer.isTurn = true;
-        _.forEach(sessionPlayers, function (player) {
             const playerSocket = sockets[player.socketId];
-            playerSocket.emit("turn", nextPlayer.socketId);
+            playerSocket.emit("gameStart", { map, player, sessionPlayers });
         });
     });
 });
