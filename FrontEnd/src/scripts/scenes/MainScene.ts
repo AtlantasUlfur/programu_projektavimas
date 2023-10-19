@@ -3,6 +3,7 @@ import SocketController from "../SocketController";
 import { TileTypeEnum, SizeEnum, DirectionEnum } from '../Models/Enums';
 import { PlayerServer } from '../Models/ServerModels';
 import { Player } from '../Models/Player';
+import { sceneEvents } from '../Events/EventsController'
 
 export default class MainScene extends Phaser.Scene{
     //Utils
@@ -76,6 +77,8 @@ export default class MainScene extends Phaser.Scene{
 
     create(){
         const scene = this;
+        this.scene.run('UIScene')
+        sceneEvents.emit('start', 100)      
         this.socketInstance = SocketController.getInstance();
 
         //Map Render
@@ -96,7 +99,7 @@ export default class MainScene extends Phaser.Scene{
                 //Camera follow this player
                 this.cameras.main.startFollow(this.player);
                 this.cameras.main.roundPixels = true;
-                this.cameras.main.zoom = 1;
+                this.cameras.main.zoom = 2;
             }
             else
             {
