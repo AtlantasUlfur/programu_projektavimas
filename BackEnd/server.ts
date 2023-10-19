@@ -50,6 +50,13 @@ const sockets: { [key: string]: Socket } = {};
 io.on("connection", function (socket: Socket) {
   sockets[socket.id] = socket;
 
+  socket.on("disconnect", function () {
+    console.log("user disconnected");
+    // remove this player from our players object
+    _.remove(players, (player: Player) => player.socketId === socket.id);
+    _.remove(sockets, (scoket: Socket) => scoket.id === socket.id);
+  });
+
   socket.on("createLobby", function (payload) {
     console.log("New lobby");
 
@@ -66,10 +73,7 @@ io.on("connection", function (socket: Socket) {
 
     const name = payload.name;
 
-    const session = _.find(
-      sessions,
-      (session: Session) => session.name === name
-    );
+    const session = getSession(name);
 
     if (!session) {
       socket.emit("lobbyStatus", 3);
@@ -84,20 +88,10 @@ io.on("connection", function (socket: Socket) {
     });
 
     //NOTE(HB) collect players in updated session
-    const sessionPlayers: Player[] = [];
+    const sessionPlayers = getSessionPlayers(session.id);
 
     //NOTE(HB) find player count in current session
-    const playerCount = _.reduce(
-      players,
-      function (count: number, player: Player) {
-        if (player.sessionId === session.id) {
-          sessionPlayers.push(player);
-          count++;
-        }
-        return count;
-      },
-      0
-    );
+    const playerCount = sessionPlayers.length;
 
     //NOTE(HB) emit player count to all connected players
     _.forEach(sessionPlayers, function (player: Player) {
@@ -109,32 +103,17 @@ io.on("connection", function (socket: Socket) {
   socket.on("startGame", function (payload) {
     console.log("Start game");
     const name = payload.name;
-    const session = _.find(
-      sessions,
-      (session: Session) => session.name === name
-    );
+
+    const session = getSession(name);
     if (!session) {
       socket.emit("lobbyStatus", 3);
       return;
     }
     const sessionId = session.id;
 
-    const sessionPlayers: Player[] = [];
+    const sessionPlayers = getSessionPlayers(sessionId);
 
-    let moveOrder = 1;
-    const playerCount = _.reduce(
-      players,
-      function (count: number, player: Player) {
-        if (player.sessionId === sessionId) {
-          player.moveOrder = moveOrder;
-          moveOrder = moveOrder + 1;
-          sessionPlayers.push(player);
-          count++;
-        }
-        return count;
-      },
-      0
-    );
+    const playerCount = sessionPlayers.length;
 
     const tileMap = getDefaultTileMap();
 
@@ -187,9 +166,49 @@ io.on("connection", function (socket: Socket) {
 
     maps.push(map);
 
+    let moveOrder = 1;
+    _.forEach(sessionPlayers, function (player: Player) {
+      player.moveOrder = moveOrder;
+
+      const playerSocket = sockets[player.socketId];
+      playerSocket.emit("gameStart", { map, player, sessionPlayers });
+      let firstPlayer = null;
+
+
+      if (moveOrder === 1) {
+        firstPlayer = player;
+        firstPlayer.isTurn = true;
+      }
+      playerSocket.emit("turn", firstPlayer?.socketId ?? null);
+      moveOrder = moveOrder + 1;
+    });
+  });
+
+  socket.on("endTurn", function () {
+    console.log("End Turn");
+
+    const player = getPlayerBySocketId(socket.id);
+    const sessionId = player.sessionId;
+    let moveOrder = player.moveOrder ?? 0;
+
+    const sessionPlayers = getSessionPlayers(sessionId);
+
+    if (moveOrder < sessionPlayers.length) {
+      moveOrder = moveOrder + 1;
+    } else {
+      moveOrder = 1;
+    }
+
+    const nextPlayer = _.find( 
+      sessionPlayers,
+      (player: Player) => player.moveOrder === moveOrder
+    );
+    player.isTurn = false;
+    nextPlayer.isTurn = true;
+
     _.forEach(sessionPlayers, function (player: Player) {
       const playerSocket = sockets[player.socketId];
-      playerSocket.emit("gameStart", {map, player, sessionPlayers});
+      playerSocket.emit("turn", nextPlayer.socketId);
     });
   });
 });
@@ -197,3 +216,24 @@ io.on("connection", function (socket: Socket) {
 server.listen(8081, function () {
   console.log(`Listening on ${server.address().port}`);
 });
+
+function getSession(name: string): Session {
+  return _.find(sessions, (session: Session) => session.name === name);
+}
+
+function getSessionPlayers(sessionId: string): Player[] {
+  return _.reduce(
+    players,
+    function (sessionPlayers: Player[], player: Player) {
+      if (player.sessionId === sessionId) {
+        sessionPlayers.push(player);
+      }
+      return sessionPlayers;
+    },
+    []
+  );
+}
+
+function getPlayerBySocketId(socketId: string): Player {
+  return _.find(players, (player: Player) => player.socketId === socketId);
+}

@@ -1,18 +1,23 @@
 import * as Phaser from 'phaser';
 import SocketController from "../SocketController";
-import { TileTypeEnum, SizeEnum } from '../Models/Enums';
+import { TileTypeEnum, SizeEnum, DirectionEnum } from '../Models/Enums';
 import { PlayerServer } from '../Models/ServerModels';
 import { Player } from '../Models/Player';
 import { sceneEvents } from '../Events/EventsController'
 
 export default class MainScene extends Phaser.Scene{
-    private tileMap: Phaser.Tilemaps.Tilemap;
-    public playerCount : number;
-    private player : Player;
-    private playerList : Player[] = [];
+    //Utils
+    private socketInstance : SocketController;
+    //Init Data
     private mapData;
     private currentPlayerData : PlayerServer;
     private allPlayerData : PlayerServer[];
+    //Map
+    private tileMap: Phaser.Tilemaps.Tilemap;
+    //Players
+    private playerList : Player[] = [];
+    private player : Player;
+    public playersTurnId : string;
 
     constructor(){
         super("MainScene");
@@ -65,7 +70,6 @@ export default class MainScene extends Phaser.Scene{
             frameWidth: 26,
             frameHeight: 36,
         });
-
         this.load.image("tiles", "../../assets/cloud_tileset.png");
         this.load.image("background", "../../assets/cloud_backround.png");
         
@@ -74,7 +78,9 @@ export default class MainScene extends Phaser.Scene{
     create(){
         const scene = this;
         this.scene.run('UIScene')
-        sceneEvents.emit('start', 100)
+        sceneEvents.emit('start', 100)      
+        this.socketInstance = SocketController.getInstance();
+
         //Map Render
         this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, "background").setDepth(0)
         this.tileMap = this.make.tilemap({data: this.mapData, tileWidth: 16, tileHeight: 16})
@@ -87,7 +93,7 @@ export default class MainScene extends Phaser.Scene{
             if(playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y)
             {
                 //Create current player
-                this.player = new Player(scene, spawnPoint.x * SizeEnum.TILE_SIZE, spawnPoint.y * SizeEnum.TILE_SIZE, 'player', 'YOU')
+                this.player = new Player(scene, spawnPoint.x * SizeEnum.TILE_SIZE, spawnPoint.y * SizeEnum.TILE_SIZE, 'player', 'YOU', playerData.currentHP, playerData.socketId)
                 scene.playerList.push(this.player);
 
                 //Camera follow this player
@@ -98,15 +104,22 @@ export default class MainScene extends Phaser.Scene{
             else
             {
                 //Create other player   
-                let otherPlayer = new Player(scene, spawnPoint.x * SizeEnum.TILE_SIZE, spawnPoint.y * SizeEnum.TILE_SIZE, 'player', 'ENEMY')
+                let otherPlayer = new Player(scene, spawnPoint.x * SizeEnum.TILE_SIZE, spawnPoint.y * SizeEnum.TILE_SIZE, 'player', 'ENEMY', playerData.currentHP, playerData.socketId)
                 scene.playerList.push(otherPlayer);
             }
-
         });
+
     }
 
     update(time : number, delta : number)
     {
         this.player.update(time, delta)
+
+        if(this.playersTurnId == this.player.id)
+        {
+
+            //Handle player turn
+            this.socketInstance.endTurn()
+        }
     }
 }

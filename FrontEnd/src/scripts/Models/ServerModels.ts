@@ -1,25 +1,25 @@
 export type Entity = {
-    id: String;
-    x?: Number;
-    y?: Number;
+    id: string;
+    x?: number;
+    y?: number;
   };
   
 export type TileServer = {
     entity?: Entity;
-    x: Number;
-    y: Number;
+    x: number;
+    y: number;
   };
 
 export type PlayerServer = Entity & {
 socketId: string;
 sessionId: string;
 name?: string;
-currentHP?: Number;
-currentAttack?: Number;
-currentMoveCount?: Number;
-leftMoveCount?: Number;
-isAlive?: Boolean;
-isTurn?: Boolean;
-isWinner?: Boolean;
+currentHP?: number;
+currentAttack?: number;
+currentMoveCount?: number;
+leftMoveCount?: number;
+isAlive?: boolean;
+isTurn?: boolean;
+isWinner?: boolean;
 moveOrder?: number;
 };
