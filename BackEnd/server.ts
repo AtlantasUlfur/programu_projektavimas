@@ -50,6 +50,13 @@ const sockets: { [key: string]: Socket } = {};
 io.on("connection", function (socket: Socket) {
   sockets[socket.id] = socket;
 
+  socket.on("disconnect", function () {
+    console.log("user disconnected");
+    // remove this player from our players object
+    _.remove(players, (player: Player) => player.socketId === socket.id);
+    _.remove(sockets, (scoket: Socket) => scoket.id === socket.id);
+  });
+
   socket.on("createLobby", function (payload) {
     console.log("New lobby");
 
