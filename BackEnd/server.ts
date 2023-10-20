@@ -227,6 +227,20 @@ io.on("connection", function (socket: Socket) {
       playerSocket.emit("playerMove", {player: socket.id, x: player.x, y: player.y});
     });
   });
+  socket.on("damagePlayer", function (damage: number) {
+    console.log("Damaged");
+
+    const player = getPlayerBySocketId(socket.id);
+    player.currentHP = player.currentHP == undefined ? 0 : player.currentHP - damage;
+    const sessionId = player.sessionId;
+
+    const sessionPlayers = getSessionPlayers(sessionId);
+
+    _.forEach(sessionPlayers, function (currentPlayer: Player) {
+      const playerSocket = sockets[currentPlayer.socketId];
+      playerSocket.emit("playerDamage", {player: socket.id, currentHP: player.currentHP});
+    });
+  });
 });
 
 server.listen(8081, function () {

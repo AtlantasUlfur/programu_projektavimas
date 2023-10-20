@@ -13,7 +13,7 @@ export type Player = Entity & {
   socketId: string;
   sessionId: string;
   name?: string;
-  currentHP?: Number;
+  currentHP?: number;
   currentAttack?: Number;
   currentMoveCount?: Number;
   leftMoveCount?: Number;
