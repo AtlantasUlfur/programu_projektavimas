@@ -2,11 +2,10 @@ import { Player } from '../Models/Player' // Assuming Player class and Enums are
 
 export default class PlayerBuilder {
   private scene: Phaser.Scene
-  private x: number
-  private y: number
+  private tilePos : Phaser.Math.Vector2
   private key: string
   private name: string
-  private hp?: number
+  private hp: number
   private socketId: string
   private frame: number
 
@@ -14,9 +13,8 @@ export default class PlayerBuilder {
     this.scene = scene
   }
 
-  setPosition(x: number, y: number): PlayerBuilder {
-    this.x = x
-    this.y = y
+  setPosition(tilePos : Phaser.Math.Vector2): PlayerBuilder {
+    this.tilePos = tilePos;
     return this
   }
 
@@ -45,7 +43,7 @@ export default class PlayerBuilder {
   }
 
   build(): Player {
-    const player = new Player(this.scene, this.x, this.y, this.key, this.frame, this.name, this.hp, this.socketId)
+    const player = new Player(this.scene, this.tilePos, this.key, this.frame, this.name, this.hp, this.socketId)
 
     return player
   }

@@ -7,14 +7,17 @@ export class Player extends Phaser.GameObjects.Sprite {
   private isFinished: boolean;
   private currentHealth: integer;
   private waitText: Phaser.GameObjects.Text;
+  public tilePos : Phaser.Math.Vector2;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, key: string, frame: number, name: string, hp: number | undefined, socketId : string) {
+  constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string) {
     super(scene, 0, 0, key)
 
     this.id = socketId;
-    this.currentHealth = hp == undefined ? 100 : hp;
+    this.currentHealth = hp;
     this.isMoved = false;
     this.isFinished = false;
+
+    this.tilePos = tilePos;
 
     //Add to scene
     this.scene.add.existing(this);
@@ -23,7 +26,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.setTexture('player');
     this.setFrame(frame);
     this.setDepth(0);
-    this.setPosition(x, y);
+    this.setPosition(tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
 
     //Create player name
     this.playerName = this.scene.add.text(0, 0, name, {
@@ -46,22 +49,26 @@ export class Player extends Phaser.GameObjects.Sprite {
   showPlayerNickname() {
     // this.playerName.x = this.x - (this.playerName.width / 2);
     // this.playerName.y = this.y - (this.height / 2);
-    this.playerName.setPosition(this.x, this.y - SizeEnum.PLAYER_NAME_OFFSET)
+    this.playerName.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET - SizeEnum.PLAYER_NAME_OFFSET)
   }
 
-  move(direction : DirectionEnum){
+  move(direction : DirectionEnum, stepCount : integer){
     switch (direction) {
       case DirectionEnum.UP:
-        this.setPosition(this.x, this.y-1);
+        this.tilePos.y -= stepCount;
+        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
         break;
       case DirectionEnum.DOWN:
-        this.setPosition(this.x, this.y+1);
+        this.tilePos.y += stepCount;
+        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
         break;
       case DirectionEnum.LEFT:
-        this.setPosition(this.x-1, this.y);
+        this.tilePos.x -= stepCount;
+        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
         break;
       case DirectionEnum.RIGHT:
-        this.setPosition(this.x+1, this.y);
+        this.tilePos.x += stepCount;
+        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
         break;
       default:
         console.log("Somethings wrong...")
