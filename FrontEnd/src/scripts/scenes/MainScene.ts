@@ -95,13 +95,21 @@ export default class MainScene extends Phaser.Scene{
         const layer = this.tileMap.createLayer(0, tiles, 0, 0)
         const builder = new PlayerBuilder(scene)
         //Create all players
-        this.allPlayerData.forEach(playerData => {
+        this.allPlayerData = this.allPlayerData.sort((a, b) => {
+            return a.socketId.localeCompare(b.socketId);
+        });
+        const texture_frames = [49, 52, 55, 10];
+        this.allPlayerData.forEach((playerData, index) => {
+        
+    
+        console.log(playerData)
+        
         if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
             //Create current player
             this.player = builder
             .setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
             .setKey('player') // key of spritesheet
-            .setFrame(49) // frame in spritesheet
+            .setFrame(texture_frames[index]) // frame in spritesheet
             .setName('YOU')
             .setHP(playerData.currentHP)
             .setSocketId(playerData.socketId)
@@ -117,7 +125,7 @@ export default class MainScene extends Phaser.Scene{
             let otherPlayer = builder
             .setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
             .setKey('player') // key of spritesheet
-            .setFrame(46) // frame in spritesheet
+            .setFrame(texture_frames[index]) // frame in spritesheet
             .setName('ENEMY')
             .setHP(playerData.currentHP)
             .setSocketId(playerData.socketId)
@@ -130,14 +138,15 @@ export default class MainScene extends Phaser.Scene{
 
     update(time: number, delta: number) {
 
-        if(this.playersTurnId == this.player.id)
+        if(this.playersTurnId == this.player.id && time > 10000)
         {
-            //Handle player turn
-            //DEBUGGING WALKING
+            // //Handle player turn
+            // //DEBUGGING WALKING
             // switch (prompt("nigga")) {
             //     case "w":
             //         if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-1))
             //             this.player.move(DirectionEnum.UP, 1);
+
             //         break;
             //     case "a":
             //         if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-1, this.player.tilePos.y))
@@ -154,6 +163,7 @@ export default class MainScene extends Phaser.Scene{
             //     default:
             //         break;
             // }
+            // this.socketInstance.endTurn();
         }
         this.player.update(time, delta)
     }
