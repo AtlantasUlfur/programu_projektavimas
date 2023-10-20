@@ -73,9 +73,9 @@ export default class GameUI extends Phaser.Scene
         this.nameLabel.setPosition(870, 70)
 
         this.nameLabel.text = this.player.getPlayerName()
-        this.playerTexture = this.player.getTexture()
+        this.playerTexture = this.player.frame.texture
   
-        this.playerSprite = this.add.sprite(850, 140, this.playerTexture).setScale(2)
+        this.playerSprite = this.add.sprite(850, 140, this.playerTexture, this.player.frame.name).setScale(2)
 
         this.hpLabel = this.add.text(0, 0, this.player.getCurrentHealth() + " / 100", {
 			fontSize: '50'
