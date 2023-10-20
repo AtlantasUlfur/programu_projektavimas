@@ -19,7 +19,6 @@ export default class MainScene extends Phaser.Scene {
   public playerList: Player[] = []
   public player: Player
   public playersTurnId: string = ''
-  private isHaveAttackPower: boolean
 
   constructor() {
     super('MainScene')
@@ -134,7 +133,6 @@ export default class MainScene extends Phaser.Scene {
 
       this.handleDamage(payload)
     })
-    console.log("have ", this.playersTurnId)
     this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
   }
 
@@ -142,32 +140,6 @@ export default class MainScene extends Phaser.Scene {
     if (this.player.attackPower == 0) {
       this.socketInstance.getAttackAmount()
     }
-    //DEBUGGING WALKING
-    // if(this.playersTurnId == this.player.id && time > 10000)
-    // {
-    // switch (prompt("Walk wasd")) {
-    //     case "w":
-    //         if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-1))
-    //             this.player.move(DirectionEnum.UP, 1);
-
-    //         break;
-    //     case "a":
-    //         if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-1, this.player.tilePos.y))
-    //             this.player.move(DirectionEnum.LEFT, 1);
-    //         break;
-    //     case "s":
-    //         if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+1))
-    //             this.player.move(DirectionEnum.DOWN, 1);
-    //         break;
-    //     case "d":
-    //         if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+1, this.player.tilePos.y))
-    //             this.player.move(DirectionEnum.RIGHT, 1);
-    //         break;
-    //     default:
-    //         break;
-    // }
-    // this.socketInstance.endTurn();
-    // }
     this.player.update(time, delta)
   }
 
@@ -217,8 +189,7 @@ export default class MainScene extends Phaser.Scene {
 
     canPlayerMove(scene : MainScene, tileMap : Phaser.Tilemaps.Tilemap, player : Player, toX : number, toY : number, direction : DirectionEnum){
         let distance = 0;
-        debugger;   
-        switch (direction) {
+            switch (direction) {
             case DirectionEnum.UP:
                 distance = player.tilePos.y - toY;
                 var travelingY = player.tilePos.y;
@@ -291,9 +262,9 @@ export default class MainScene extends Phaser.Scene {
         if (this.playersTurnId == this.player.id) {
           this.socketInstance.damagePlayer(this.player.attackPower, targetId)
           sceneEvents.emit('changeHP')
-          this.playerList.forEach(playerObj => {
-            console.log(playerObj)
-          })
+        //   this.playerList.forEach(playerObj => {
+        //     console.log(playerObj)
+        //   })
           this.socketInstance.endTurn()
           //TODO: DISTANCE CHECK
         }

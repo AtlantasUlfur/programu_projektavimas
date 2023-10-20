@@ -147,6 +147,12 @@ export default class GameUI extends Phaser.Scene
         this.hotbarOne.setOrigin(1,0)
         this.hotbarOne.setPosition(790, 260)
         this.hotbarOne.setInteractive();
+        this.hotbarOne.on('pointerdown', (event) => {
+            this.hotbarOne.setTint('#eaebe7');
+        });
+        this.hotbarOne.on('pointerup', (event) => {
+            this.hotbarOne.clearTint();
+        });
         
         this.hotbarTwo = this.add.sprite(0,0, "frame")
         this.hotbarTwo.displayHeight = 40
@@ -154,6 +160,12 @@ export default class GameUI extends Phaser.Scene
         this.hotbarTwo.setOrigin(1,0)
         this.hotbarTwo.setPosition(840, 260)
         this.hotbarTwo.setInteractive();
+        this.hotbarTwo.on('pointerdown', (event) => {
+            this.hotbarTwo.setTint('#eaebe7');
+        });
+        this.hotbarTwo.on('pointerup', (event) => {
+            this.hotbarTwo.clearTint();
+        });
 
         this.hotbarThree = this.add.sprite(0,0, "frame")
         this.hotbarThree.displayHeight = 40
@@ -161,6 +173,12 @@ export default class GameUI extends Phaser.Scene
         this.hotbarThree.setOrigin(1,0)
         this.hotbarThree.setPosition(890, 260)
         this.hotbarThree.setInteractive();
+        this.hotbarThree.on('pointerdown', (event) => {
+            this.hotbarThree.setTint('#eaebe7');
+        });
+        this.hotbarThree.on('pointerup', (event) => {
+            this.hotbarThree.clearTint();
+        });
 
         this.hotbarFour = this.add.sprite(0,0, "frame")
         this.hotbarFour.displayHeight = 40
@@ -168,6 +186,12 @@ export default class GameUI extends Phaser.Scene
         this.hotbarFour.setOrigin(1,0)
         this.hotbarFour.setPosition(940, 260)
         this.hotbarFour.setInteractive();
+        this.hotbarFour.on('pointerdown', (event) => {
+            this.hotbarFour.setTint('#eaebe7');
+        });
+        this.hotbarFour.on('pointerup', (event) => {
+            this.hotbarFour.clearTint();
+        });
 
 
         this.arrowUp = this.add.sprite(0,0, "arrowup")
@@ -177,7 +201,11 @@ export default class GameUI extends Phaser.Scene
         this.arrowUp.setPosition(860, 450)
         this.arrowUp.setInteractive();
         this.arrowUp.on('pointerdown', (event) => {
+            this.arrowUp.tint = 12;
             sceneEvents.emit("movement", DirectionEnum.UP);
+        });
+        this.arrowUp.on('pointerup', (event) => {
+            this.arrowUp.clearTint();
         });
 
         this.arrowDown = this.add.sprite(0,0, "arrowdown")
@@ -187,7 +215,11 @@ export default class GameUI extends Phaser.Scene
         this.arrowDown.setPosition(860, 500)
         this.arrowDown.setInteractive();
         this.arrowDown.on('pointerdown', (event) => {
+            this.arrowDown.tint = 12;
             sceneEvents.emit("movement", DirectionEnum.DOWN);
+        });
+        this.arrowDown.on('pointerup', (event) => {
+            this.arrowDown.clearTint();
         });
 
         this.arrowLeft = this.add.sprite(0,0, "arrowleft")
@@ -197,7 +229,11 @@ export default class GameUI extends Phaser.Scene
         this.arrowLeft.setPosition(835, 475)
         this.arrowLeft.setInteractive();
         this.arrowLeft.on('pointerdown', (event) => {
+            this.arrowLeft.tint = 12;
             sceneEvents.emit("movement", DirectionEnum.LEFT);
+        });
+        this.arrowLeft.on('pointerup', (event) => {
+            this.arrowLeft.clearTint();
         });
 
         this.arrowRight = this.add.sprite(0,0, "arrowright")
@@ -207,7 +243,11 @@ export default class GameUI extends Phaser.Scene
         this.arrowRight.setPosition(885, 475)
         this.arrowRight.setInteractive();
         this.arrowRight.on('pointerdown', (event) => {
+            this.arrowRight.tint = 12;
             sceneEvents.emit("movement", DirectionEnum.RIGHT);
+        });
+        this.arrowRight.on('pointerup', (event) => {
+            this.hotbarOne.clearTint();
         });
 
         this.MenuGroup = this.add.group()
@@ -235,7 +275,11 @@ export default class GameUI extends Phaser.Scene
                 var attackBtn = this.add.sprite(0,0, "attack")
                 attackBtn.setInteractive()
                 attackBtn.on('pointerdown', (event) => {
+                    attackBtn.tint = 12;
                     sceneEvents.emit("damage", playerInList.id);
+                });
+                attackBtn.on('pointerup', (event) => {
+                    attackBtn.clearTint(); 
                 });
                 attackBtn.displayHeight = 44
                 attackBtn.displayWidth = 44
