@@ -39,6 +39,16 @@ export default class  SocketController
                 const mainScene = this.scene as MainScene;
                 mainScene.playersTurnId = payload;
             });
+            this.socket.on("playerMove", (payload)=>{
+                const mainScene = this.scene as MainScene;
+                mainScene.playerList.forEach(playerObj =>{
+                    if(playerObj.id == payload.player){
+                        console.log("MOVEDD FROM BACK");
+                        console.log(playerObj);
+                        playerObj.setTilePos(payload.x, payload.y);
+                    }
+                });
+            });
         }
     }
 
@@ -64,6 +74,10 @@ export default class  SocketController
 
     public endTurn(){
         this.socket?.emit("endTurn");
+    }
+
+    public movePlayer(x :number, y : number){
+        this.socket?.emit("movePlayer", x, y)
     }
 
 }

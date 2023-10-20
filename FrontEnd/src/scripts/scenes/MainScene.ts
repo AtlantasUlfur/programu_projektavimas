@@ -4,7 +4,7 @@ import { TileTypeEnum, SizeEnum, DirectionEnum } from '../Models/Enums'
 import { PlayerServer } from '../Models/ServerModels'
 import { Player } from '../Models/Player'
 import PlayerBuilder from '../utils/PlayerBuilder'
-
+import { sceneEvents } from '../Events/EventsController'
 
 export default class MainScene extends Phaser.Scene{
     //Utils
@@ -16,7 +16,7 @@ export default class MainScene extends Phaser.Scene{
     //Map
     private tileMap: Phaser.Tilemaps.Tilemap;
     //Players
-    private playerList : Player[] = [];
+    public playerList : Player[] = [];
     private player : Player;
     public playersTurnId :string = "";
 
@@ -133,16 +133,17 @@ export default class MainScene extends Phaser.Scene{
             scene.playerList.push(otherPlayer)
         }
         })
+        sceneEvents.on("movement", (payload) =>{
+            this.handleMovement(payload);
+        });
         this.scene.run('UIScene', { playerObj: this.player, players: this.playerList })
     }
 
     update(time: number, delta: number) {
-
-        if(this.playersTurnId == this.player.id && time > 10000)
-        {
-            // //Handle player turn
-            // //DEBUGGING WALKING
-            // switch (prompt("nigga")) {
+        //DEBUGGING WALKING
+        // if(this.playersTurnId == this.player.id && time > 10000)
+        // {
+            // switch (prompt("Walk wasd")) {
             //     case "w":
             //         if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-1))
             //             this.player.move(DirectionEnum.UP, 1);
@@ -164,8 +165,44 @@ export default class MainScene extends Phaser.Scene{
             //         break;
             // }
             // this.socketInstance.endTurn();
-        }
+        // }
         this.player.update(time, delta)
+    }
+
+    handleMovement(direction: DirectionEnum){
+        if(this.playersTurnId == this.player.id)
+        {
+            switch (direction) {
+                case DirectionEnum.UP:
+                    if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-1)){
+                        this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y-1);
+                        this.player.move(DirectionEnum.UP, 1);
+                    }
+                  break;
+                case DirectionEnum.DOWN:
+                    if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+1)){
+                        this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y+1);
+                        this.player.move(DirectionEnum.DOWN, 1);
+                    }
+                  break;
+                case DirectionEnum.LEFT:
+                    if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-1, this.player.tilePos.y)){
+                        this.socketInstance.movePlayer(this.player.tilePos.x-1, this.player.tilePos.y);
+                        this.player.move(DirectionEnum.LEFT, 1);
+                    }
+                  break;
+                case DirectionEnum.RIGHT:
+                    if(this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+1, this.player.tilePos.y)){
+                        this.socketInstance.movePlayer(this.player.tilePos.x+1, this.player.tilePos.y);
+                        this.player.move(DirectionEnum.RIGHT, 1);
+                    }
+                  break;
+                default:
+                  console.log("Somethings wrong...")
+                  break;
+            }
+            this.socketInstance.endTurn();
+        }
     }
 
     canPlayerMove(scene : MainScene, tileMap : Phaser.Tilemaps.Tilemap, player : Player, toX : number, toY : number){
