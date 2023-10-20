@@ -63,7 +63,7 @@ io.on("connection", function (socket: Socket) {
     const sessionId = uuid();
     sessions.push({ id: sessionId, name: payload.name });
 
-    players.push({ id: "player", socketId: socket.id, sessionId });
+    players.push({ id: "player", socketId: socket.id, sessionId, currentHP: 100 });
 
     socket.emit("playerCount", 1);
   });
@@ -85,6 +85,7 @@ io.on("connection", function (socket: Socket) {
       id: "player",
       socketId: socket.id,
       sessionId: session.id,
+      currentHP: 100
     });
 
     //NOTE(HB) collect players in updated session
@@ -227,19 +228,34 @@ io.on("connection", function (socket: Socket) {
       playerSocket.emit("playerMove", {player: socket.id, x: player.x, y: player.y});
     });
   });
-  socket.on("damagePlayer", function (damage: number) {
+  socket.on("damagePlayer", function (damage: number, targetId: string) {
     console.log("Damaged");
+    console.log("DMG", damage)
+    console.log(targetId)
 
-    const player = getPlayerBySocketId(socket.id);
-    player.currentHP = player.currentHP == undefined ? 0 : player.currentHP - damage;
+    const player = getPlayerBySocketId(targetId);
+    console.log("BEFORE HP", player.currentHP)
+    player.currentHP = player.currentHP == undefined ? 69 : player.currentHP - damage;
+    console.log("AFTER HP", player.currentHP)
     const sessionId = player.sessionId;
 
     const sessionPlayers = getSessionPlayers(sessionId);
 
     _.forEach(sessionPlayers, function (currentPlayer: Player) {
       const playerSocket = sockets[currentPlayer.socketId];
-      playerSocket.emit("playerDamage", {player: socket.id, currentHP: player.currentHP});
+      playerSocket.emit("playerDamage", {player: targetId, currentHP: player.currentHP});
     });
+  });
+
+  socket.on("getAttackAmount", function () {
+    console.log("Getting attack amount");
+
+    const player = getPlayerBySocketId(socket.id);
+    const randomNumber = Math.floor(Math.random() * 11) + 5;
+
+    const playerSocket = sockets[player.socketId];
+    playerSocket.emit("attackAmount", {player: socket.id, currentAttack: randomNumber});
+    
   });
 });
 

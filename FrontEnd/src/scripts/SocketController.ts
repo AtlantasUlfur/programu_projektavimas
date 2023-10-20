@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { MainMenuScene } from "./scenes/MainMenuScene";
 import MainScene from "./scenes/MainScene";
+import { sceneEvents } from "./Events/EventsController";
 
 //Singleton
 export default class  SocketController
@@ -50,6 +51,21 @@ export default class  SocketController
                     }
                 });
             });
+            this.socket.on("playerDamage", (payload)=>{
+                const mainScene = this.scene as MainScene;
+                    mainScene.playerList.forEach(playerObj =>{
+                    if(playerObj.id == payload.player){
+                        playerObj.setHP(payload.currentHP)
+                    }   
+                    if (mainScene.player.id == payload.player) {
+                        sceneEvents.emit('hpChange')
+                    }
+                });
+            });
+            this.socket.on("attackAmount", (payload)=>{
+                const mainScene = this.scene as MainScene;
+                mainScene.player.attackPower = payload.currentAttack;
+            });
         }
     }
 
@@ -79,6 +95,13 @@ export default class  SocketController
 
     public movePlayer(x :number, y : number){
         this.socket?.emit("movePlayer", x, y)
+    }
+    public damagePlayer(damage : number, targetId: string){
+        console.log("dmg", damage);
+        this.socket?.emit("damagePlayer", damage, targetId)
+    }
+    public getAttackAmount(){
+        this.socket?.emit("getAttackAmount");
     }
 
 }

@@ -102,6 +102,10 @@ export default class GameUI extends Phaser.Scene
         this.hpLabel.setOrigin(1,0)
         this.hpLabel.setPosition(890, 200)
         this.hpLabel.setColor("#008000")
+        sceneEvents.on('hpChange', (event) => {
+            console.log('hp changed')
+            this.hpLabel.setText(this.player.getCurrentHealth() + " / 100")
+        });
 
         this.hotbarOne = this.add.sprite(0,0, "frame")
         this.hotbarOne.displayHeight = 40
@@ -195,6 +199,10 @@ export default class GameUI extends Phaser.Scene
                 var spriteLocal = this.add.sprite(750 + i, 350, playerInList.frame.texture, playerInList.frame.name).setScale(2)
                 i = i + 100;
                 var attackBtn = this.add.sprite(0,0, "attack")
+                attackBtn.setInteractive()
+                attackBtn.on('pointerdown', (event) => {
+                    sceneEvents.emit("damage", playerInList.id);
+                });
                 attackBtn.displayHeight = 44
                 attackBtn.displayWidth = 44
                 attackBtn.setOrigin(1,0)

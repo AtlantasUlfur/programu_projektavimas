@@ -8,6 +8,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   private currentHealth: integer;
   private waitText: Phaser.GameObjects.Text;
   public tilePos : Phaser.Math.Vector2;
+  public attackPower: number = 0;
 
   constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string) {
     super(scene, 0, 0, key)
@@ -50,6 +51,9 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.tilePos = new Phaser.Math.Vector2(x, y);
     this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
     this.showPlayerNickname();
+  }
+  setHP(amount: number){
+    this.currentHealth = amount
   }
 
   showPlayerNickname() {
