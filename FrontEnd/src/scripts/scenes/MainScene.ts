@@ -77,11 +77,14 @@ export default class MainScene extends Phaser.Scene {
     })
     this.load.image('tiles', '../../assets/cloud_tileset.png')
     this.load.image('background', '../../assets/cloud_backround.png')
+    this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 });
   }
 
   create() {
     const scene = this
     this.socketInstance = SocketController.getInstance()
+    
+    //const gunImage = this.add.image(200, 200, 'guns', 0).setDepth(100).setScale(0.25).setOrigin(0)
 
     //Map Render
     this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, 'background').setDepth(0)

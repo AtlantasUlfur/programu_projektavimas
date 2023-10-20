@@ -32,11 +32,13 @@ export class MainMenuScene extends Phaser.Scene {
     {
 		this.load.image('glass-panel', '../../assets/glassPanel.png')
 		this.load.image('cursor-hand', '../../assets/cursor_hand.png')
+
     }
 
     create()
     {
         const scene = this;
+
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             createButtonImage.off('selected')

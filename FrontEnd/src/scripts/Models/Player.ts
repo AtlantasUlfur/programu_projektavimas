@@ -1,5 +1,7 @@
 import { Textures } from 'phaser';
 import { SizeEnum, DirectionEnum } from './Enums'
+import { IGun } from '../ModelInterfaces/Guns/IGun';
+import { GunCreator } from './Guns/GunCreator';
 export class Player extends Phaser.GameObjects.Sprite {
   public id : string;
   private playerName: Phaser.GameObjects.Text;
@@ -7,8 +9,12 @@ export class Player extends Phaser.GameObjects.Sprite {
   private isFinished: boolean;
   private currentHealth: integer;
   private waitText: Phaser.GameObjects.Text;
+  private allGuns: IGun[];
+
   public tilePos : Phaser.Math.Vector2;
   public attackPower: number = 0;
+  public selectedGun: IGun;
+  private gunImage: Phaser.GameObjects.Image
 
   constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string) {
     super(scene, 0, 0, key)
@@ -41,16 +47,34 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.playerName.setResolution(7);
 
     this.showPlayerNickname();
+
+
+    this.allGuns = GunCreator.CreateAllGuns();
+    // needs specific gun at some point
+    if(this.allGuns.length > 0){
+      this.selectedGun = this.allGuns[0];
+      this.gunImage = this.scene.add.image(
+        0, 0, 'guns', this.selectedGun.gunFrame
+        ).setScale(0.2);
+
+      this.gunImage.setDepth(10);
+      this.gunImage.setOrigin(0.5, 1.5);
+
+      this.showChosenGun();
+    } 
+
   }
 
   update(time: number, delta: number) {
     this.showPlayerNickname()
+    this.showChosenGun()
   }
 
   setTilePos(x: number, y: number){
     this.tilePos = new Phaser.Math.Vector2(x, y);
     this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
     this.showPlayerNickname();
+    this.showChosenGun();
   }
   setHP(amount: number){
     this.currentHealth = amount
@@ -60,6 +84,11 @@ export class Player extends Phaser.GameObjects.Sprite {
     // this.playerName.x = this.x - (this.playerName.width / 2);
     // this.playerName.y = this.y - (this.height / 2);
     this.playerName.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET - SizeEnum.PLAYER_NAME_OFFSET)
+  }
+  showChosenGun() {
+    // this.playerName.x = this.x - (this.playerName.width / 2);
+    // this.playerName.y = this.y - (this.height / 2);
+    this.gunImage.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET - SizeEnum.PLAYER_NAME_OFFSET + 10)
   }
 
   move(direction : DirectionEnum, stepCount : integer){
