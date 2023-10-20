@@ -222,8 +222,8 @@ io.on("connection", function (socket: Socket) {
 
     const sessionPlayers = getSessionPlayers(sessionId);
 
-    _.forEach(sessionPlayers, function (player: Player) {
-      const playerSocket = sockets[player.socketId];
+    _.forEach(sessionPlayers, function (playerCurrent: Player) {
+      const playerSocket = sockets[playerCurrent.socketId];
       playerSocket.emit("playerMove", {player: socket.id, x: player.x, y: player.y});
     });
   });

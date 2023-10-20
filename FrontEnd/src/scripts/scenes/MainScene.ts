@@ -17,7 +17,7 @@ export default class MainScene extends Phaser.Scene{
     private tileMap: Phaser.Tilemaps.Tilemap;
     //Players
     public playerList : Player[] = [];
-    private player : Player;
+    public player : Player;
     public playersTurnId :string = "";
 
     constructor(){
