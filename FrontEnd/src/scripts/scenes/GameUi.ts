@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 
 import { sceneEvents } from '../Events/EventsController'
 import { Player } from '../Models/Player'
+import { DirectionEnum } from '../Models/Enums'
 
 export default class GameUI extends Phaser.Scene
 {
@@ -107,24 +108,28 @@ export default class GameUI extends Phaser.Scene
         this.hotbarOne.displayWidth = 40
         this.hotbarOne.setOrigin(1,0)
         this.hotbarOne.setPosition(790, 260)
+        this.hotbarOne.setInteractive();
         
         this.hotbarTwo = this.add.sprite(0,0, "frame")
         this.hotbarTwo.displayHeight = 40
         this.hotbarTwo.displayWidth = 40
         this.hotbarTwo.setOrigin(1,0)
         this.hotbarTwo.setPosition(840, 260)
+        this.hotbarTwo.setInteractive();
 
         this.hotbarThree = this.add.sprite(0,0, "frame")
         this.hotbarThree.displayHeight = 40
         this.hotbarThree.displayWidth = 40
         this.hotbarThree.setOrigin(1,0)
         this.hotbarThree.setPosition(890, 260)
+        this.hotbarThree.setInteractive();
 
         this.hotbarFour = this.add.sprite(0,0, "frame")
         this.hotbarFour.displayHeight = 40
         this.hotbarFour.displayWidth = 40
         this.hotbarFour.setOrigin(1,0)
         this.hotbarFour.setPosition(940, 260)
+        this.hotbarFour.setInteractive();
 
 
         this.arrowUp = this.add.sprite(0,0, "arrowup")
@@ -132,24 +137,40 @@ export default class GameUI extends Phaser.Scene
         this.arrowUp.displayWidth = 24
         this.arrowUp.setOrigin(1,0)
         this.arrowUp.setPosition(860, 450)
+        this.arrowUp.setInteractive();
+        this.arrowUp.on('pointerdown', (event) => {
+            sceneEvents.emit("movement", DirectionEnum.UP);
+        });
 
         this.arrowDown = this.add.sprite(0,0, "arrowdown")
         this.arrowDown.displayHeight = 24
         this.arrowDown.displayWidth = 24
         this.arrowDown.setOrigin(1,0)
         this.arrowDown.setPosition(860, 500)
+        this.arrowDown.setInteractive();
+        this.arrowDown.on('pointerdown', (event) => {
+            sceneEvents.emit("movement", DirectionEnum.DOWN);
+        });
 
         this.arrowLeft = this.add.sprite(0,0, "arrowleft")
         this.arrowLeft.displayHeight = 24
         this.arrowLeft.displayWidth = 24
         this.arrowLeft.setOrigin(1,0)
         this.arrowLeft.setPosition(835, 475)
+        this.arrowLeft.setInteractive();
+        this.arrowLeft.on('pointerdown', (event) => {
+            sceneEvents.emit("movement", DirectionEnum.LEFT);
+        });
 
         this.arrowRight = this.add.sprite(0,0, "arrowright")
         this.arrowRight.displayHeight = 24
         this.arrowRight.displayWidth = 24
         this.arrowRight.setOrigin(1,0)
         this.arrowRight.setPosition(885, 475)
+        this.arrowRight.setInteractive();
+        this.arrowRight.on('pointerdown', (event) => {
+            sceneEvents.emit("movement", DirectionEnum.RIGHT);
+        });
 
         this.MenuGroup = this.add.group()
         this.MenuGroup.add(this.baseSprite)

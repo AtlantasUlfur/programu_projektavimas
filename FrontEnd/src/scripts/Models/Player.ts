@@ -46,6 +46,12 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.showPlayerNickname()
   }
 
+  setTilePos(x: number, y: number){
+    this.tilePos = new Phaser.Math.Vector2(x, y);
+    this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
+    this.showPlayerNickname();
+  }
+
   showPlayerNickname() {
     // this.playerName.x = this.x - (this.playerName.width / 2);
     // this.playerName.y = this.y - (this.height / 2);
