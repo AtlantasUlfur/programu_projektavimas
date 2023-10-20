@@ -41,11 +41,8 @@ export default class  SocketController
             });
             this.socket.on("playerMove", (payload)=>{
                 const mainScene = this.scene as MainScene;
-                    console.log(payload);
                     mainScene.playerList.forEach(playerObj =>{
                     if(playerObj.id == payload.player){
-                        console.log("MOVEDD FROM BACK");
-                        console.log(playerObj);
                         playerObj.setTilePos(payload.x, payload.y);
                     }
                 });
