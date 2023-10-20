@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { MainMenuScene } from "./scenes/MainMenuScene";
 import MainScene from "./scenes/MainScene";
+import { sceneEvents } from "./Events/EventsController";
 
 //Singleton
 export default class  SocketController
@@ -38,6 +39,7 @@ export default class  SocketController
             this.socket.on("turn", (payload) =>{
                 const mainScene = this.scene as MainScene;
                 mainScene.playersTurnId = payload;
+                sceneEvents.emit('turnChanged', payload)
             });
             this.socket.on("playerMove", (payload)=>{
                 const mainScene = this.scene as MainScene;
@@ -46,6 +48,25 @@ export default class  SocketController
                         playerObj.setTilePos(payload.x, payload.y);
                     }
                 });
+            });
+            this.socket.on("playerDamage", (payload)=>{
+                const mainScene = this.scene as MainScene;
+                    mainScene.playerList.forEach(playerObj =>{
+                    if(playerObj.id == payload.player){
+                        playerObj.setTint(0xff0000)
+                        setTimeout(() => {
+                            playerObj.clearTint()
+                        }, 250)
+                        playerObj.setHP(payload.currentHP)
+                    }   
+                    if (mainScene.player.id == payload.player) {
+                        sceneEvents.emit('hpChange')
+                    }
+                });
+            });
+            this.socket.on("attackAmount", (payload)=>{
+                const mainScene = this.scene as MainScene;
+                mainScene.player.attackPower = payload.currentAttack;
             });
         }
     }
@@ -76,6 +97,13 @@ export default class  SocketController
 
     public movePlayer(x :number, y : number){
         this.socket?.emit("movePlayer", x, y)
+    }
+    public damagePlayer(damage : number, targetId: string){
+        console.log("dmg", damage);
+        this.socket?.emit("damagePlayer", damage, targetId)
+    }
+    public getAttackAmount(){
+        this.socket?.emit("getAttackAmount");
     }
 
 }

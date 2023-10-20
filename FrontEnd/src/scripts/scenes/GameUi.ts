@@ -15,12 +15,14 @@ export default class GameUI extends Phaser.Scene
     player
     playerTexture
     hpLabel
+    turnLabel
     playerSprite
     hotbarOne
     hotbarTwo
     hotbarThree
     hotbarFour
     playerList
+    playersTurnId
     arrowUp
     arrowDown
     arrowLeft
@@ -42,8 +44,10 @@ export default class GameUI extends Phaser.Scene
         this.load.spritesheet("arrowright", "../../assets/arrow_right.png", {frameWidth: 32, frameHeight: 32});
     }
     init(data){
-        console.log(data)
+        console.log("data", data)
         this.player = data["playerObj"]
+        this.playersTurnId = data["playersTurnId"]
+        console.log("its here", this.playersTurnId)
         console.log(this.player)
         this.playerList = data["players"]
     }
@@ -102,6 +106,40 @@ export default class GameUI extends Phaser.Scene
         this.hpLabel.setOrigin(1,0)
         this.hpLabel.setPosition(890, 200)
         this.hpLabel.setColor("#008000")
+        sceneEvents.on('hpChange', (event) => {
+            console.log('hp changed')
+            this.hpLabel.setText(this.player.getCurrentHealth() + " / 100")
+        });
+
+        this.turnLabel = this.add.text(0, 0, "", {
+			fontSize: '50'
+		})
+
+        this.turnLabel.scale = 2
+        this.turnLabel.setOrigin(1,0)
+        this.turnLabel.setPosition(950, 530)
+        this.turnLabel.setColor("#000000")
+        if (this.playersTurnId == this.player.id) {
+            this.turnLabel.setText("IT'S YOUR TURN!")
+            this.turnLabel.setColor("#008000")
+        }
+        else {
+            this.turnLabel.setText("IT'S NOT YOUR TURN!")
+            this.turnLabel.setColor("#ff0000")
+        }
+        sceneEvents.on('turnChanged', (event) => {
+            console.log('turn changed')
+            console.log(event)
+            if (event == this.player.id) {
+                this.turnLabel.setText("IT'S YOUR TURN!")
+                this.turnLabel.setColor("#008000")
+            }
+            else {
+                this.turnLabel.setText("IT'S NOT YOUR TURN!")
+                this.turnLabel.setColor("#ff0000")
+            }
+        });
+
 
         this.hotbarOne = this.add.sprite(0,0, "frame")
         this.hotbarOne.displayHeight = 40
@@ -195,6 +233,10 @@ export default class GameUI extends Phaser.Scene
                 var spriteLocal = this.add.sprite(750 + i, 350, playerInList.frame.texture, playerInList.frame.name).setScale(2)
                 i = i + 100;
                 var attackBtn = this.add.sprite(0,0, "attack")
+                attackBtn.setInteractive()
+                attackBtn.on('pointerdown', (event) => {
+                    sceneEvents.emit("damage", playerInList.id);
+                });
                 attackBtn.displayHeight = 44
                 attackBtn.displayWidth = 44
                 attackBtn.setOrigin(1,0)

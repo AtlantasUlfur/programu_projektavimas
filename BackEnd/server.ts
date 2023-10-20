@@ -35,9 +35,32 @@ const getDefaultTileMap: () => Tile[] = () => {
       ) {
         entity = { id: "wall", x: i, y: a };
       }
+      if(i === 5 && a > 4 && a < 11) {
+        entity = { id: "wall", x: i, y: a };
+      }
+      if(i === 6 && a > 16 && a < 20) {
+        entity = { id: "wall", x: i, y: a };
+      }
+      if(i === 12 && a > 14 && a < 16) {
+        entity = { id: "wall", x: i, y: a };
+      }
+      if(a === 10 && i > 16 && i < 20) {
+        entity = { id: "wall", x: i, y: a };
+      }
+      if(a === 7 && i > 14 && i < 20) {
+        entity = { id: "wall", x: i, y: a };
+      }
+      if(a === 16 && i > 7 && i < 11) {
+        entity = { id: "wall", x: i, y: a };
+      }
+      if(a === 16 && i > 16 && i < 20) {
+        entity = { id: "wall", x: i, y: a };
+      }
       tileMap.push({ x: i, y: a, entity });
     }
   }
+
+
 
   return tileMap;
 };
@@ -63,7 +86,7 @@ io.on("connection", function (socket: Socket) {
     const sessionId = uuid();
     sessions.push({ id: sessionId, name: payload.name });
 
-    players.push({ id: "player", socketId: socket.id, sessionId });
+    players.push({ id: "player", socketId: socket.id, sessionId, currentHP: 100 });
 
     socket.emit("playerCount", 1);
   });
@@ -85,6 +108,7 @@ io.on("connection", function (socket: Socket) {
       id: "player",
       socketId: socket.id,
       sessionId: session.id,
+      currentHP: 100
     });
 
     //NOTE(HB) collect players in updated session
@@ -226,6 +250,35 @@ io.on("connection", function (socket: Socket) {
       const playerSocket = sockets[playerCurrent.socketId];
       playerSocket.emit("playerMove", {player: socket.id, x: player.x, y: player.y});
     });
+  });
+  socket.on("damagePlayer", function (damage: number, targetId: string) {
+    console.log("Damaged");
+    console.log("DMG", damage)
+    console.log(targetId)
+
+    const player = getPlayerBySocketId(targetId);
+    console.log("BEFORE HP", player.currentHP)
+    player.currentHP = player.currentHP == undefined ? 69 : player.currentHP - damage;
+    console.log("AFTER HP", player.currentHP)
+    const sessionId = player.sessionId;
+
+    const sessionPlayers = getSessionPlayers(sessionId);
+
+    _.forEach(sessionPlayers, function (currentPlayer: Player) {
+      const playerSocket = sockets[currentPlayer.socketId];
+      playerSocket.emit("playerDamage", {player: targetId, currentHP: player.currentHP});
+    });
+  });
+
+  socket.on("getAttackAmount", function () {
+    console.log("Getting attack amount");
+
+    const player = getPlayerBySocketId(socket.id);
+    const randomNumber = Math.floor(Math.random() * 11) + 5;
+
+    const playerSocket = sockets[player.socketId];
+    playerSocket.emit("attackAmount", {player: socket.id, currentAttack: randomNumber});
+    
   });
 });
 
