@@ -34,26 +34,26 @@ export default class MainScene extends Phaser.Scene {
 
     //Fill map data disgusting
     this.mapData = [
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373],
-      [373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373]
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
+      [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367]
     ]
 
     data.map.tileMap.forEach(tile => {
@@ -134,8 +134,8 @@ export default class MainScene extends Phaser.Scene {
 
       this.handleDamage(payload)
     })
-
-    this.scene.run('UIScene', { playerObj: this.player, players: this.playerList })
+    console.log("have ", this.playersTurnId)
+    this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
   }
 
   update(time: number, delta: number) {
@@ -171,70 +171,131 @@ export default class MainScene extends Phaser.Scene {
     this.player.update(time, delta)
   }
 
-  handleMovement(direction: DirectionEnum) {
-    if (this.playersTurnId == this.player.id) {
-      switch (direction) {
-        case DirectionEnum.UP:
-          if (this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y - 1)) {
-            this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - 1)
-            this.player.move(DirectionEnum.UP, 1)
-          }
-          break
-        case DirectionEnum.DOWN:
-          if (this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y + 1)) {
-            this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + 1)
-            this.player.move(DirectionEnum.DOWN, 1)
-          }
-          break
-        case DirectionEnum.LEFT:
-          if (this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x - 1, this.player.tilePos.y)) {
-            this.socketInstance.movePlayer(this.player.tilePos.x - 1, this.player.tilePos.y)
-            this.player.move(DirectionEnum.LEFT, 1)
-          }
-          break
-        case DirectionEnum.RIGHT:
-          if (this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x + 1, this.player.tilePos.y)) {
-            this.socketInstance.movePlayer(this.player.tilePos.x + 1, this.player.tilePos.y)
-            this.player.move(DirectionEnum.RIGHT, 1)
-          }
-          break
-        default:
-          console.log('Somethings wrong...')
-          break
-      }
-      this.socketInstance.endTurn()
+    handleMovement(direction: DirectionEnum){
+        if(this.playersTurnId == this.player.id)
+        {
+            var distance = 0;
+            switch (direction) {
+                case DirectionEnum.UP:
+                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-5, DirectionEnum.UP);
+                    if(distance != 0){
+                        this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y-distance);
+                        this.player.move(DirectionEnum.UP, distance);
+                        this.socketInstance.endTurn();
+                    }
+                  break;
+                case DirectionEnum.DOWN:
+                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+5, DirectionEnum.DOWN)
+                    if(distance != 0){
+                        this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y+distance);
+                        this.player.move(DirectionEnum.DOWN, distance);
+                        this.socketInstance.endTurn();
+                    }
+                  break;
+                case DirectionEnum.LEFT:
+                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-5, this.player.tilePos.y, DirectionEnum.LEFT)
+                    if(distance != 0){
+                        this.socketInstance.movePlayer(this.player.tilePos.x-distance, this.player.tilePos.y);
+                        this.player.move(DirectionEnum.LEFT, distance);
+                        this.socketInstance.endTurn();
+                    }
+                  break;
+                case DirectionEnum.RIGHT:
+                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+5, this.player.tilePos.y, DirectionEnum.RIGHT)
+                    if(distance != 0){
+                        this.socketInstance.movePlayer(this.player.tilePos.x+distance, this.player.tilePos.y);
+                        this.player.move(DirectionEnum.RIGHT,  distance);
+                        this.socketInstance.endTurn();
+                    }
+                  break;
+                default:
+                  console.log("Somethings wrong...")
+                  break;
+            }
+        }
     }
-  }
-  handleDamage(targetId: string) {
-    if (this.playersTurnId == this.player.id) {
-      this.socketInstance.damagePlayer(this.player.attackPower, targetId)
-      sceneEvents.emit('changeHP')
-      this.playerList.forEach(playerObj => {
-        console.log(playerObj)
-      })
-      this.socketInstance.endTurn()
-      //TODO: DISTANCE CHECK
-    }
-  }
 
-  canPlayerMove(scene: MainScene, tileMap: Phaser.Tilemaps.Tilemap, player: Player, toX: number, toY: number) {
-    var toTile = tileMap.getTileAt(toX, toY)
-    //Check if collides with player
-    var result = true
-    scene.playerList.forEach(playerElem => {
-      if (playerElem.id != player.id) {
-        var playerTile = tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y)
-        if (playerTile.x == toTile.x && playerTile.y == toTile.y) result = false
-      }
-    })
-    if (!result) return result
-
-    //Check if collides with tile types
-    switch (toTile.index) {
-      case TileTypeEnum.WALL:
-        return false
-      default:
-        return true
+    canPlayerMove(scene : MainScene, tileMap : Phaser.Tilemaps.Tilemap, player : Player, toX : number, toY : number, direction : DirectionEnum){
+        let distance = 0;
+        debugger;   
+        switch (direction) {
+            case DirectionEnum.UP:
+                distance = player.tilePos.y - toY;
+                var travelingY = player.tilePos.y;
+                for (let i = 0; i < distance; i++) {
+                    travelingY--;
+                    let tile = tileMap.getTileAt(toX, travelingY);
+                    if(!scene.tileMoveCheck(scene, tile))
+                        return i;
+                }
+                return distance;
+            case DirectionEnum.DOWN:
+                distance = toY - player.tilePos.y;
+                var travelingY = player.tilePos.y;
+                for (let i = 0; i < distance; i++) {
+                    travelingY++;
+                    let tile = tileMap.getTileAt(toX, travelingY);
+                    if(!scene.tileMoveCheck(scene, tile))
+                        return i;
+                }
+                return distance;
+            case DirectionEnum.LEFT:
+                distance = player.tilePos.x - toX;
+                var travelingX = player.tilePos.x;
+                for (let i = 0; i < distance; i++) {
+                    travelingX--;
+                    let tile = tileMap.getTileAt(travelingX, toY);
+                    if(!scene.tileMoveCheck(scene, tile))
+                        return i;
+                }
+                return distance;
+            case DirectionEnum.RIGHT:
+                distance = toX - player.tilePos.x;
+                var travelingX = player.tilePos.x;
+                for (let i = 0; i < distance; i++) {
+                    travelingX++;
+                    let tile = tileMap.getTileAt(travelingX, toY);
+                    if(!scene.tileMoveCheck(scene, tile))
+                        return i;
+                }
+                return distance;
+            default:
+                console.log("Somethings wrong...")
+                return distance;
+        }
     }
-  }
+
+    private tileMoveCheck(scene : MainScene, toTile : Phaser.Tilemaps.Tile){
+        //Check if collides with player
+        var result = true;
+        scene.playerList.forEach(playerElem =>{
+            if(playerElem.id != scene.player.id){
+                var playerTile = scene.tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y);
+                if(playerTile.x == toTile.x && playerTile.y == toTile.y)
+                    result = false;
+            }
+        });
+        if(!result)
+            return result;
+
+        //Check if collides with tile types
+        switch (toTile.index) {
+            case TileTypeEnum.WALL:
+                return false;
+            default:
+                return true;
+        }
+
+    }
+    handleDamage(targetId: string) {
+        if (this.playersTurnId == this.player.id) {
+          this.socketInstance.damagePlayer(this.player.attackPower, targetId)
+          sceneEvents.emit('changeHP')
+          this.playerList.forEach(playerObj => {
+            console.log(playerObj)
+          })
+          this.socketInstance.endTurn()
+          //TODO: DISTANCE CHECK
+        }
+      }
 }
