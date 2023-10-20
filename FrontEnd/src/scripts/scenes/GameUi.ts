@@ -12,6 +12,9 @@ export default class GameUI extends Phaser.Scene
     backBtn
     nameLabel
     player
+    playerTexture
+    hpLabel
+    playerSprite
 	constructor()
 	{
 		super({ key: 'UIScene' })
@@ -62,22 +65,37 @@ export default class GameUI extends Phaser.Scene
             this.expandSprite.setVisible(true)
         
         });
-
-        this.MenuGroup = this.add.group()
-        this.MenuGroup.add(this.baseSprite)
-        this.MenuGroup.add(this.expandSprite)
-        this.MenuGroup.add(this.backBtn)
-
         this.nameLabel = this.add.text(0, 0, "xddd", {
 			fontSize: '50'
 		})
         this.nameLabel.scale = 2
         this.nameLabel.setOrigin(1,0)
-        this.nameLabel.setPosition(870, 50)
+        this.nameLabel.setPosition(870, 70)
 
         this.nameLabel.text = this.player.getPlayerName()
+        this.playerTexture = this.player.getTexture()
+  
+        this.playerSprite = this.add.sprite(850, 140, this.playerTexture).setScale(2)
 
-        this.add.sprite(850, 100, this.player.getTexture())
+        this.hpLabel = this.add.text(0, 0, this.player.getCurrentHealth() + " / 100", {
+			fontSize: '50'
+		})
+        this.hpLabel.scale = 2
+        this.hpLabel.setOrigin(1,0)
+        this.hpLabel.setPosition(890, 200)
+        this.hpLabel.setColor("#008000")
+
+
+        
+        this.MenuGroup = this.add.group()
+        this.MenuGroup.add(this.baseSprite)
+        this.MenuGroup.add(this.expandSprite)
+        this.MenuGroup.add(this.backBtn)
+        this.MenuGroup.add(this.nameLabel)
+        this.MenuGroup.add(this.hpLabel)
+        this.MenuGroup.add(this.playerSprite)
+
+
 	}
 
 

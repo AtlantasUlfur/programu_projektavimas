@@ -100,6 +100,9 @@ export class Player extends Phaser.GameObjects.Sprite {
   getPlayerName() : string{
     return this.playerName.text
   }
+  getCurrentHealth() : integer{
+    return this.currentHealth
+  }
   setFinishedText() {
     this.waitText.setX(this.x)
     this.waitText.setY(this.y)
