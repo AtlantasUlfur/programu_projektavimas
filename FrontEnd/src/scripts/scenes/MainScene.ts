@@ -6,30 +6,31 @@ import { Player } from '../Models/Player'
 import PlayerBuilder from '../utils/PlayerBuilder'
 import { sceneEvents } from '../Events/EventsController'
 
-export default class MainScene extends Phaser.Scene{
-    //Utils
-    private socketInstance : SocketController;
-    //Init Data
-    private mapData;
-    private currentPlayerData : PlayerServer;
-    private allPlayerData : PlayerServer[];
-    //Map
-    private tileMap: Phaser.Tilemaps.Tilemap;
-    //Players
-    private playerList : Player[] = [];
-    private player : Player;
-    public playersTurnId :string = "";
+export default class MainScene extends Phaser.Scene {
+  //Utils
+  private socketInstance: SocketController
+  //Init Data
+  private mapData
+  private currentPlayerData: PlayerServer
+  private allPlayerData: PlayerServer[]
+  //Map
+  private tileMap: Phaser.Tilemaps.Tilemap
+  //Players
+  private playerList: Player[] = []
+  private player: Player
+  public playersTurnId: string = ''
+  private lastUpdate: number = 0
 
-    constructor(){
-        super("MainScene");
-    }
+  constructor() {
+    super('MainScene')
+  }
 
-    init(data){
-        this.currentPlayerData = data.player;
-        this.allPlayerData = data.sessionPlayers;
-        this.playersTurnId = data.playersTurnId;
-        this.socketInstance = SocketController.getInstance();
-        this.socketInstance.setScene(this);
+  init(data) {
+    this.currentPlayerData = data.player
+    this.allPlayerData = data.sessionPlayers
+    this.playersTurnId = data.playersTurnId
+    this.socketInstance = SocketController.getInstance()
+    this.socketInstance.setScene(this)
 
     //Fill map data disgusting
     this.mapData = [
