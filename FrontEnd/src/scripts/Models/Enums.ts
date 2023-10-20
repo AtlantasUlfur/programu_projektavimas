@@ -13,7 +13,9 @@ export enum TileTypeEnum {
 
 export enum SizeEnum {
     TILE_SIZE = 16,
-    PLAYER_NAME_OFFSET = 15
+    PLAYER_NAME_OFFSET = 15,
+    TILE_X_OFFSET = 8,
+    TILE_Y_OFFSET = 8
 }
 
 export enum DirectionEnum{
