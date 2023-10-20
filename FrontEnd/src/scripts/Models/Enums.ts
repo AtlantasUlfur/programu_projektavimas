@@ -6,8 +6,8 @@ export enum LobbiesEnum {
 }
 
 export enum TileTypeEnum {
-    GROUND = 373,
-    WALL = 92,
+    GROUND = 367,
+    WALL = 712,
     PLAYER = 100,
 }
 

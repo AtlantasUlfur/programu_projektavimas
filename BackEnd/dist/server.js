@@ -27,6 +27,27 @@ const getDefaultTileMap = () => {
                 a === MAP_DIMENSIONS - 1) {
                 entity = { id: "wall", x: i, y: a };
             }
+            if (i === 5 && a > 4 && a < 11) {
+                entity = { id: "wall", x: i, y: a };
+            }
+            if (i === 6 && a > 16 && a < 20) {
+                entity = { id: "wall", x: i, y: a };
+            }
+            if (i === 12 && a > 14 && a < 16) {
+                entity = { id: "wall", x: i, y: a };
+            }
+            if (a === 10 && i > 16 && i < 20) {
+                entity = { id: "wall", x: i, y: a };
+            }
+            if (a === 7 && i > 14 && i < 20) {
+                entity = { id: "wall", x: i, y: a };
+            }
+            if (a === 16 && i > 7 && i < 11) {
+                entity = { id: "wall", x: i, y: a };
+            }
+            if (a === 16 && i > 16 && i < 20) {
+                entity = { id: "wall", x: i, y: a };
+            }
             tileMap.push({ x: i, y: a, entity });
         }
     }

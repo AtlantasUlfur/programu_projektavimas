@@ -55,6 +55,10 @@ export default class  SocketController
                 const mainScene = this.scene as MainScene;
                     mainScene.playerList.forEach(playerObj =>{
                     if(playerObj.id == payload.player){
+                        playerObj.setTint(0xff0000)
+                        setTimeout(() => {
+                            playerObj.clearTint()
+                        }, 250)
                         playerObj.setHP(payload.currentHP)
                     }   
                     if (mainScene.player.id == payload.player) {
