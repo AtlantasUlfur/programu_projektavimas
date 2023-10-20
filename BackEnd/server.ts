@@ -258,7 +258,10 @@ io.on("connection", function (socket: Socket) {
 
     const player = getPlayerBySocketId(targetId);
     console.log("BEFORE HP", player.currentHP)
-    player.currentHP = player.currentHP == undefined ? 69 : player.currentHP - damage;
+    player.currentHP = player.currentHP == undefined ? 0 : player.currentHP - damage;
+    if (player.currentHP < 0) {
+      player.currentHP = 0;
+    }
     console.log("AFTER HP", player.currentHP)
     const sessionId = player.sessionId;
 
