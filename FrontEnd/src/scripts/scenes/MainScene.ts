@@ -4,7 +4,7 @@ import { TileTypeEnum, SizeEnum, DirectionEnum } from '../Models/Enums'
 import { PlayerServer } from '../Models/ServerModels'
 import { Player } from '../Models/Player'
 import PlayerBuilder from '../utils/PlayerBuilder'
-import { sceneEvents } from '../Events/EventsController'
+
 
 export default class MainScene extends Phaser.Scene {
   //Utils
@@ -124,7 +124,7 @@ export default class MainScene extends Phaser.Scene {
         scene.playerList.push(otherPlayer)
       }
     })
-    this.scene.run('UIScene', this.player)
+    this.scene.run('UIScene', { playerObj: this.player, players: this.playerList })
   }
 
     update(time : number, delta : number)

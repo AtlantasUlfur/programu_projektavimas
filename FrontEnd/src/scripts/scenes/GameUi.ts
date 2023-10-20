@@ -19,6 +19,11 @@ export default class GameUI extends Phaser.Scene
     hotbarTwo
     hotbarThree
     hotbarFour
+    playerList
+    arrowUp
+    arrowDown
+    arrowLeft
+    arrowRight
 	constructor()
 	{
 		super({ key: 'UIScene' })
@@ -29,9 +34,17 @@ export default class GameUI extends Phaser.Scene
         this.load.spritesheet("back", "../../assets/back.png", {frameWidth: 64, frameHeight: 64});
         this.load.spritesheet("arrow", "../../assets/arrow.png", {frameWidth: 64, frameHeight: 64});
         this.load.spritesheet("frame", "../../assets/frame.png", {frameWidth: 96, frameHeight: 96});
+        this.load.spritesheet("attack", "../../assets/attack.png", {frameWidth: 88, frameHeight: 88});
+        this.load.spritesheet("arrowup", "../../assets/arrow_top.png", {frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet("arrowdown", "../../assets/arrow_down.png", {frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet("arrowleft", "../../assets/arrow_left.png", {frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet("arrowright", "../../assets/arrow_right.png", {frameWidth: 32, frameHeight: 32});
     }
-    init(player : Player){
-        this.player = player
+    init(data){
+        console.log(data)
+        this.player = data["playerObj"]
+        console.log(this.player)
+        this.playerList = data["players"]
     }
 
 	create()
@@ -112,7 +125,32 @@ export default class GameUI extends Phaser.Scene
         this.hotbarFour.displayWidth = 40
         this.hotbarFour.setOrigin(1,0)
         this.hotbarFour.setPosition(940, 260)
-        
+
+
+        this.arrowUp = this.add.sprite(0,0, "arrowup")
+        this.arrowUp.displayHeight = 24
+        this.arrowUp.displayWidth = 24
+        this.arrowUp.setOrigin(1,0)
+        this.arrowUp.setPosition(860, 450)
+
+        this.arrowDown = this.add.sprite(0,0, "arrowdown")
+        this.arrowDown.displayHeight = 24
+        this.arrowDown.displayWidth = 24
+        this.arrowDown.setOrigin(1,0)
+        this.arrowDown.setPosition(860, 500)
+
+        this.arrowLeft = this.add.sprite(0,0, "arrowleft")
+        this.arrowLeft.displayHeight = 24
+        this.arrowLeft.displayWidth = 24
+        this.arrowLeft.setOrigin(1,0)
+        this.arrowLeft.setPosition(835, 475)
+
+        this.arrowRight = this.add.sprite(0,0, "arrowright")
+        this.arrowRight.displayHeight = 24
+        this.arrowRight.displayWidth = 24
+        this.arrowRight.setOrigin(1,0)
+        this.arrowRight.setPosition(885, 475)
+
         this.MenuGroup = this.add.group()
         this.MenuGroup.add(this.baseSprite)
         this.MenuGroup.add(this.expandSprite)
@@ -124,6 +162,28 @@ export default class GameUI extends Phaser.Scene
         this.MenuGroup.add(this.hotbarTwo)
         this.MenuGroup.add(this.hotbarThree)
         this.MenuGroup.add(this.hotbarFour)
+        this.MenuGroup.add(this.arrowUp)
+        this.MenuGroup.add(this.arrowDown)
+        this.MenuGroup.add(this.arrowLeft)
+        this.MenuGroup.add(this.arrowRight)
+
+
+        var i = 0;
+        this.playerList.forEach(playerInList => {
+            if(playerInList.id != this.player.id){
+                var spriteLocal = this.add.sprite(750 + i, 350, playerInList.frame.texture, playerInList.frame.name).setScale(2)
+                i = i + 100;
+                var attackBtn = this.add.sprite(0,0, "attack")
+                attackBtn.displayHeight = 44
+                attackBtn.displayWidth = 44
+                attackBtn.setOrigin(1,0)
+                attackBtn.setPosition(672 + i, 400)
+                this.MenuGroup.add(attackBtn)
+                this.MenuGroup.add(spriteLocal)
+            }
+        });
+
+
 
 	}
 
