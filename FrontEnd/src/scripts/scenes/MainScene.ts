@@ -134,8 +134,8 @@ export default class MainScene extends Phaser.Scene {
 
       this.handleDamage(payload)
     })
-
-    this.scene.run('UIScene', { playerObj: this.player, players: this.playerList })
+    console.log("have ", this.playersTurnId)
+    this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
   }
 
   update(time: number, delta: number) {

@@ -39,6 +39,7 @@ export default class  SocketController
             this.socket.on("turn", (payload) =>{
                 const mainScene = this.scene as MainScene;
                 mainScene.playersTurnId = payload;
+                sceneEvents.emit('turnChanged', payload)
             });
             this.socket.on("playerMove", (payload)=>{
                 const mainScene = this.scene as MainScene;
