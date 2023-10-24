@@ -85,14 +85,14 @@ io.on("connection", function (socket: Socket) {
     const sessionId = uuid();
     sessions.push({ id: sessionId, name: payload.name, playerCount: 1 });
 
-    players.push({ id: "player", socketId: socket.id, sessionId, currentHP: 100 });
+    players.push({ id: "player", socketId: socket.id, sessionId, currentHP: 100, name: payload.name });
 
     socket.emit("playerCount", 1);
   });
 
   socket.on("joinLobby", function (payload) {
     console.log("Join lobby");
-
+    console.log(payload)
     const name = payload.name;
 
     const session = getSession(name);
@@ -107,7 +107,8 @@ io.on("connection", function (socket: Socket) {
       id: "player",
       socketId: socket.id,
       sessionId: session.id,
-      currentHP: 100
+      currentHP: 100,
+      name: payload.playerName
     });
 
     //NOTE(HB) collect players in updated session

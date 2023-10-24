@@ -8,6 +8,7 @@ export default class PlayerBuilder {
   private hp: number
   private socketId: string
   private frame: number
+  private color: string
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -36,6 +37,10 @@ export default class PlayerBuilder {
     this.frame = frame;
     return this
   }
+  setColor(color: string): PlayerBuilder {
+    this.color = color;
+    return this
+  }
 
   setSocketId(socketId: string): PlayerBuilder {
     this.socketId = socketId
@@ -43,7 +48,7 @@ export default class PlayerBuilder {
   }
 
   build(): Player {
-    const player = new Player(this.scene, this.tilePos, this.key, this.frame, this.name, this.hp, this.socketId)
+    const player = new Player(this.scene, this.tilePos, this.key, this.frame, this.name, this.hp, this.socketId, this.color)
 
     return player
   }

@@ -25,6 +25,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   init(data) {
+    console.log(data)
     this.currentPlayerData = data.player
     this.allPlayerData = data.sessionPlayers
     this.playersTurnId = data.playersTurnId
@@ -106,9 +107,10 @@ export default class MainScene extends Phaser.Scene {
           .setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
           .setKey('player') // key of spritesheet
           .setFrame(texture_frames[index]) // frame in spritesheet
-          .setName('YOU')
+          .setName(playerData.name)
           .setHP(playerData.currentHP)
           .setSocketId(playerData.socketId)
+          .setColor('#008000')
           .build()
         scene.playerList.push(this.player)
 
@@ -122,9 +124,10 @@ export default class MainScene extends Phaser.Scene {
           .setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
           .setKey('player') // key of spritesheet
           .setFrame(texture_frames[index]) // frame in spritesheet
-          .setName('ENEMY')
+          .setName(playerData.name)
           .setHP(playerData.currentHP)
           .setSocketId(playerData.socketId)
+          .setColor('red')
           .build()
         scene.playerList.push(otherPlayer)
       }

@@ -10,13 +10,14 @@ export class Player extends Phaser.GameObjects.Sprite {
   private currentHealth: integer;
   private waitText: Phaser.GameObjects.Text;
   private allGuns: IGun[];
+  private color: string
 
   public tilePos : Phaser.Math.Vector2;
   public attackPower: number = 0;
   public selectedGun: IGun;
   private gunImage: Phaser.GameObjects.Image
 
-  constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string) {
+  constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string, color: string) {
     super(scene, 0, 0, key)
 
     this.id = socketId;
@@ -40,7 +41,7 @@ export class Player extends Phaser.GameObjects.Sprite {
       fontFamily: 'Arial',
       fontSize: '16',
       fontStyle: 'bold',
-      color: name == 'YOU' ? '#008000' : 'red'
+      color: color
     });
     this.playerName.setDepth(10);
     this.playerName.setOrigin(0.5, 1.5);

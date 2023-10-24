@@ -87,8 +87,8 @@ export default class  SocketController
         this.socket?.emit("createLobby", {name})
     }
 
-    public joinLobby(name : string | null){
-        this.socket?.emit("joinLobby", {name})
+    public joinLobby(name : string | null, playerName : string | null){
+        this.socket?.emit("joinLobby", {name, playerName})
     }
 
     public startGame(name : string | null){

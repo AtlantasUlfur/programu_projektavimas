@@ -13,7 +13,7 @@ export type TileServer = {
 export type PlayerServer = Entity & {
 socketId: string;
 sessionId: string;
-name?: string;
+name: string;
 currentHP?: number;
 currentAttack?: number;
 currentMoveCount?: number;

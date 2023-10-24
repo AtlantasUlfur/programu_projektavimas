@@ -225,7 +225,7 @@ export class MainMenuScene extends Phaser.Scene {
             lobby = prompt('Please enter the lobby you wish to join:', '')
           }
           scene.playerCountText = scene.add.text(lobbyButtonImage.x * 0.76, lobbyButtonImage.y, `Joining lobby...`)
-          scene.socketInstance.joinLobby(lobby)
+          scene.socketInstance.joinLobby(lobby, scene.playerName)
           scene.lobbyStatus = LobbiesEnum.WAITING
           lobbyTitleText.visible = false
           lobbyCountText.visible = false
