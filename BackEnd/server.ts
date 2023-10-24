@@ -23,7 +23,6 @@ app.use(
 
 const getDefaultTileMap: () => Tile[] = () => {
   const tileMap: Tile[] = [];
-
   for (let i = 0; i < MAP_DIMENSIONS; i++) {
     for (let a = 0; a < MAP_DIMENSIONS; a++) {
       let entity: Entity | undefined = undefined;
@@ -84,7 +83,7 @@ io.on("connection", function (socket: Socket) {
     console.log("New lobby");
 
     const sessionId = uuid();
-    sessions.push({ id: sessionId, name: payload.name });
+    sessions.push({ id: sessionId, name: payload.name, playerCount: 1 });
 
     players.push({ id: "player", socketId: socket.id, sessionId, currentHP: 100 });
 
@@ -281,6 +280,20 @@ io.on("connection", function (socket: Socket) {
 
     const playerSocket = sockets[player.socketId];
     playerSocket.emit("attackAmount", {player: socket.id, currentAttack: randomNumber});
+    
+  });
+
+  socket.on("getLobbies", function () {
+    console.log("Getting lobbies");
+
+    const playerSocket = sockets[socket.id];
+    console.log(sessions)
+    _.forEach(sessions, function(session: Session) {
+      const sessionPlayers = getSessionPlayers(session.id);
+      const playerCount = sessionPlayers.length;
+      session.playerCount = playerCount
+    })
+    playerSocket.emit("lobbies", {sessions});
     
   });
 });

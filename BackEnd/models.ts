@@ -37,4 +37,5 @@ export type GameMap = {
 export type Session = {
   name: string;
   id: string;
+  playerCount: Number;
 };

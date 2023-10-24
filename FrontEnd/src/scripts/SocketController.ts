@@ -68,6 +68,10 @@ export default class  SocketController
                 const mainScene = this.scene as MainScene;
                 mainScene.player.attackPower = payload.currentAttack;
             });
+            this.socket.on("lobbies", (payload) => {
+                const mainMenuScene = this.scene as MainMenuScene;
+                mainMenuScene.lobbies = payload.sessions
+            });
         }
     }
 
@@ -104,6 +108,9 @@ export default class  SocketController
     }
     public getAttackAmount(){
         this.socket?.emit("getAttackAmount");
+    }
+    public getLobbies() {
+        this.socket?.emit("getLobbies");
     }
 
 }

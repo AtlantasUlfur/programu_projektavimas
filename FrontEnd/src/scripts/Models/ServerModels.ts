@@ -23,3 +23,9 @@ isTurn?: boolean;
 isWinner?: boolean;
 moveOrder?: number;
 };
+
+export type SessionServer = {
+  name: string;
+  id: string;
+  playerCount: number;
+};
