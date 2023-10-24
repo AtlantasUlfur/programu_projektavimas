@@ -77,6 +77,13 @@ io.on("connection", function (socket: Socket) {
     // remove this player from our players object
     _.remove(players, (player: Player) => player.socketId === socket.id);
     _.remove(sockets, (scoket: Socket) => scoket.id === socket.id);
+    
+    _.remove(sessions, (session: Session) => {
+      const sessionPlayers = getSessionPlayers(session.id);
+      if (sessionPlayers.length == 0) {
+        return true
+      }
+    });
   });
 
   socket.on("createLobby", function (payload) {
