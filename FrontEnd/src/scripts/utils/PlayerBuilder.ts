@@ -1,4 +1,4 @@
-import { IGun } from '../ModelInterfaces/Guns/IGun'
+import { IGun } from '../Interfaces/Guns/IGun'
 import { SizeEnum } from '../Models/Enums'
 import { Player } from '../Models/Player'
 

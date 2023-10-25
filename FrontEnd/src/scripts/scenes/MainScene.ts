@@ -5,8 +5,8 @@ import { PlayerServer } from '../Models/ServerModels'
 import { Player } from '../Models/Player'
 import PlayerBuilder from '../utils/PlayerBuilder'
 import { sceneEvents } from '../Events/EventsController'
-import { IGun } from '../ModelInterfaces/Guns/IGun'
-import { GunCreator } from '../Models/Guns/GunCreator'
+import { IGun } from '../Interfaces/Guns/IGun'
+import { GunCreator } from '../utils/GunCreator'
 
 export default class MainScene extends Phaser.Scene {
   //Utils
