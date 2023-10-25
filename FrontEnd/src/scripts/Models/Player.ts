@@ -4,15 +4,14 @@ import { IGun } from '../Interfaces/Guns/IGun';
 import { GunCreator } from '../utils/GunCreator';
 export class Player extends Phaser.GameObjects.Sprite {
   public id : string;
-  private playerName: Phaser.GameObjects.Text;
   private isMoved: boolean;
   private isFinished: boolean;
-  private currentHealth: integer;
   private waitText: Phaser.GameObjects.Text;
   private allGuns: IGun[];
   private color: string
-  private gunImage: Phaser.GameObjects.Image
 
+  public playerName: Phaser.GameObjects.Text;
+  public currentHealth: integer;
   public tilePos : Phaser.Math.Vector2;
   public attackPower: number = 0;
 
@@ -21,9 +20,9 @@ export class Player extends Phaser.GameObjects.Sprite {
   public mainGunIndex: number;
   public sideGunIndex: number;
 
+  public gunImage: Phaser.GameObjects.Image
 
-
-  constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string, color: string) {
+  constructor(scene: Phaser.Scene, key: string) {
     super(scene, 0, 0, key)
 
     this.id = socketId;
@@ -141,13 +140,6 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
   }
 
-  setMoveStatus(isMoved: boolean) {
-    this.isMoved = isMoved
-  }
-
-  isAvailable(): boolean {
-    return !this.isFinished
-  }
 
   onDamage(damage: integer) {
     this.currentHealth -= damage
@@ -159,36 +151,11 @@ export class Player extends Phaser.GameObjects.Sprite {
     return this.currentHealth <= 0
   }
 
-  createFinishedText() {
-    this.waitText = this.scene.add
-      .text(this.x, this.y, 'E', {
-        padding: {
-          left: 10,
-          top: 10
-        }
-      })
-      .setVisible(false)
-  }
   getPlayerName() : string{
     return this.playerName.text
   }
   getCurrentHealth() : integer{
     return this.currentHealth
   }
-  setFinishedText() {
-    this.waitText.setX(this.x)
-    this.waitText.setY(this.y)
-    this.waitText.setVisible(true)
-  }
 
-  finishAction() {
-    this.setMoveStatus(false)
-    this.isFinished = true
-    this.setFinishedText()
-  }
-
-  startAction() {
-    this.isFinished = false
-    this.waitText.setVisible(false)
-  }
 }
