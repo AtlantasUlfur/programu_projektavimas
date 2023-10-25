@@ -5,6 +5,8 @@ import { PlayerServer } from '../Models/ServerModels'
 import { Player } from '../Models/Player'
 import PlayerBuilder from '../utils/PlayerBuilder'
 import { sceneEvents } from '../Events/EventsController'
+import { IGun } from '../ModelInterfaces/Guns/IGun'
+import { GunCreator } from '../Models/Guns/GunCreator'
 
 export default class MainScene extends Phaser.Scene {
   //Utils
@@ -20,6 +22,7 @@ export default class MainScene extends Phaser.Scene {
   public alivePlayerCount : number = 0;
   public player: Player
   public playersTurnId: string = ''
+  private allGuns: IGun[];
 
   constructor() {
     super('MainScene')
@@ -32,6 +35,7 @@ export default class MainScene extends Phaser.Scene {
     this.playersTurnId = data.playersTurnId
     this.socketInstance = SocketController.getInstance()
     this.socketInstance.setScene(this)
+    this.allGuns = GunCreator.CreateAllGuns();
 
     //Fill map data disgusting
     this.mapData = [
@@ -97,26 +101,25 @@ export default class MainScene extends Phaser.Scene {
     this.tileMap = this.make.tilemap({ data: this.mapData, tileWidth: 16, tileHeight: 16 })
     const tiles = this.tileMap.addTilesetImage('tile-set', 'tiles')
     const layer = this.tileMap.createLayer(0, tiles, 0, 0)
-    const builder = new PlayerBuilder(scene)
     //Create all players
     this.allPlayerData = this.allPlayerData.sort((a, b) => {
       return a.socketId.localeCompare(b.socketId)
     })
     const texture_frames = [49, 52, 55, 10]
+    let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
       console.log(playerData) 
 
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
         //Create current player
-        this.player = builder
-          .setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
-          .setKey('player') // key of spritesheet
-          .setFrame(texture_frames[index]) // frame in spritesheet
-          .setName(playerData.name)
-          .setHP(playerData.currentHP)
-          .setSocketId(playerData.socketId)
-          .setColor('#008000')
-          .build()
+        builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y));
+        builder.setFrame(texture_frames[index]);
+        builder.setName(playerData.name);
+        builder.setColor('#008000')
+        builder.setHP(playerData.currentHP);
+        builder.setSocketId(playerData.socketId);
+        builder.setGun(this.allGuns[0])
+        this.player = builder.build()
         scene.playerList.push(this.player)
 
         //Camera follow this player
@@ -125,15 +128,14 @@ export default class MainScene extends Phaser.Scene {
         this.cameras.main.zoom = 2
       } else {
         //Create other player
-        let otherPlayer = builder
-          .setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
-          .setKey('player') // key of spritesheet
-          .setFrame(texture_frames[index]) // frame in spritesheet
-          .setName(playerData.name)
-          .setHP(playerData.currentHP)
-          .setSocketId(playerData.socketId)
-          .setColor('red')
-          .build()
+        builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y));
+        builder.setFrame(texture_frames[index]);
+        builder.setName(playerData.name);
+        builder.setColor('red')
+        builder.setHP(playerData.currentHP);
+        builder.setSocketId(playerData.socketId);
+        builder.setGun(this.allGuns[0])
+        let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
       }
     })

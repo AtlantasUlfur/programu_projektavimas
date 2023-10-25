@@ -14,7 +14,7 @@ export type PlayerServer = Entity & {
 socketId: string;
 sessionId: string;
 name: string;
-currentHP?: number;
+currentHP: number;
 currentAttack?: number;
 currentMoveCount?: number;
 leftMoveCount?: number;
