@@ -5,6 +5,8 @@ export interface IGun {
     gunFrame: number,
     ammo: number,
     damage: number,
+    distance: number,
+    price: number
 
     shoot(targetPlayer: Player);
     refillAmmo();
