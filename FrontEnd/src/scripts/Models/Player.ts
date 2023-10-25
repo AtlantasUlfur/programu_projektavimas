@@ -4,65 +4,18 @@ import { IGun } from '../ModelInterfaces/Guns/IGun';
 import { GunCreator } from './Guns/GunCreator';
 export class Player extends Phaser.GameObjects.Sprite {
   public id : string;
-  private playerName: Phaser.GameObjects.Text;
-  private isMoved: boolean;
-  private isFinished: boolean;
-  private currentHealth: integer;
-  private waitText: Phaser.GameObjects.Text;
-  private allGuns: IGun[];
-  private color: string
-
+  public playerName: Phaser.GameObjects.Text;
+  public currentHealth: integer;
   public tilePos : Phaser.Math.Vector2;
   public attackPower: number = 0;
   public selectedGun: IGun;
-  private gunImage: Phaser.GameObjects.Image
+  public gunImage: Phaser.GameObjects.Image
 
-  constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string, color: string) {
+  constructor(scene: Phaser.Scene, key: string) {
     super(scene, 0, 0, key)
-
-    this.id = socketId;
-    this.currentHealth = hp;
-    this.isMoved = false;
-    this.isFinished = false;
-
-    this.tilePos = tilePos;
-
+    
     //Add to scene
     this.scene.add.existing(this);
-
-    //Self explanitory
-    this.setTexture('player');
-    this.setFrame(frame);
-    this.setDepth(0);
-    this.setPosition(tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
-
-    //Create player name
-    this.playerName = this.scene.add.text(0, 0, name, {
-      fontFamily: 'Arial',
-      fontSize: '16',
-      fontStyle: 'bold',
-      color: color
-    });
-    this.playerName.setDepth(10);
-    this.playerName.setOrigin(0.5, 1.5);
-    this.playerName.setResolution(7);
-
-    this.showPlayerNickname();
-
-
-    this.allGuns = GunCreator.CreateAllGuns();
-    // needs specific gun at some point
-    if(this.allGuns.length > 0){
-      this.selectedGun = this.allGuns[0];
-      this.gunImage = this.scene.add.image(
-        0, 0, 'guns', this.selectedGun.gunFrame
-        ).setScale(0.2);
-
-      this.gunImage.setDepth(10);
-      this.gunImage.setOrigin(0.5, 1.5);
-
-      this.showChosenGun();
-    } 
 
   }
 
@@ -116,13 +69,6 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
   }
 
-  setMoveStatus(isMoved: boolean) {
-    this.isMoved = isMoved
-  }
-
-  isAvailable(): boolean {
-    return !this.isFinished
-  }
 
   onDamage(damage: integer) {
     this.currentHealth -= damage
@@ -134,36 +80,11 @@ export class Player extends Phaser.GameObjects.Sprite {
     return this.currentHealth <= 0
   }
 
-  createFinishedText() {
-    this.waitText = this.scene.add
-      .text(this.x, this.y, 'E', {
-        padding: {
-          left: 10,
-          top: 10
-        }
-      })
-      .setVisible(false)
-  }
   getPlayerName() : string{
     return this.playerName.text
   }
   getCurrentHealth() : integer{
     return this.currentHealth
   }
-  setFinishedText() {
-    this.waitText.setX(this.x)
-    this.waitText.setY(this.y)
-    this.waitText.setVisible(true)
-  }
 
-  finishAction() {
-    this.setMoveStatus(false)
-    this.isFinished = true
-    this.setFinishedText()
-  }
-
-  startAction() {
-    this.isFinished = false
-    this.waitText.setVisible(false)
-  }
 }
