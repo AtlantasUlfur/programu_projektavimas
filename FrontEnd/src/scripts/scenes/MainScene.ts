@@ -101,9 +101,9 @@ export default class MainScene extends Phaser.Scene {
       return a.socketId.localeCompare(b.socketId)
     })
     const texture_frames = [49, 52, 55, 10]
+    let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
       console.log(playerData)
-      let builder = new PlayerBuilder(scene, 'player')
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
         //Create current player
         builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y));

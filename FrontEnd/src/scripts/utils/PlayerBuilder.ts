@@ -75,6 +75,9 @@ export default class PlayerBuilder implements PlayerBuilderInterface {
 
   build(): Player {
     const result = this.player;
+    //Add to scene
+    this.scene.add.existing(this.player);
+    this.reset()
     return result;
   }
 }

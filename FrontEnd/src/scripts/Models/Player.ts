@@ -13,9 +13,6 @@ export class Player extends Phaser.GameObjects.Sprite {
 
   constructor(scene: Phaser.Scene, key: string) {
     super(scene, 0, 0, key)
-    
-    //Add to scene
-    this.scene.add.existing(this);
 
   }
 
