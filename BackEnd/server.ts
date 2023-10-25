@@ -34,32 +34,30 @@ const getDefaultTileMap: () => Tile[] = () => {
       ) {
         entity = { id: "wall", x: i, y: a };
       }
-      if(i === 5 && a > 4 && a < 11) {
+      if (i === 5 && a > 4 && a < 11) {
         entity = { id: "wall", x: i, y: a };
       }
-      if(i === 6 && a > 16 && a < 20) {
+      if (i === 6 && a > 16 && a < 20) {
         entity = { id: "wall", x: i, y: a };
       }
-      if(i === 12 && a > 14 && a < 16) {
+      if (i === 12 && a > 14 && a < 16) {
         entity = { id: "wall", x: i, y: a };
       }
-      if(a === 10 && i > 16 && i < 20) {
+      if (a === 10 && i > 16 && i < 20) {
         entity = { id: "wall", x: i, y: a };
       }
-      if(a === 7 && i > 14 && i < 20) {
+      if (a === 7 && i > 14 && i < 20) {
         entity = { id: "wall", x: i, y: a };
       }
-      if(a === 16 && i > 7 && i < 11) {
+      if (a === 16 && i > 7 && i < 11) {
         entity = { id: "wall", x: i, y: a };
       }
-      if(a === 16 && i > 16 && i < 20) {
+      if (a === 16 && i > 16 && i < 20) {
         entity = { id: "wall", x: i, y: a };
       }
       tileMap.push({ x: i, y: a, entity });
     }
   }
-
-
 
   return tileMap;
 };
@@ -75,13 +73,18 @@ io.on("connection", function (socket: Socket) {
   socket.on("disconnect", function () {
     console.log("user disconnected");
     // remove this player from our players object
-    _.remove(players, (player: Player) => player.socketId === socket.id);
+    const removedPlayer: Player[] = _.remove(
+      players,
+      (player: Player) => player.socketId === socket.id
+    );
     _.remove(sockets, (scoket: Socket) => scoket.id === socket.id);
-    
+
     _.remove(sessions, (session: Session) => {
-      const sessionPlayers = getSessionPlayers(session.id);
-      if (sessionPlayers.length == 0) {
-        return true
+      if (session.id === removedPlayer[0].sessionId) {
+        const sessionPlayers = getSessionPlayers(session.id);
+        if (sessionPlayers.length == 0) {
+          return true;
+        }
       }
     });
   });
@@ -92,14 +95,20 @@ io.on("connection", function (socket: Socket) {
     const sessionId = uuid();
     sessions.push({ id: sessionId, name: payload.name, playerCount: 1 });
 
-    players.push({ id: "player", socketId: socket.id, sessionId, currentHP: 100, name: payload.name });
+    players.push({
+      id: "player",
+      socketId: socket.id,
+      sessionId,
+      currentHP: 100,
+      name: payload.name,
+    });
 
     socket.emit("playerCount", 1);
   });
 
   socket.on("joinLobby", function (payload) {
     console.log("Join lobby");
-    console.log(payload)
+    console.log(payload);
     const name = payload.name;
 
     const session = getSession(name);
@@ -115,7 +124,7 @@ io.on("connection", function (socket: Socket) {
       socketId: socket.id,
       sessionId: session.id,
       currentHP: 100,
-      name: payload.playerName
+      name: payload.playerName,
     });
 
     //NOTE(HB) collect players in updated session
@@ -184,7 +193,7 @@ io.on("connection", function (socket: Socket) {
         });
         break;
     }
-    let firstPlayer : Player | null = null;
+    let firstPlayer: Player | null = null;
 
     _.forEach(playerTiles, function (playerTile: Tile) {
       const tileIndex = _.findIndex(
@@ -209,7 +218,12 @@ io.on("connection", function (socket: Socket) {
         firstPlayer.isTurn = true;
       }
 
-      playerSocket.emit("gameStart", { map, player, sessionPlayers, playersTurnId: firstPlayer?.socketId });
+      playerSocket.emit("gameStart", {
+        map,
+        player,
+        sessionPlayers,
+        playersTurnId: firstPlayer?.socketId,
+      });
 
       moveOrder = moveOrder + 1;
     });
@@ -223,17 +237,29 @@ io.on("connection", function (socket: Socket) {
     let moveOrder = player.moveOrder ?? 0;
 
     const sessionPlayers = getSessionPlayers(sessionId);
+    const nextPlayers: Player[] = [];
 
-    if (moveOrder < sessionPlayers.length) {
-      moveOrder = moveOrder + 1;
-    } else {
-      moveOrder = 1;
-    }
+    _.forEach(sessionPlayers, (player: Player) => {
+      if (Number(player.moveOrder) > moveOrder) {
+        nextPlayers.push(player);
+      }
+    });
 
-    const nextPlayer = _.find( 
-      sessionPlayers,
-      (player: Player) => player.moveOrder === moveOrder
+    const nextPlayersSorted = _.sortBy(
+      nextPlayers,
+      (player: Player) => player.moveOrder
     );
+
+    let nextPlayer = nextPlayersSorted[0];
+
+    if (nextPlayers.length <= 0) {
+      const sessionPlayersSorted = _.sortBy(
+        sessionPlayers,
+        (player: Player) => player.moveOrder
+      );
+      nextPlayer = sessionPlayersSorted[0];
+    };
+    
     player.isTurn = false;
     nextPlayer.isTurn = true;
 
@@ -255,28 +281,36 @@ io.on("connection", function (socket: Socket) {
 
     _.forEach(sessionPlayers, function (playerCurrent: Player) {
       const playerSocket = sockets[playerCurrent.socketId];
-      playerSocket.emit("playerMove", {player: socket.id, x: player.x, y: player.y});
+      playerSocket.emit("playerMove", {
+        player: socket.id,
+        x: player.x,
+        y: player.y,
+      });
     });
   });
   socket.on("damagePlayer", function (damage: number, targetId: string) {
     console.log("Damaged");
-    console.log("DMG", damage)
-    console.log(targetId)
+    console.log("DMG", damage);
+    console.log(targetId);
 
     const player = getPlayerBySocketId(targetId);
-    console.log("BEFORE HP", player.currentHP)
-    player.currentHP = player.currentHP == undefined ? 0 : player.currentHP - damage;
+    console.log("BEFORE HP", player.currentHP);
+    player.currentHP =
+      player.currentHP == undefined ? 0 : player.currentHP - damage;
     if (player.currentHP < 0) {
       player.currentHP = 0;
     }
-    console.log("AFTER HP", player.currentHP)
+    console.log("AFTER HP", player.currentHP);
     const sessionId = player.sessionId;
 
     const sessionPlayers = getSessionPlayers(sessionId);
 
     _.forEach(sessionPlayers, function (currentPlayer: Player) {
       const playerSocket = sockets[currentPlayer.socketId];
-      playerSocket.emit("playerDamage", {player: targetId, currentHP: player.currentHP});
+      playerSocket.emit("playerDamage", {
+        player: targetId,
+        currentHP: player.currentHP,
+      });
     });
   });
 
@@ -284,25 +318,24 @@ io.on("connection", function (socket: Socket) {
     console.log("Getting attack amount");
 
     const player = getPlayerBySocketId(socket.id);
-    const randomNumber = Math.floor(Math.random() * 11) + 5;
+    const randomNumber = 10;
 
     const playerSocket = sockets[player.socketId];
-    playerSocket.emit("attackAmount", {player: socket.id, currentAttack: randomNumber});
-    
+    playerSocket.emit("attackAmount", {
+      player: socket.id,
+      currentAttack: randomNumber,
+    });
   });
 
   socket.on("getLobbies", function () {
     console.log("Getting lobbies");
 
-    const playerSocket = sockets[socket.id];
-    console.log(sessions)
-    _.forEach(sessions, function(session: Session) {
+    _.forEach(sessions, function (session: Session) {
       const sessionPlayers = getSessionPlayers(session.id);
       const playerCount = sessionPlayers.length;
-      session.playerCount = playerCount
-    })
-    playerSocket.emit("lobbies", {sessions});
-    
+      session.playerCount = playerCount;
+    });
+    socket.emit("lobbies", { sessions });
   });
 });
 
