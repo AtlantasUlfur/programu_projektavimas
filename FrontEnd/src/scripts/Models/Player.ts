@@ -1,6 +1,11 @@
 import { Textures } from 'phaser';
 import { SizeEnum, DirectionEnum } from './Enums'
 import { IGun } from '../Interfaces/Guns/IGun';
+import { IRifle } from '../Interfaces/Guns/IRifle';
+import { IGrenadeLauncher } from '../Interfaces/Guns/IGrenadeLauncher';
+import { IPistol } from '../Interfaces/Guns/IPistol';
+import _ from 'lodash';
+
 export class Player extends Phaser.GameObjects.Sprite {
   public id : string;
   public playerName: Phaser.GameObjects.Text;
@@ -8,11 +13,14 @@ export class Player extends Phaser.GameObjects.Sprite {
   public tilePos : Phaser.Math.Vector2;
   public attackPower: number = 0;
   public selectedGun: IGun;
+  
+  public mainGun: IRifle | IGrenadeLauncher;
+  public secondaryGun: IPistol;
+
   public gunImage: Phaser.GameObjects.Image
 
   constructor(scene: Phaser.Scene, key: string) {
     super(scene, 0, 0, key)
-
   }
 
   update(time: number, delta: number) {
@@ -90,4 +98,26 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.gunImage.visible = false;
     this.playerName.setText("DEAD");
   }
+  setGun(gun : IGun) : void {
+    // needs specific gun at some point
+    this.selectedGun = gun;
+    this.setGunImage(this.selectedGun.gunFrame)
+ }
+
+ setGunImage(gunFrame : number)
+ {
+    if(this.gunImage !== undefined)
+    {
+      this.gunImage.destroy();
+    }
+
+    this.gunImage = this.scene.add.image(
+        0, 0, 'guns', gunFrame
+    ).setScale(0.2);
+
+    this.gunImage.setDepth(10);
+    this.gunImage.setOrigin(0.5, 1.5);
+
+    this.showChosenGun();
+ }
 }

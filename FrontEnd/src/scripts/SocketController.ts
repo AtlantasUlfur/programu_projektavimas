@@ -2,6 +2,8 @@ import { io, Socket } from "socket.io-client";
 import { MainMenuScene } from "./scenes/MainMenuScene";
 import MainScene from "./scenes/MainScene";
 import { sceneEvents } from "./Events/EventsController";
+import { Player } from "./Models/Player";
+import _ from 'lodash';
 
 //Singleton
 export default class  SocketController
@@ -85,6 +87,14 @@ export default class  SocketController
                 const mainMenuScene = this.scene as MainMenuScene;
                 mainMenuScene.lobbies = payload.sessions
             });
+            this.socket.on("changeGun", (payload) => {
+                const mainScene = this.scene as MainScene;
+                let player =  _.find(mainScene.playerList, (player: Player) => player.id === payload.id);
+                if(player !== undefined)
+                {
+                    player.setGunImage(payload.frame)
+                }
+            })
         }
     }
 
@@ -127,6 +137,10 @@ export default class  SocketController
     }
     public removeTurn(){
         this.socket?.emit("disconnect");
+    }
+
+    public changeGun(index: number){
+        this.socket?.emit("changeGun", index)
     }
 
 }

@@ -229,6 +229,11 @@ io.on("connection", function (socket: Socket) {
     });
   });
 
+  socket.on("changeGun", function(gunFrameIndex) {
+    console.log(`change weapons on ${gunFrameIndex}`)
+
+    socket.broadcast.emit("changeGun", {id: socket.id, frame: gunFrameIndex})
+  })
   socket.on("endTurn", function () {
     console.log("End Turn");
 

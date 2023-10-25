@@ -3,6 +3,7 @@ import Phaser from 'phaser'
 import { sceneEvents } from '../Events/EventsController'
 import { Player } from '../Models/Player'
 import { DirectionEnum } from '../Models/Enums'
+import { GunCreator } from '../utils/GunCreator'
 
 export default class GameUI extends Phaser.Scene
 {
@@ -22,13 +23,16 @@ export default class GameUI extends Phaser.Scene
     hotbarThree
     hotbarFour
     mainGunHotbar
+    mainGunIcon
     sideGunHotbar
+    sideGunIcon
     playerList
     playersTurnId
     arrowUp
     arrowDown
     arrowLeft
     arrowRight
+    allguns
 	constructor()
 	{
 		super({ key: 'UIScene' })
@@ -44,6 +48,7 @@ export default class GameUI extends Phaser.Scene
         this.load.spritesheet("arrowdown", "../../assets/arrow_down.png", {frameWidth: 32, frameHeight: 32});
         this.load.spritesheet("arrowleft", "../../assets/arrow_left.png", {frameWidth: 32, frameHeight: 32});
         this.load.spritesheet("arrowright", "../../assets/arrow_right.png", {frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 });
     }
     init(data){
         console.log("data", data)
@@ -57,7 +62,8 @@ export default class GameUI extends Phaser.Scene
 	create()
 	{
         const scene = this 
-    
+        this.allguns = GunCreator.CreateAllGuns();
+
         this.baseSprite = this.add.sprite(0, 0, "base")
         this.baseSprite.displayHeight = 600
         this.baseSprite.displayWidth = 300
@@ -199,14 +205,75 @@ export default class GameUI extends Phaser.Scene
         this.mainGunHotbar.displayHeight = 40
         this.mainGunHotbar.displayWidth = 40
         this.mainGunHotbar.setOrigin(1,0)
-        this.mainGunHotbar.setPosition(940, 200)
+        this.mainGunHotbar.setPosition(890, 320)
         this.mainGunHotbar.setInteractive();
         this.mainGunHotbar.on('pointerdown', (event) => {
             this.mainGunHotbar.setTint('#eaebe7');
+            this.mainGunIcon.setTint('#eaebe7');
+            sceneEvents.emit("changeGun", {gun: "mainGun"});
         });
         this.mainGunHotbar.on('pointerup', (event) => {
             this.mainGunHotbar.clearTint();
+            this.mainGunIcon.clearTint();
         });
+
+        this.mainGunIcon = this.add.image(
+            0, 0, 'guns', this.player.mainGun.gunFrame
+        ).setScale(0.2);
+
+        this.mainGunIcon.displayHeight = 40
+        this.mainGunIcon.displayWidth = 40
+        this.mainGunIcon.setOrigin(1,0)
+        this.mainGunIcon.setDepth(10)
+        this.mainGunIcon.setPosition(890, 320)
+        this.mainGunIcon.setInteractive();
+        this.mainGunIcon.on('pointerdown', (event) => {
+            this.mainGunHotbar.setTint('#eaebe7');
+            this.mainGunIcon.setTint('#eaebe7');
+            sceneEvents.emit("changeGun", {gun: "mainGun"});
+        });
+        this.mainGunIcon.on('pointerup', (event) => {
+            this.mainGunHotbar.clearTint();
+            this.mainGunIcon.clearTint();
+        });
+
+        
+        this.sideGunHotbar = this.add.sprite(0,0, "frame")
+        this.sideGunHotbar.displayHeight = 40
+        this.sideGunHotbar.displayWidth = 40
+        this.sideGunHotbar.setOrigin(1,0)
+        this.sideGunHotbar.setPosition(940, 320)
+        this.sideGunHotbar.setInteractive();
+        this.sideGunHotbar.on('pointerdown', (event) => {
+            this.sideGunHotbar.setTint('#eaebe7');
+            this.sideGunIcon.setTint('#eaebe7');
+            sceneEvents.emit("changeGun", {gun: "secondaryGun"});
+        });
+        this.sideGunHotbar.on('pointerup', (event) => {
+            this.sideGunHotbar.clearTint();
+            this.sideGunIcon.clearTint();
+        });
+
+        this.sideGunIcon = this.add.image(
+            0, 0, 'guns', this.player.secondaryGun.gunFrame
+        ).setScale(0.2);
+
+        this.sideGunIcon.displayHeight = 40
+        this.sideGunIcon.displayWidth = 40
+        this.sideGunIcon.setOrigin(1,0)
+        this.sideGunIcon.setDepth(10)
+        this.sideGunIcon.setPosition(940, 320)
+        this.sideGunIcon.setInteractive();
+        this.sideGunIcon.on('pointerdown', (event) => {
+            this.sideGunHotbar.setTint('#eaebe7');
+            this.sideGunIcon.setTint('#eaebe7');
+            sceneEvents.emit("changeGun", {gun: "secondaryGun"});
+        });
+        this.sideGunIcon.on('pointerup', (event) => {
+            this.sideGunHotbar.clearTint();
+            this.sideGunIcon.clearTint();
+        });
+
 
         this.arrowUp = this.add.sprite(0,0, "arrowup")
         this.arrowUp.displayHeight = 24
@@ -275,6 +342,8 @@ export default class GameUI extends Phaser.Scene
         this.MenuGroup.add(this.hotbarTwo)
         this.MenuGroup.add(this.hotbarThree)
         this.MenuGroup.add(this.hotbarFour)
+        this.MenuGroup.add(this.mainGunHotbar)
+        this.MenuGroup.add(this.mainGunIcon)
         this.MenuGroup.add(this.arrowUp)
         this.MenuGroup.add(this.arrowDown)
         this.MenuGroup.add(this.arrowLeft)

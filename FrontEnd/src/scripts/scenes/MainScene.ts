@@ -7,6 +7,8 @@ import PlayerBuilder from '../utils/PlayerBuilder'
 import { sceneEvents } from '../Events/EventsController'
 import { IGun } from '../Interfaces/Guns/IGun'
 import { GunCreator } from '../utils/GunCreator'
+import { IRifle } from '../Interfaces/Guns/IRifle'
+import { IPistol } from '../Interfaces/Guns/IPistol'
 
 export default class MainScene extends Phaser.Scene {
   //Utils
@@ -118,7 +120,9 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('#008000')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setGun(this.allGuns[0])
+        builder.setGun(this.allGuns[3]);
+        builder.setSecondaryGun(this.allGuns[0] as IPistol);
+        builder.setMainGun(this.allGuns[3] as IRifle);
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -134,7 +138,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('red')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setGun(this.allGuns[0])
+        builder.setGun(this.allGuns[3]);
+        builder.setSecondaryGun(this.allGuns[0] as IPistol);
+        builder.setMainGun(this.allGuns[3] as IRifle);
+
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
       }
@@ -147,10 +154,32 @@ export default class MainScene extends Phaser.Scene {
     sceneEvents.on('damage', payload => {
       this.handleDamage(payload)
     })
+    sceneEvents.on('changeGun', payload => {
+      this.handleGunChange(payload)
+    })
 
     //Run UI Scenes
     this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
     this.scene.run('GameOver');
+  }
+  handleGunChange(payload: any) {
+    var playerToChangeGunFor = this.player
+    if(payload.player !== undefined){
+      // change gun for other player
+    }
+
+    var gunToChangeTo = this.player.selectedGun;
+    if(payload.gun === "secondaryGun"){
+      gunToChangeTo = this.player.secondaryGun;
+    }
+    if(payload.gun === "mainGun"){
+      gunToChangeTo = this.player.mainGun;
+    }
+
+    playerToChangeGunFor.setGun(gunToChangeTo)
+    playerToChangeGunFor.showChosenGun()
+
+    this.socketInstance.changeGun(gunToChangeTo.gunFrame)
   }
 
   update(time: number, delta: number) {

@@ -1,4 +1,7 @@
+import { IGrenadeLauncher } from '../Interfaces/Guns/IGrenadeLauncher'
 import { IGun } from '../Interfaces/Guns/IGun'
+import { IPistol } from '../Interfaces/Guns/IPistol'
+import { IRifle } from '../Interfaces/Guns/IRifle'
 import { SizeEnum } from '../Models/Enums'
 import { Player } from '../Models/Player'
 
@@ -60,6 +63,16 @@ export default class PlayerBuilder implements PlayerBuilderInterface {
   setSocketId(socketId: string): void {
     this.player.id = socketId;
   }
+
+  setMainGun(gun: IRifle | IGrenadeLauncher){
+    this.player.mainGun = gun;
+  }
+
+  setSecondaryGun(gun: IPistol)
+  {
+    this.player.secondaryGun = gun;
+  }
+
   setGun(gun : IGun) : void {
      // needs specific gun at some point
      this.player.selectedGun = gun;
