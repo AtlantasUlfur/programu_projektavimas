@@ -237,17 +237,29 @@ io.on("connection", function (socket: Socket) {
     let moveOrder = player.moveOrder ?? 0;
 
     const sessionPlayers = getSessionPlayers(sessionId);
+    const nextPlayers: Player[] = [];
 
-    if (moveOrder < sessionPlayers.length) {
-      moveOrder = moveOrder + 1;
-    } else {
-      moveOrder = 1;
-    }
+    _.forEach(sessionPlayers, (player: Player) => {
+      if (Number(player.moveOrder) > moveOrder) {
+        nextPlayers.push(player);
+      }
+    });
 
-    const nextPlayer = _.find(
-      sessionPlayers,
-      (player: Player) => player.moveOrder === moveOrder
+    const nextPlayersSorted = _.sortBy(
+      nextPlayers,
+      (player: Player) => player.moveOrder
     );
+
+    let nextPlayer = nextPlayersSorted[0];
+
+    if (nextPlayers.length <= 0) {
+      const sessionPlayersSorted = _.sortBy(
+        sessionPlayers,
+        (player: Player) => player.moveOrder
+      );
+      nextPlayer = sessionPlayersSorted[0];
+    };
+    
     player.isTurn = false;
     nextPlayer.isTurn = true;
 
