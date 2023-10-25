@@ -1,4 +1,4 @@
-import { IGrenadeLauncher } from "../../ModelInterfaces/Guns/IGrenadeLauncher";
+import { IGrenadeLauncher } from "../../Interfaces/Guns/IGrenadeLauncher";
 import { Player } from "../Player";
 
 export class GrenadeLauncher implements IGrenadeLauncher{
@@ -7,16 +7,21 @@ export class GrenadeLauncher implements IGrenadeLauncher{
     gunFrame: number;
     ammo: number;
     damage: number;
-    
+    distance: number;
+    price: number;
+
     private _maxAmmo: number;
 
-    constructor(gunFrame: number, ammo: number, explosionRadius: number, damage: number) {
-        this.gunFrame = gunFrame;
-        this.ammo = ammo;
-        this.explosionRadius = explosionRadius;
-        this.damage = damage;
-        this._maxAmmo = ammo;
+    constructor(grenadeLauncher: {gunFrame: number, ammo: number, explosionRadius: number, damage: number, distance: number, price: number}) {
+        this.gunFrame = grenadeLauncher.gunFrame;
+        this.ammo = grenadeLauncher.ammo;
+        this.explosionRadius = grenadeLauncher.explosionRadius;
+        this.damage = grenadeLauncher.damage;
+        this._maxAmmo = grenadeLauncher.ammo;
+        this.distance = grenadeLauncher.distance;
+        this.price = grenadeLauncher.price;
     }
+
 
     shoot(targetPlayer: Player) {
         throw new Error("Method not implemented.");

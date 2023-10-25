@@ -1,7 +1,7 @@
 import { Textures } from 'phaser';
 import { SizeEnum, DirectionEnum } from './Enums'
-import { IGun } from '../ModelInterfaces/Guns/IGun';
-import { GunCreator } from './Guns/GunCreator';
+import { IGun } from '../Interfaces/Guns/IGun';
+import { GunCreator } from '../utils/GunCreator';
 export class Player extends Phaser.GameObjects.Sprite {
   public id : string;
   private playerName: Phaser.GameObjects.Text;
@@ -11,11 +11,17 @@ export class Player extends Phaser.GameObjects.Sprite {
   private waitText: Phaser.GameObjects.Text;
   private allGuns: IGun[];
   private color: string
+  private gunImage: Phaser.GameObjects.Image
 
   public tilePos : Phaser.Math.Vector2;
   public attackPower: number = 0;
+
   public selectedGun: IGun;
-  private gunImage: Phaser.GameObjects.Image
+
+  public mainGunIndex: number;
+  public sideGunIndex: number;
+
+
 
   constructor(scene: Phaser.Scene, tilePos : Phaser.Math.Vector2, key: string, frame: number, name: string, hp: number, socketId : string, color: string) {
     super(scene, 0, 0, key)
@@ -51,9 +57,14 @@ export class Player extends Phaser.GameObjects.Sprite {
 
 
     this.allGuns = GunCreator.CreateAllGuns();
+
     // needs specific gun at some point
     if(this.allGuns.length > 0){
-      this.selectedGun = this.allGuns[0];
+      this.selectedGun = this.allGuns[3];
+      this.sideGunIndex = 0;
+
+      this.mainGunIndex = 3;
+      
       this.gunImage = this.scene.add.image(
         0, 0, 'guns', this.selectedGun.gunFrame
         ).setScale(0.2);
@@ -63,7 +74,21 @@ export class Player extends Phaser.GameObjects.Sprite {
 
       this.showChosenGun();
     } 
+  }
 
+  selectWeapon(index: number)
+  {
+    this.gunImage.destroy();
+    this.selectedGun = this.allGuns[index]
+
+    this.gunImage = this.scene.add.image(
+      0, 0, 'guns', this.selectedGun.gunFrame
+      ).setScale(0.2);
+
+    this.gunImage.setDepth(10);
+    this.gunImage.setOrigin(0.5, 1.5);
+
+    this.showChosenGun();
   }
 
   update(time: number, delta: number) {

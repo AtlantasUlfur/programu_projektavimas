@@ -21,6 +21,8 @@ export default class GameUI extends Phaser.Scene
     hotbarTwo
     hotbarThree
     hotbarFour
+    mainGunHotbar
+    sideGunHotbar
     playerList
     playersTurnId
     arrowUp
@@ -193,6 +195,18 @@ export default class GameUI extends Phaser.Scene
             this.hotbarFour.clearTint();
         });
 
+        this.mainGunHotbar = this.add.sprite(0,0, "frame")
+        this.mainGunHotbar.displayHeight = 40
+        this.mainGunHotbar.displayWidth = 40
+        this.mainGunHotbar.setOrigin(1,0)
+        this.mainGunHotbar.setPosition(940, 200)
+        this.mainGunHotbar.setInteractive();
+        this.mainGunHotbar.on('pointerdown', (event) => {
+            this.mainGunHotbar.setTint('#eaebe7');
+        });
+        this.mainGunHotbar.on('pointerup', (event) => {
+            this.mainGunHotbar.clearTint();
+        });
 
         this.arrowUp = this.add.sprite(0,0, "arrowup")
         this.arrowUp.displayHeight = 24

@@ -1,8 +1,8 @@
-import { IAbstractGunFactory } from "../../AbstractFactories/IAbstractGunFactory";
-import { GrenadeLauncherFactory } from "../../Factories/GrenadeLauncherFactory";
-import { PistolFactory } from "../../Factories/PistolFactory";
-import { RifleFactory } from "../../Factories/RifleFactory";
-import { IGun } from "../../ModelInterfaces/Guns/IGun";
+import { IAbstractGunFactory } from "./AbstractFactories/IAbstractGunFactory";
+import { GrenadeLauncherFactory } from "./Factories/GrenadeLauncherFactory";
+import { PistolFactory } from "./Factories/PistolFactory";
+import { RifleFactory } from "./Factories/RifleFactory";
+import { IGun } from "../Interfaces/Guns/IGun";
 
 export class GunCreator{
     static CreateAllGuns(): Array<IGun>{

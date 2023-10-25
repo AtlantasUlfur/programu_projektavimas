@@ -1,4 +1,4 @@
-import { IRifle } from "../../ModelInterfaces/Guns/IRifle";
+import { IRifle } from "../../Interfaces/Guns/IRifle";
 import { Player } from "../Player";
 
 export class Rifle implements IRifle{
@@ -6,16 +6,21 @@ export class Rifle implements IRifle{
     ammo: number;
     damage: number;
     fireRate: number;
+    distance: number;
+    price: number;
 
     private _maxAmmo: number;
 
-    constructor(gunFrame: number, ammo: number, damage: number, fireRate: number){
-        this.gunFrame = gunFrame;
-        this.ammo = ammo;
-        this._maxAmmo = ammo;
-        this.damage = damage;
-        this.fireRate = fireRate;
+    constructor(rifle: {gunFrame: number, ammo: number, damage: number, fireRate: number, distance: number, price: number}){
+        this.gunFrame = rifle.gunFrame;
+        this.ammo = rifle.ammo;
+        this._maxAmmo = rifle.ammo;
+        this.damage = rifle.damage;
+        this.fireRate = rifle.fireRate;
+        this.distance = rifle.distance;
+        this.price = rifle.price;
     }
+
 
 
     shoot(targetPlayer: Player) {
