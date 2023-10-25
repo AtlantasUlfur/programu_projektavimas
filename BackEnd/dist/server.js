@@ -62,18 +62,33 @@ io.on("connection", function (socket) {
     socket.on("disconnect", function () {
         console.log("user disconnected");
         // remove this player from our players object
-        _.remove(players, (player) => player.socketId === socket.id);
+        const removedPlayer = _.remove(players, (player) => player.socketId === socket.id);
         _.remove(sockets, (scoket) => scoket.id === socket.id);
+        _.remove(sessions, (session) => {
+            if (session.id === removedPlayer[0].sessionId) {
+                const sessionPlayers = getSessionPlayers(session.id);
+                if (sessionPlayers.length == 0) {
+                    return true;
+                }
+            }
+        });
     });
     socket.on("createLobby", function (payload) {
         console.log("New lobby");
         const sessionId = uuid();
-        sessions.push({ id: sessionId, name: payload.name });
-        players.push({ id: "player", socketId: socket.id, sessionId, currentHP: 100 });
+        sessions.push({ id: sessionId, name: payload.name, playerCount: 1 });
+        players.push({
+            id: "player",
+            socketId: socket.id,
+            sessionId,
+            currentHP: 100,
+            name: payload.name,
+        });
         socket.emit("playerCount", 1);
     });
     socket.on("joinLobby", function (payload) {
         console.log("Join lobby");
+        console.log(payload);
         const name = payload.name;
         const session = getSession(name);
         if (!session) {
@@ -85,7 +100,8 @@ io.on("connection", function (socket) {
             id: "player",
             socketId: socket.id,
             sessionId: session.id,
-            currentHP: 100
+            currentHP: 100,
+            name: payload.playerName,
         });
         //NOTE(HB) collect players in updated session
         const sessionPlayers = getSessionPlayers(session.id);
@@ -159,7 +175,12 @@ io.on("connection", function (socket) {
                 firstPlayer = player;
                 firstPlayer.isTurn = true;
             }
-            playerSocket.emit("gameStart", { map, player, sessionPlayers, playersTurnId: firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId });
+            playerSocket.emit("gameStart", {
+                map,
+                player,
+                sessionPlayers,
+                playersTurnId: firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId,
+            });
             moveOrder = moveOrder + 1;
         });
     });
@@ -170,13 +191,19 @@ io.on("connection", function (socket) {
         const sessionId = player.sessionId;
         let moveOrder = (_a = player.moveOrder) !== null && _a !== void 0 ? _a : 0;
         const sessionPlayers = getSessionPlayers(sessionId);
-        if (moveOrder < sessionPlayers.length) {
-            moveOrder = moveOrder + 1;
+        const nextPlayers = [];
+        _.forEach(sessionPlayers, (player) => {
+            if (Number(player.moveOrder) > moveOrder) {
+                nextPlayers.push(player);
+            }
+        });
+        const nextPlayersSorted = _.sortBy(nextPlayers, (player) => player.moveOrder);
+        let nextPlayer = nextPlayersSorted[0];
+        if (nextPlayers.length <= 0) {
+            const sessionPlayersSorted = _.sortBy(sessionPlayers, (player) => player.moveOrder);
+            nextPlayer = sessionPlayersSorted[0];
         }
-        else {
-            moveOrder = 1;
-        }
-        const nextPlayer = _.find(sessionPlayers, (player) => player.moveOrder === moveOrder);
+        ;
         player.isTurn = false;
         nextPlayer.isTurn = true;
         _.forEach(sessionPlayers, function (player) {
@@ -193,7 +220,11 @@ io.on("connection", function (socket) {
         const sessionPlayers = getSessionPlayers(sessionId);
         _.forEach(sessionPlayers, function (playerCurrent) {
             const playerSocket = sockets[playerCurrent.socketId];
-            playerSocket.emit("playerMove", { player: socket.id, x: player.x, y: player.y });
+            playerSocket.emit("playerMove", {
+                player: socket.id,
+                x: player.x,
+                y: player.y,
+            });
         });
     });
     socket.on("damagePlayer", function (damage, targetId) {
@@ -202,7 +233,8 @@ io.on("connection", function (socket) {
         console.log(targetId);
         const player = getPlayerBySocketId(targetId);
         console.log("BEFORE HP", player.currentHP);
-        player.currentHP = player.currentHP == undefined ? 0 : player.currentHP - damage;
+        player.currentHP =
+            player.currentHP == undefined ? 0 : player.currentHP - damage;
         if (player.currentHP < 0) {
             player.currentHP = 0;
         }
@@ -211,15 +243,30 @@ io.on("connection", function (socket) {
         const sessionPlayers = getSessionPlayers(sessionId);
         _.forEach(sessionPlayers, function (currentPlayer) {
             const playerSocket = sockets[currentPlayer.socketId];
-            playerSocket.emit("playerDamage", { player: targetId, currentHP: player.currentHP });
+            playerSocket.emit("playerDamage", {
+                player: targetId,
+                currentHP: player.currentHP,
+            });
         });
     });
     socket.on("getAttackAmount", function () {
         console.log("Getting attack amount");
         const player = getPlayerBySocketId(socket.id);
-        const randomNumber = Math.floor(Math.random() * 11) + 5;
+        const randomNumber = 10;
         const playerSocket = sockets[player.socketId];
-        playerSocket.emit("attackAmount", { player: socket.id, currentAttack: randomNumber });
+        playerSocket.emit("attackAmount", {
+            player: socket.id,
+            currentAttack: randomNumber,
+        });
+    });
+    socket.on("getLobbies", function () {
+        console.log("Getting lobbies");
+        _.forEach(sessions, function (session) {
+            const sessionPlayers = getSessionPlayers(session.id);
+            const playerCount = sessionPlayers.length;
+            session.playerCount = playerCount;
+        });
+        socket.emit("lobbies", { sessions });
     });
 });
 server.listen(8081, function () {

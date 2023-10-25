@@ -58,9 +58,22 @@ export default class  SocketController
                             playerObj.clearTint()
                         }, 250)
                         playerObj.setHP(payload.currentHP)
+                        //If enemy dies
+                        if(playerObj.getCurrentHealth() == 0){
+                            mainScene.alivePlayerCount--;
+                            playerObj.die();
+                        }
                     }   
                     if (mainScene.player.id == payload.player) {
-                        sceneEvents.emit('hpChange')
+                        sceneEvents.emit('hpChange');
+                        //If player dies
+                        if(mainScene.player.getCurrentHealth() == 0){
+                            sceneEvents.emit('gameOver', {victory: false})
+                            mainScene.player.die();
+                            mainScene.alivePlayerCount--;
+                            this.endTurn();
+                            this.removeTurn();
+                        }
                     }
                 });
             });
@@ -111,6 +124,9 @@ export default class  SocketController
     }
     public getLobbies() {
         this.socket?.emit("getLobbies");
+    }
+    public removeTurn(){
+        this.socket?.emit("disconnect");
     }
 
 }

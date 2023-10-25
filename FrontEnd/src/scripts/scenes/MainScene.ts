@@ -17,6 +17,7 @@ export default class MainScene extends Phaser.Scene {
   private tileMap: Phaser.Tilemaps.Tilemap
   //Players
   public playerList: Player[] = []
+  public alivePlayerCount : number = 0;
   public player: Player
   public playersTurnId: string = ''
 
@@ -25,9 +26,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    console.log(data)
     this.currentPlayerData = data.player
     this.allPlayerData = data.sessionPlayers
+    this.alivePlayerCount = this.allPlayerData.length;
     this.playersTurnId = data.playersTurnId
     this.socketInstance = SocketController.getInstance()
     this.socketInstance.setScene(this)
@@ -76,6 +77,10 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 26,
       frameHeight: 36
     })
+    this.load.spritesheet('dead', '../../assets/cloud_tileset.png',{
+      frameWidth: 16,
+      frameHeight: 16
+    });
     this.load.image('tiles', '../../assets/cloud_tileset.png')
     this.load.image('background', '../../assets/cloud_backround.png')
     this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 });
@@ -99,7 +104,7 @@ export default class MainScene extends Phaser.Scene {
     })
     const texture_frames = [49, 52, 55, 10]
     this.allPlayerData.forEach((playerData, index) => {
-      console.log(playerData)
+      console.log(playerData) 
 
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
         //Create current player
@@ -132,115 +137,124 @@ export default class MainScene extends Phaser.Scene {
         scene.playerList.push(otherPlayer)
       }
     })
+
+    //Handle player events
     sceneEvents.on('movement', payload => {
       this.handleMovement(payload)
     })
     sceneEvents.on('damage', payload => {
-
       this.handleDamage(payload)
     })
+
+    //Run UI Scenes
     this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
+    this.scene.run('GameOver');
   }
 
   update(time: number, delta: number) {
+
     if (this.player.attackPower == 0) {
       this.socketInstance.getAttackAmount()
+    }
+    if(this.alivePlayerCount == 1) {
+      sceneEvents.emit("gameOver", {victory: true});
     }
     this.player.update(time, delta)
   }
 
-    handleMovement(direction: DirectionEnum){
-        if(this.playersTurnId == this.player.id)
-        {
-            var distance = 0;
-            switch (direction) {
-                case DirectionEnum.UP:
-                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-5, DirectionEnum.UP);
-                    if(distance != 0){
-                        this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y-distance);
-                        this.player.move(DirectionEnum.UP, distance);
-                        this.socketInstance.endTurn();
-                    }
-                  break;
-                case DirectionEnum.DOWN:
-                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+5, DirectionEnum.DOWN)
-                    if(distance != 0){
-                        this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y+distance);
-                        this.player.move(DirectionEnum.DOWN, distance);
-                        this.socketInstance.endTurn();
-                    }
-                  break;
-                case DirectionEnum.LEFT:
-                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-5, this.player.tilePos.y, DirectionEnum.LEFT)
-                    if(distance != 0){
-                        this.socketInstance.movePlayer(this.player.tilePos.x-distance, this.player.tilePos.y);
-                        this.player.move(DirectionEnum.LEFT, distance);
-                        this.socketInstance.endTurn();
-                    }
-                  break;
-                case DirectionEnum.RIGHT:
-                    distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+5, this.player.tilePos.y, DirectionEnum.RIGHT)
-                    if(distance != 0){
-                        this.socketInstance.movePlayer(this.player.tilePos.x+distance, this.player.tilePos.y);
-                        this.player.move(DirectionEnum.RIGHT,  distance);
-                        this.socketInstance.endTurn();
-                    }
-                  break;
-                default:
-                  console.log("Somethings wrong...")
-                  break;
-            }
-        }
-    }
-
-    canPlayerMove(scene : MainScene, tileMap : Phaser.Tilemaps.Tilemap, player : Player, toX : number, toY : number, direction : DirectionEnum){
-        let distance = 0;
-            switch (direction) {
-            case DirectionEnum.UP:
-                distance = player.tilePos.y - toY;
-                var travelingY = player.tilePos.y;
-                for (let i = 0; i < distance; i++) {
-                    travelingY--;
-                    let tile = tileMap.getTileAt(toX, travelingY);
-                    if(!scene.tileMoveCheck(scene, tile))
-                        return i;
-                }
-                return distance;
-            case DirectionEnum.DOWN:
-                distance = toY - player.tilePos.y;
-                var travelingY = player.tilePos.y;
-                for (let i = 0; i < distance; i++) {
-                    travelingY++;
-                    let tile = tileMap.getTileAt(toX, travelingY);
-                    if(!scene.tileMoveCheck(scene, tile))
-                        return i;
-                }
-                return distance;
-            case DirectionEnum.LEFT:
-                distance = player.tilePos.x - toX;
-                var travelingX = player.tilePos.x;
-                for (let i = 0; i < distance; i++) {
-                    travelingX--;
-                    let tile = tileMap.getTileAt(travelingX, toY);
-                    if(!scene.tileMoveCheck(scene, tile))
-                        return i;
-                }
-                return distance;
-            case DirectionEnum.RIGHT:
-                distance = toX - player.tilePos.x;
-                var travelingX = player.tilePos.x;
-                for (let i = 0; i < distance; i++) {
-                    travelingX++;
-                    let tile = tileMap.getTileAt(travelingX, toY);
-                    if(!scene.tileMoveCheck(scene, tile))
-                        return i;
-                }
-                return distance;
-            default:
+  handleMovement(direction: DirectionEnum)
+  {
+      if(this.playersTurnId == this.player.id && !this.player.isDead())
+      {
+          var distance = 0;
+          switch (direction) {
+              case DirectionEnum.UP:
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-5, DirectionEnum.UP);
+                  if(distance != 0){
+                      this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y-distance);
+                      this.player.move(DirectionEnum.UP, distance);
+                      this.socketInstance.endTurn();
+                  }
+                break;
+              case DirectionEnum.DOWN:
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+5, DirectionEnum.DOWN)
+                  if(distance != 0){
+                      this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y+distance);
+                      this.player.move(DirectionEnum.DOWN, distance);
+                      this.socketInstance.endTurn();
+                  }
+                break;
+              case DirectionEnum.LEFT:
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-5, this.player.tilePos.y, DirectionEnum.LEFT)
+                  if(distance != 0){
+                      this.socketInstance.movePlayer(this.player.tilePos.x-distance, this.player.tilePos.y);
+                      this.player.move(DirectionEnum.LEFT, distance);
+                      this.socketInstance.endTurn();
+                  }
+                break;
+              case DirectionEnum.RIGHT:
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+5, this.player.tilePos.y, DirectionEnum.RIGHT)
+                  if(distance != 0){
+                      this.socketInstance.movePlayer(this.player.tilePos.x+distance, this.player.tilePos.y);
+                      this.player.move(DirectionEnum.RIGHT,  distance);
+                      this.socketInstance.endTurn();
+                  }
+                break;
+              default:
                 console.log("Somethings wrong...")
-                return distance;
-        }
+                break;
+          }
+      }
+  }
+
+  canPlayerMove(scene : MainScene, tileMap : Phaser.Tilemaps.Tilemap, player : Player, toX : number, toY : number, direction : DirectionEnum){
+    let distance = 0;
+        switch (direction) {
+        case DirectionEnum.UP:
+            distance = player.tilePos.y - toY;
+            var travelingY = player.tilePos.y;
+            for (let i = 0; i < distance; i++) {
+                travelingY--;
+                let tile = tileMap.getTileAt(toX, travelingY);
+                if(!scene.tileMoveCheck(scene, tile))
+                    return i;
+            }
+            return distance;
+        case DirectionEnum.DOWN:
+            distance = toY - player.tilePos.y;
+            var travelingY = player.tilePos.y;
+            for (let i = 0; i < distance; i++) {
+                travelingY++;
+                let tile = tileMap.getTileAt(toX, travelingY);
+                if(!scene.tileMoveCheck(scene, tile))
+                    return i;
+            }
+            return distance;
+        case DirectionEnum.LEFT:
+            distance = player.tilePos.x - toX;
+            var travelingX = player.tilePos.x;
+            for (let i = 0; i < distance; i++) {
+                travelingX--;
+                let tile = tileMap.getTileAt(travelingX, toY);
+                if(!scene.tileMoveCheck(scene, tile))
+                    return i;
+            }
+            return distance;
+        case DirectionEnum.RIGHT:
+            distance = toX - player.tilePos.x;
+            var travelingX = player.tilePos.x;
+            for (let i = 0; i < distance; i++) {
+                travelingX++;
+                let tile = tileMap.getTileAt(travelingX, toY);
+                if(!scene.tileMoveCheck(scene, tile))
+                    return i;
+            }
+            return distance;
+        default:
+            console.log("Somethings wrong...")
+            return distance;
     }
+  }
 
     private tileMoveCheck(scene : MainScene, toTile : Phaser.Tilemaps.Tile){
         //Check if collides with player
@@ -265,12 +279,8 @@ export default class MainScene extends Phaser.Scene {
 
     }
     handleDamage(targetId: string) {
-        if (this.playersTurnId == this.player.id) {
+        if (this.playersTurnId == this.player.id && !this.player.isDead()) {
           this.socketInstance.damagePlayer(this.player.attackPower, targetId)
-          sceneEvents.emit('changeHP')
-        //   this.playerList.forEach(playerObj => {
-        //     console.log(playerObj)
-        //   })
           this.socketInstance.endTurn()
           //TODO: DISTANCE CHECK
         }
