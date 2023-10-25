@@ -42,26 +42,29 @@ export class Player extends Phaser.GameObjects.Sprite {
   }
 
   move(direction : DirectionEnum, stepCount : integer){
-    switch (direction) {
-      case DirectionEnum.UP:
-        this.tilePos.y -= stepCount;
-        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
-        break;
-      case DirectionEnum.DOWN:
-        this.tilePos.y += stepCount;
-        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
-        break;
-      case DirectionEnum.LEFT:
-        this.tilePos.x -= stepCount;
-        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
-        break;
-      case DirectionEnum.RIGHT:
-        this.tilePos.x += stepCount;
-        this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
-        break;
-      default:
-        console.log("Somethings wrong...")
-        break;
+    if(!this.isDead())
+    {
+      switch (direction) {
+        case DirectionEnum.UP:
+          this.tilePos.y -= stepCount;
+          this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
+          break;
+        case DirectionEnum.DOWN:
+          this.tilePos.y += stepCount;
+          this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
+          break;
+        case DirectionEnum.LEFT:
+          this.tilePos.x -= stepCount;
+          this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
+          break;
+        case DirectionEnum.RIGHT:
+          this.tilePos.x += stepCount;
+          this.setPosition(this.tilePos.x * SizeEnum.TILE_SIZE + SizeEnum.TILE_X_OFFSET, this.tilePos.y * SizeEnum.TILE_SIZE - SizeEnum.TILE_Y_OFFSET);
+          break;
+        default:
+          console.log("Somethings wrong...")
+          break;
+      }
     }
   }
 
