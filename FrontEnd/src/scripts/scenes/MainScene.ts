@@ -214,7 +214,7 @@ export default class MainScene extends Phaser.Scene {
 
     //Handle player events
     sceneEvents.on('movement', payload => {
-      this.handleMovement(payload)
+      this.handleMovement(payload.direction, payload.commandCounter)
     })
     sceneEvents.on('damage', payload => {
       this.handleDamage(payload)
@@ -269,14 +269,14 @@ export default class MainScene extends Phaser.Scene {
     this.player.update(time, delta)
   }
 
-  handleMovement(direction: DirectionEnum)
+  handleMovement(direction: DirectionEnum, commandCounter: number)
   {
       if(this.playersTurnId == this.player.id && !this.player.isDead())
       {
           var distance = 0;
           switch (direction) {
               case DirectionEnum.UP:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-5, DirectionEnum.UP);
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-commandCounter, DirectionEnum.UP);
                   if(distance != 0){
                       this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y-distance);
                       this.player.move(DirectionEnum.UP, distance);
@@ -284,7 +284,7 @@ export default class MainScene extends Phaser.Scene {
                   }
                 break;
               case DirectionEnum.DOWN:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+5, DirectionEnum.DOWN)
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+commandCounter, DirectionEnum.DOWN)
                   if(distance != 0){
                       this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y+distance);
                       this.player.move(DirectionEnum.DOWN, distance);
@@ -292,7 +292,7 @@ export default class MainScene extends Phaser.Scene {
                   }
                 break;
               case DirectionEnum.LEFT:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-5, this.player.tilePos.y, DirectionEnum.LEFT)
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-commandCounter, this.player.tilePos.y, DirectionEnum.LEFT)
                   if(distance != 0){
                       this.socketInstance.movePlayer(this.player.tilePos.x-distance, this.player.tilePos.y);
                       this.player.move(DirectionEnum.LEFT, distance);
@@ -300,7 +300,7 @@ export default class MainScene extends Phaser.Scene {
                   }
                 break;
               case DirectionEnum.RIGHT:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+5, this.player.tilePos.y, DirectionEnum.RIGHT)
+                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+commandCounter, this.player.tilePos.y, DirectionEnum.RIGHT)
                   if(distance != 0){
                       this.socketInstance.movePlayer(this.player.tilePos.x+distance, this.player.tilePos.y);
                       this.player.move(DirectionEnum.RIGHT,  distance);
