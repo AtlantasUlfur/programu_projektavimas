@@ -9,6 +9,7 @@ import { IGun } from '../Interfaces/Guns/IGun'
 import { GunCreator } from '../utils/GunCreator'
 import { IRifle } from '../Interfaces/Guns/IRifle'
 import { IPistol } from '../Interfaces/Guns/IPistol'
+import MapBuilder from '../utils/MapBuilder'
 
 export default class MainScene extends Phaser.Scene {
   //Utils
@@ -25,16 +26,18 @@ export default class MainScene extends Phaser.Scene {
   public player: Player
   public playersTurnId: string = ''
   private allGuns: IGun[];
+  public theme: string;
 
   constructor() {
     super('MainScene')
   }
 
   init(data) {
-    this.currentPlayerData = data.player
-    this.allPlayerData = data.sessionPlayers
+    this.theme = data.theme;
+    this.currentPlayerData = data.payload.player
+    this.allPlayerData = data.payload.sessionPlayers
     this.alivePlayerCount = this.allPlayerData.length;
-    this.playersTurnId = data.playersTurnId
+    this.playersTurnId = data.payload.playersTurnId
     this.socketInstance = SocketController.getInstance()
     this.socketInstance.setScene(this)
     this.allGuns = GunCreator.CreateAllGuns();
@@ -63,7 +66,7 @@ export default class MainScene extends Phaser.Scene {
       [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367]
     ]
 
-    data.map.tileMap.forEach(tile => {
+    data.payload.map.tileMap.forEach(tile => {
       switch (tile.entity?.id) {
         case 'wall':
           this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL
@@ -88,21 +91,23 @@ export default class MainScene extends Phaser.Scene {
       frameHeight: 16
     });
     this.load.image('tiles', '../../assets/cloud_tileset.png')
-    this.load.image('background', '../../assets/cloud_backround.png')
+    this.load.image('cloud_background', '../../assets/cloud_backround.png')
+    this.load.image('hell_background', '../../assets/hell_background.jpg')
+    this.load.image('jungle_background', '../../assets/jungle_background.png')
+    this.load.image('city_background', '../../assets/city_background.png')
     this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 });
   }
 
   create() {
     const scene = this
     this.socketInstance = SocketController.getInstance()
-    
-    //const gunImage = this.add.image(200, 200, 'guns', 0).setDepth(100).setScale(0.25).setOrigin(0)
+ 
+    let mapBuilder = new MapBuilder(scene);
+    mapBuilder.setBackground(this.theme);
+    mapBuilder.setTileMap(this.mapData, 16, 16);
+    mapBuilder.setTileSet('tile-set', 'tiles');
+    this.tileMap = mapBuilder.build();
 
-    //Map Render
-    this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, 'background').setDepth(0)
-    this.tileMap = this.make.tilemap({ data: this.mapData, tileWidth: 16, tileHeight: 16 })
-    const tiles = this.tileMap.addTilesetImage('tile-set', 'tiles')
-    const layer = this.tileMap.createLayer(0, tiles, 0, 0)
     //Create all players
     this.allPlayerData = this.allPlayerData.sort((a, b) => {
       return a.socketId.localeCompare(b.socketId)

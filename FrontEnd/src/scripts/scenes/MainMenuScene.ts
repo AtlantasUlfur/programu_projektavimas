@@ -16,6 +16,7 @@ export class MainMenuScene extends Phaser.Scene {
   public lobbyStatus: LobbiesEnum = LobbiesEnum.MENU
   public playerName: string | null
   public lobbies: SessionServer[] = []
+  public selectedTheme: string | null
 
   constructor() {
     super('MainMenu')
@@ -88,6 +89,29 @@ export class MainMenuScene extends Phaser.Scene {
       console.log('Join game pressed')
       this.buttonClick(scene, 1)
     })
+  }
+  startGame(payload: any) {
+    var theme;
+    if (payload.theme == "1") {
+      theme = "cloud_background"
+      this.scene.start("MainScene", {payload, theme});
+    }
+    else if (payload.theme == "2") {
+      theme = "jungle_background"
+      this.scene.start("MainScene", {payload, theme});
+    }
+    else if (payload.theme == "3") {
+      theme = "city_background"
+      this.scene.start("MainScene", {payload, theme});
+    }
+    else if (payload.theme == "4") {
+      theme = "hell_background"
+      this.scene.start("MainScene", {payload, theme});
+    }
+    else {
+      theme = "cloud_background"
+      this.scene.start("MainScene", {payload, theme});
+    }
   }
 
   selectButton(index: number) {
@@ -172,7 +196,9 @@ export class MainMenuScene extends Phaser.Scene {
     if (0 == index) {
       scene.socketInstance.createLobby(this.playerName)
       scene.lobbyStatus = LobbiesEnum.IN_LOBBY
-
+      while(!this.selectedTheme) {
+        this.selectedTheme = prompt("Enter a number for map theme(1:cloud, 2:jungle, 3:city, 4:hell)", "1");
+      }
       scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.5, 'You are host').setOrigin(0.5)
       scene.playerCountText = scene.add
         .text(scene.scale.width * 0.5, scene.scale.height * 0.6, `Waiting for players... ${scene.playerCount}/4`)
@@ -191,7 +217,7 @@ export class MainMenuScene extends Phaser.Scene {
 
       startGameButtonImage.on('selected', () => {
         console.log('Start game pressed')
-        scene.socketInstance.startGame(this.playerName)
+        scene.socketInstance.startGame(this.playerName, this.selectedTheme)
       })
     } else {
       setTimeout(function () {
