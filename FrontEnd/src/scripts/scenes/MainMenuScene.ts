@@ -91,26 +91,28 @@ export class MainMenuScene extends Phaser.Scene {
     })
   }
   startGame(payload: any) {
-    var theme;
-    if (payload.theme == "1") {
-      theme = "cloud_background"
-      this.scene.start("MainScene", {payload, theme});
-    }
-    else if (payload.theme == "2") {
-      theme = "jungle_background"
-      this.scene.start("MainScene", {payload, theme});
-    }
-    else if (payload.theme == "3") {
-      theme = "city_background"
-      this.scene.start("MainScene", {payload, theme});
-    }
-    else if (payload.theme == "4") {
-      theme = "hell_background"
-      this.scene.start("MainScene", {payload, theme});
-    }
-    else {
-      theme = "cloud_background"
-      this.scene.start("MainScene", {payload, theme});
+    var theme = payload.theme;
+    switch(theme) {
+      case "1":
+        theme = "cloud_background";
+        this.scene.start("MainScene", {payload, theme});
+        break;
+      case "2":
+        theme = "jungle_background";
+        this.scene.start("MainScene", {payload, theme});
+        break;
+      case "3":
+        theme = "city_background";
+        this.scene.start("MainScene", {payload, theme});
+        break;
+      case "4":
+        theme = "hell_background";
+        this.scene.start("MainScene", {payload, theme});
+        break;
+      default:
+        theme = "cloud_background";
+        this.scene.start("MainScene", {payload, theme});
+        break;
     }
   }
 

@@ -33,6 +33,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   init(data) {
+    console.log(data)
     this.theme = data.theme;
     this.currentPlayerData = data.payload.player
     this.allPlayerData = data.payload.sessionPlayers
@@ -67,15 +68,56 @@ export default class MainScene extends Phaser.Scene {
     ]
 
     data.payload.map.tileMap.forEach(tile => {
+      console.log("tile?? got foreach", tile)
       switch (tile.entity?.id) {
         case 'wall':
-          this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL
-          break
-        // case 'player':
-        //     this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.PLAYER;
-        //     break;
-        default:
-          break
+          switch(this.theme) {
+            case "cloud_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL;
+              break;
+            case "hell_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_HELL
+              break;
+            case "city_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_CITY
+              break;
+            case "jungle_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_JUNGLE
+              break;
+          }
+          break;
+        case 'ground':
+          switch(this.theme) {
+            case "cloud_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
+              break;
+            case "hell_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
+              break;
+            case "city_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
+              break;
+            case "jungle_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
+              break;
+          }
+          break;
+        case 'player':
+          switch(this.theme) {
+            case "cloud_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
+              break;
+            case "hell_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
+              break;
+            case "city_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
+              break;
+            case "jungle_background":
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
+              break;
+          }
+          break;
       }
     })
   }
@@ -90,11 +132,29 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16
     });
-    this.load.image('tiles', '../../assets/cloud_tileset.png')
-    this.load.image('cloud_background', '../../assets/cloud_backround.png')
-    this.load.image('hell_background', '../../assets/hell_background.jpg')
-    this.load.image('jungle_background', '../../assets/jungle_background.png')
-    this.load.image('city_background', '../../assets/city_background.png')
+    switch(this.theme) {
+      case "cloud_background":
+        this.load.image('tiles', '../../assets/cloud_tileset.png')
+        this.load.image('cloud_background', '../../assets/cloud_backround.png')
+        break;
+      case "hell_background":
+        this.load.image('tiles', '../../assets/hell_tileset.png')
+        this.load.image('hell_background', '../../assets/hell_background.jpg')
+        break;
+      case "jungle_background":
+        this.load.image('tiles', '../../assets/jungle_tileset.png')
+        this.load.image('jungle_background', '../../assets/jungle_background.png')
+        break;
+      case "city_background":
+        this.load.image('tiles', '../../assets/city_tileset.png')
+        this.load.image('city_background', '../../assets/city_background.png')
+        
+      default:
+        this.load.image('tiles', '../../assets/cloud_tileset.png')
+        this.load.image('cloud_background', '../../assets/cloud_backround.png')
+        break;
+    }
+
     this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 });
   }
 
@@ -319,6 +379,12 @@ export default class MainScene extends Phaser.Scene {
         //Check if collides with tile types
         switch (toTile.index) {
             case TileTypeEnum.WALL:
+                return false;
+            case TileTypeEnum.WALL_CITY:
+                return false;
+            case TileTypeEnum.WALL_HELL:
+                return false;
+            case TileTypeEnum.WALL_JUNGLE:
                 return false;
             default:
                 return true;
