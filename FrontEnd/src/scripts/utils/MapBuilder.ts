@@ -1,5 +1,4 @@
 interface MapBuilderInterface {
-  build(): Phaser.Tilemaps.Tilemap
   setBackground(mapImage: string): void
   setTileMap(mapData: any, tileWidth: number, tileHeight: number): void
   setTileSet(tileSetName: string, tileSetKey: string): void
