@@ -13,10 +13,9 @@ export class GunCreator {
       new GrenadeLauncherFactory() as IAbstractGunFactory
     ]
 
-    for (const factory of gunFactories) {
-      guns.push(factory.CreateWeakGun(), factory.CreateMiddleTierGun(), factory.CreateHighTierGun())
+        for (const factory of gunFactories) {
+            guns.push(factory.CreateWeakGun(), factory.CreateMiddleTierGun(), factory.CreateHighTierGun())
+        }
+        return guns;
     }
-
-    return guns
-  }
 }

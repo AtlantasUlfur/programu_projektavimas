@@ -4,6 +4,7 @@ import { sceneEvents } from '../Events/EventsController'
 import { Player } from '../Models/Player'
 import { DirectionEnum } from '../Models/Enums'
 import { GunCreator } from '../utils/GunCreator'
+import { PlayerChangeWeapon } from '../utils/Command/Command'
 
 export default class GameUI extends Phaser.Scene {
   MenuGroup: Phaser.GameObjects.Group
@@ -22,6 +23,8 @@ export default class GameUI extends Phaser.Scene {
   hotbarFour: Phaser.GameObjects.Sprite
   mainGunHotbar: Phaser.GameObjects.Sprite
   mainGunIcon: Phaser.GameObjects.Image
+  switchWeaponBtn: Phaser.GameObjects.Sprite
+  switchWeaponCommand : PlayerChangeWeapon;
   sideGunHotbar: Phaser.GameObjects.Sprite
   sideGunIcon: Phaser.GameObjects.Image
   playerList: Player[]
@@ -50,19 +53,19 @@ export default class GameUI extends Phaser.Scene {
     this.load.spritesheet('arrowleft', '../../assets/arrow_left.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('arrowright', '../../assets/arrow_right.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 })
+    this.load.spritesheet('gun-switch', '../../assets/GunSwitch.png', { frameWidth: 130, frameHeight: 130 })
   }
   init(data) {
     this.commandCounter = 1
-    console.log('data', data)
     this.player = data['playerObj']
     this.playersTurnId = data['playersTurnId']
-    console.log('its here', this.playersTurnId)
-    console.log(this.player)
     this.playerList = data['players']
   }
 
   create() {
     const scene = this
+
+    this.switchWeaponCommand = new PlayerChangeWeapon(this.player);
 
     this.baseSprite = this.add.sprite(0, 0, 'base')
     this.baseSprite.displayHeight = 600
@@ -114,7 +117,6 @@ export default class GameUI extends Phaser.Scene {
     this.hpLabel.setPosition(890, 200)
     this.hpLabel.setColor('#008000')
     sceneEvents.on('hpChange', event => {
-      console.log('hp changed')
       this.hpLabel.setText(this.player.getCurrentHealth() + ' / 100')
     })
 
@@ -134,8 +136,6 @@ export default class GameUI extends Phaser.Scene {
       this.turnLabel.setColor('#ff0000')
     }
     sceneEvents.on('turnChanged', event => {
-      console.log('turn changed')
-      console.log(event)
       if (event == this.player.id) {
         this.turnLabel.setText("IT'S YOUR TURN!")
         this.turnLabel.setColor('#008000')
@@ -197,72 +197,23 @@ export default class GameUI extends Phaser.Scene {
       this.hotbarFour.clearTint()
     })
 
-    this.mainGunHotbar = this.add.sprite(0, 0, 'frame')
-    this.mainGunHotbar.displayHeight = 40
-    this.mainGunHotbar.displayWidth = 40
-    this.mainGunHotbar.setOrigin(1, 0)
-    this.mainGunHotbar.setPosition(790, 160)
-    this.mainGunHotbar.setInteractive()
-    this.mainGunHotbar.on('pointerdown', event => {
-      this.mainGunHotbar.setTint(0xeaebe7)
-      this.mainGunIcon.setTint(0xeaebe7)
-      sceneEvents.emit('changeGun', { gun: 'mainGun' })
+    //Switch Weapon
+    this.switchWeaponBtn = this.add.sprite(0, 0, 'gun-switch');
+    this.switchWeaponBtn.displayHeight = 40;
+    this.switchWeaponBtn.displayWidth = 40;
+    this.switchWeaponBtn.setOrigin(1, 0)
+    this.switchWeaponBtn.setPosition(940, 160)
+    this.switchWeaponBtn.setInteractive()
+    this.switchWeaponBtn.on('pointerdown', event => {
+      this.switchWeaponBtn.setTint(0xeaebe7)
+      if(this.player.selectedGun == this.player.mainGun)
+        this.switchWeaponCommand.execute();
+      else
+        this.switchWeaponCommand.undo();
+      
     })
-    this.mainGunHotbar.on('pointerup', event => {
-      this.mainGunHotbar.clearTint()
-      this.mainGunIcon.clearTint()
-    })
-
-    this.mainGunIcon = this.add.image(0, 0, 'guns', this.player.mainGun.gunFrame).setScale(0.2)
-
-    this.mainGunIcon.displayHeight = 40
-    this.mainGunIcon.displayWidth = 40
-    this.mainGunIcon.setOrigin(1, 0)
-    this.mainGunIcon.setDepth(10)
-    this.mainGunIcon.setPosition(790, 160)
-    this.mainGunIcon.setInteractive()
-    this.mainGunIcon.on('pointerdown', event => {
-      this.mainGunHotbar.setTint(0xeaebe7)
-      this.mainGunIcon.setTint(0xeaebe7)
-      sceneEvents.emit('changeGun', { gun: 'mainGun' })
-    })
-    this.mainGunIcon.on('pointerup', event => {
-      this.mainGunHotbar.clearTint()
-      this.mainGunIcon.clearTint()
-    })
-
-    this.sideGunHotbar = this.add.sprite(0, 0, 'frame')
-    this.sideGunHotbar.displayHeight = 40
-    this.sideGunHotbar.displayWidth = 40
-    this.sideGunHotbar.setOrigin(1, 0)
-    this.sideGunHotbar.setPosition(940, 160)
-    this.sideGunHotbar.setInteractive()
-    this.sideGunHotbar.on('pointerdown', event => {
-      this.sideGunHotbar.setTint(0xeaebe7)
-      this.sideGunIcon.setTint(0xeaebe7)
-      sceneEvents.emit('changeGun', { gun: 'secondaryGun' })
-    })
-    this.sideGunHotbar.on('pointerup', event => {
-      this.sideGunHotbar.clearTint()
-      this.sideGunIcon.clearTint()
-    })
-
-    this.sideGunIcon = this.add.image(0, 0, 'guns', this.player.secondaryGun.gunFrame).setScale(0.2)
-
-    this.sideGunIcon.displayHeight = 40
-    this.sideGunIcon.displayWidth = 40
-    this.sideGunIcon.setOrigin(1, 0)
-    this.sideGunIcon.setDepth(10)
-    this.sideGunIcon.setPosition(940, 160)
-    this.sideGunIcon.setInteractive()
-    this.sideGunIcon.on('pointerdown', event => {
-      this.sideGunHotbar.setTint(0xeaebe7)
-      this.sideGunIcon.setTint(0xeaebe7)
-      sceneEvents.emit('changeGun', { gun: 'secondaryGun' })
-    })
-    this.sideGunIcon.on('pointerup', event => {
-      this.sideGunHotbar.clearTint()
-      this.sideGunIcon.clearTint()
+    this.switchWeaponBtn.on('pointerup', event => {
+      this.switchWeaponBtn.clearTint()
     })
 
     // CONTROLS
@@ -392,10 +343,7 @@ export default class GameUI extends Phaser.Scene {
     this.MenuGroup.add(this.hotbarTwo)
     this.MenuGroup.add(this.hotbarThree)
     this.MenuGroup.add(this.hotbarFour)
-    this.MenuGroup.add(this.mainGunHotbar)
-    this.MenuGroup.add(this.mainGunIcon)
-    this.MenuGroup.add(this.sideGunHotbar)
-    this.MenuGroup.add(this.sideGunIcon)
+    this.MenuGroup.add(this.switchWeaponBtn)
     this.MenuGroup.add(this.arrowUp)
     this.MenuGroup.add(this.arrowDown)
     this.MenuGroup.add(this.arrowLeft)

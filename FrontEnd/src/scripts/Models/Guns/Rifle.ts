@@ -35,14 +35,14 @@ export class Rifle implements IRifle {
     this.damageStrategy = damageStrategy
   }
 
-  shoot(distance: number) {
-    debugger
-    return this.damageStrategy.calculateDamage(distance, this.damage)
-  }
-  refillAmmo() {
-    this.ammo = this._maxAmmo
-  }
-  createGunImage(scene: Phaser.Scene) {
-    throw new Error('Method not implemented.')
-  }
+    shoot(distance: number) {
+        return this.damageStrategy.calculateDamage(distance, this.damage);
+    }
+    refillAmmo() {
+        this.ammo = this._maxAmmo;
+    }
+    createGunImage(scene: Phaser.Scene) {
+        throw new Error("Method not implemented.");
+    }
+
 }

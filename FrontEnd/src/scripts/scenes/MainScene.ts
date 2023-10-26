@@ -33,8 +33,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    console.log(data)
-    this.theme = data.theme
+    this.theme = data.theme;
     this.currentPlayerData = data.payload.player
     this.allPlayerData = data.payload.sessionPlayers
     this.alivePlayerCount = this.allPlayerData.length
@@ -68,7 +67,6 @@ export default class MainScene extends Phaser.Scene {
     ]
 
     data.payload.map.tileMap.forEach(tile => {
-      console.log('tile?? got foreach', tile)
       switch (tile.entity?.id) {
         case 'wall':
           switch (this.theme) {
@@ -175,18 +173,16 @@ export default class MainScene extends Phaser.Scene {
     const texture_frames = [49, 52, 55, 10]
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
-      console.log(playerData)
-
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
         //Create current player
         builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('#008000')
-        builder.setHP(playerData.currentHP)
-        builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(this.allGuns[0] as IPistol)
-        builder.setMainGun(this.allGuns[3] as IRifle)
+        builder.setHP(playerData.currentHP);
+        builder.setSocketId(playerData.socketId);
+        builder.setSecondaryGun(this.allGuns[0] as IPistol);
+        builder.setMainGun(this.allGuns[4] as IRifle);
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -200,10 +196,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('red')
-        builder.setHP(playerData.currentHP)
-        builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(this.allGuns[0] as IPistol)
-        builder.setMainGun(this.allGuns[3] as IRifle)
+        builder.setHP(playerData.currentHP);
+        builder.setSocketId(playerData.socketId);
+        builder.setSecondaryGun(this.allGuns[0] as IPistol);
+        builder.setMainGun(this.allGuns[4] as IRifle);
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
