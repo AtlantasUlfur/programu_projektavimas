@@ -1,6 +1,7 @@
 import { IAbstractGunFactory } from "../AbstractFactories/IAbstractGunFactory";
 import { IPistol } from "../../Interfaces/Guns/IPistol";
 import { Pistol } from "../../Models/Guns/Pistol";
+import { ShortRangeGunStrategy, MediumRangeGunStrategy, LongRangeGunStrategy } from "../Strategy/GunStrategy";
 
 export class PistolFactory implements IAbstractGunFactory{
     CreateWeakGun(): IPistol {
@@ -10,7 +11,8 @@ export class PistolFactory implements IAbstractGunFactory{
             damage: 10,
             distance: 3,
             price: 0,
-            pushback: 0
+            pushback: 0,
+            damageStrategy: new ShortRangeGunStrategy()
         });
     }
     CreateMiddleTierGun(): IPistol {
@@ -20,7 +22,8 @@ export class PistolFactory implements IAbstractGunFactory{
             damage: 12,
             distance: 4,
             price: 100,
-            pushback: 1
+            pushback: 1,
+            damageStrategy: new MediumRangeGunStrategy()
         });
     }
     CreateHighTierGun(): IPistol {
@@ -30,7 +33,8 @@ export class PistolFactory implements IAbstractGunFactory{
             damage: 15,
             distance: 4,
             price: 100,
-            pushback: 1
+            pushback: 1,
+            damageStrategy: new LongRangeGunStrategy()
         });
     }
 

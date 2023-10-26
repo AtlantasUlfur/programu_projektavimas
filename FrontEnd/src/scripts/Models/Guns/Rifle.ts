@@ -1,5 +1,6 @@
 import { IRifle } from "../../Interfaces/Guns/IRifle";
 import { Player } from "../Player";
+import { GunDamageStrategy } from "../../utils/Strategy/GunStrategy";
 
 export class Rifle implements IRifle{
     gunFrame: number;
@@ -8,10 +9,11 @@ export class Rifle implements IRifle{
     fireRate: number;
     distance: number;
     price: number;
+    damageStrategy: GunDamageStrategy;
 
     private _maxAmmo: number;
 
-    constructor(rifle: {gunFrame: number, ammo: number, damage: number, fireRate: number, distance: number, price: number}){
+    constructor(rifle: {gunFrame: number, ammo: number, damage: number, fireRate: number, distance: number, price: number, damageStrategy: GunDamageStrategy}){
         this.gunFrame = rifle.gunFrame;
         this.ammo = rifle.ammo;
         this._maxAmmo = rifle.ammo;
@@ -19,12 +21,15 @@ export class Rifle implements IRifle{
         this.fireRate = rifle.fireRate;
         this.distance = rifle.distance;
         this.price = rifle.price;
+        this.damageStrategy = rifle.damageStrategy;
+    }
+    setDamageStrategy(damageStrategy: GunDamageStrategy) {
+        this.damageStrategy = damageStrategy;
     }
 
-
-
-    shoot(targetPlayer: Player) {
-        throw new Error("Method not implemented.");
+    shoot(distance: number) {
+        debugger;
+        return this.damageStrategy.calculateDamage(distance, this.damage);
     }
     refillAmmo() {
         this.ammo = this._maxAmmo;

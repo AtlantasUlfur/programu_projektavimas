@@ -1,5 +1,6 @@
 import { IPistol } from "../../Interfaces/Guns/IPistol";
 import { Player } from "../Player";
+import { GunDamageStrategy } from "../../utils/Strategy/GunStrategy";
 
 export class Pistol implements IPistol{
     gunFrame: number;
@@ -8,10 +9,10 @@ export class Pistol implements IPistol{
     pushback?: number | undefined;
     distance: number;
     price: number;
-
+    damageStrategy: GunDamageStrategy;
     private _maxAmmo: number;
 
-    constructor(pistol: {gunFrame: number, ammo:number, damage:number, distance: number, price: number, pushback: number | undefined}){
+    constructor(pistol: {gunFrame: number, ammo:number, damage:number, distance: number, price: number, pushback: number | undefined, damageStrategy: GunDamageStrategy}){
         this.gunFrame = pistol.gunFrame;
         this.ammo = pistol.ammo;
         this._maxAmmo = pistol.ammo;
@@ -19,11 +20,14 @@ export class Pistol implements IPistol{
         this.distance = pistol.distance;
         this.price = pistol.price;
         this.pushback = pistol.pushback;
+        this.damageStrategy = pistol.damageStrategy;
+    }
+    setDamageStrategy(damageStrategy: GunDamageStrategy) {
+        this.damageStrategy = damageStrategy;
     }
 
-
-    shoot(targetPlayer: Player) {
-        throw new Error("Method not implemented.");
+    shoot(distance: number) {
+        return this.damageStrategy.calculateDamage(distance, this.damage);
     }
     refillAmmo() {
         this.ammo = this._maxAmmo;

@@ -298,25 +298,28 @@ io.on("connection", function (socket: Socket) {
     console.log("DMG", damage);
     console.log(targetId);
 
-    const player = getPlayerBySocketId(targetId);
-    console.log("BEFORE HP", player.currentHP);
-    player.currentHP =
-      player.currentHP == undefined ? 0 : player.currentHP - damage;
-    if (player.currentHP < 0) {
-      player.currentHP = 0;
-    }
-    console.log("AFTER HP", player.currentHP);
-    const sessionId = player.sessionId;
+    if(damage != 0)
+    {
+      const player = getPlayerBySocketId(targetId);
+      console.log("BEFORE HP", player.currentHP);
+      player.currentHP =
+        player.currentHP == undefined ? 0 : player.currentHP - damage;
+      if (player.currentHP < 0) {
+        player.currentHP = 0;
+      }
+      console.log("AFTER HP", player.currentHP);
+      const sessionId = player.sessionId;
 
-    const sessionPlayers = getSessionPlayers(sessionId);
+      const sessionPlayers = getSessionPlayers(sessionId);
 
-    _.forEach(sessionPlayers, function (currentPlayer: Player) {
-      const playerSocket = sockets[currentPlayer.socketId];
-      playerSocket.emit("playerDamage", {
-        player: targetId,
-        currentHP: player.currentHP,
+      _.forEach(sessionPlayers, function (currentPlayer: Player) {
+        const playerSocket = sockets[currentPlayer.socketId];
+        playerSocket.emit("playerDamage", {
+          player: targetId,
+          currentHP: player.currentHP,
+        });
       });
-    });
+    }
   });
 
   socket.on("getAttackAmount", function () {

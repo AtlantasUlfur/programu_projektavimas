@@ -162,6 +162,17 @@ export default class MainScene extends Phaser.Scene {
     this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
     this.scene.run('GameOver');
   }
+  private findPlayerById(id : string) : Player | null
+  {
+    var player : Player | null = null;
+
+    this.playerList.forEach(element => {
+      if(element.id == id){
+        player = element;
+      }
+    });
+    return player;
+  }
   handleGunChange(payload: any) {
     var playerToChangeGunFor = this.player
     if(payload.player !== undefined){
@@ -309,11 +320,25 @@ export default class MainScene extends Phaser.Scene {
         }
 
     }
-    handleDamage(targetId: string) {
+    handleDamage(targetId: string)
+    {
         if (this.playersTurnId == this.player.id && !this.player.isDead()) {
-          this.socketInstance.damagePlayer(this.player.attackPower, targetId)
-          this.socketInstance.endTurn()
-          //TODO: DISTANCE CHECK
+
+          var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId));
+          this.socketInstance.damagePlayer(damage, targetId);
+          this.socketInstance.endTurn();
         }
-      }
+    }
+    private findDistanceToPlayer(targetId : string) : number
+    {
+      var target = this.findPlayerById(targetId);
+      if(target == null)
+        return -1;
+      
+      //Euclidean distance
+      var deltaX = Math.abs(this.player.tilePos.x - target?.tilePos.x);
+      var deltaY = Math.abs(this.player.tilePos.y - target?.tilePos.y);
+      return Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY)); // <- Distance
+    }
+
 }

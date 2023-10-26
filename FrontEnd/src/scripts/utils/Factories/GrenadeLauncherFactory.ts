@@ -2,6 +2,7 @@ import { IAbstractGunFactory } from "../AbstractFactories/IAbstractGunFactory";
 import { IGrenadeLauncher } from "../../Interfaces/Guns/IGrenadeLauncher";
 import { IGun } from "../../Interfaces/Guns/IGun";
 import { GrenadeLauncher } from "../../Models/Guns/GrenadeLauncher";
+import { ShortRangeGunStrategy, MediumRangeGunStrategy, LongRangeGunStrategy } from "../Strategy/GunStrategy";
 
 export class GrenadeLauncherFactory implements IAbstractGunFactory
 {
@@ -12,7 +13,8 @@ export class GrenadeLauncherFactory implements IAbstractGunFactory
             explosionRadius: 10,
             damage: 15,
             distance: 2,
-            price: 100
+            price: 100,
+            damageStrategy: new ShortRangeGunStrategy()
         });
     }
 
@@ -23,7 +25,8 @@ export class GrenadeLauncherFactory implements IAbstractGunFactory
             explosionRadius: 15,
             damage: 20,
             distance: 3,
-            price: 200
+            price: 200,
+            damageStrategy: new MediumRangeGunStrategy()
         });
     }
 
@@ -34,7 +37,8 @@ export class GrenadeLauncherFactory implements IAbstractGunFactory
             explosionRadius: 25,
             damage: 25,
             distance: 3,
-            price: 300
+            price: 300,
+            damageStrategy: new LongRangeGunStrategy()
         });
     }
     
