@@ -205,7 +205,7 @@ export default class GameUI extends Phaser.Scene
         this.mainGunHotbar.displayHeight = 40
         this.mainGunHotbar.displayWidth = 40
         this.mainGunHotbar.setOrigin(1,0)
-        this.mainGunHotbar.setPosition(890, 320)
+        this.mainGunHotbar.setPosition(790, 160)
         this.mainGunHotbar.setInteractive();
         this.mainGunHotbar.on('pointerdown', (event) => {
             this.mainGunHotbar.setTint('#eaebe7');
@@ -225,7 +225,7 @@ export default class GameUI extends Phaser.Scene
         this.mainGunIcon.displayWidth = 40
         this.mainGunIcon.setOrigin(1,0)
         this.mainGunIcon.setDepth(10)
-        this.mainGunIcon.setPosition(890, 320)
+        this.mainGunIcon.setPosition(790, 160)
         this.mainGunIcon.setInteractive();
         this.mainGunIcon.on('pointerdown', (event) => {
             this.mainGunHotbar.setTint('#eaebe7');
@@ -242,7 +242,7 @@ export default class GameUI extends Phaser.Scene
         this.sideGunHotbar.displayHeight = 40
         this.sideGunHotbar.displayWidth = 40
         this.sideGunHotbar.setOrigin(1,0)
-        this.sideGunHotbar.setPosition(940, 320)
+        this.sideGunHotbar.setPosition(940, 160)
         this.sideGunHotbar.setInteractive();
         this.sideGunHotbar.on('pointerdown', (event) => {
             this.sideGunHotbar.setTint('#eaebe7');
@@ -262,7 +262,7 @@ export default class GameUI extends Phaser.Scene
         this.sideGunIcon.displayWidth = 40
         this.sideGunIcon.setOrigin(1,0)
         this.sideGunIcon.setDepth(10)
-        this.sideGunIcon.setPosition(940, 320)
+        this.sideGunIcon.setPosition(940, 160)
         this.sideGunIcon.setInteractive();
         this.sideGunIcon.on('pointerdown', (event) => {
             this.sideGunHotbar.setTint('#eaebe7');
@@ -344,6 +344,8 @@ export default class GameUI extends Phaser.Scene
         this.MenuGroup.add(this.hotbarFour)
         this.MenuGroup.add(this.mainGunHotbar)
         this.MenuGroup.add(this.mainGunIcon)
+        this.MenuGroup.add(this.sideGunHotbar)
+        this.MenuGroup.add(this.sideGunIcon)
         this.MenuGroup.add(this.arrowUp)
         this.MenuGroup.add(this.arrowDown)
         this.MenuGroup.add(this.arrowLeft)
