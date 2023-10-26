@@ -28,7 +28,6 @@ export class Rifle implements IRifle{
     }
 
     shoot(distance: number) {
-        debugger;
         return this.damageStrategy.calculateDamage(distance, this.damage);
     }
     refillAmmo() {

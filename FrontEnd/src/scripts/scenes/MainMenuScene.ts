@@ -261,8 +261,6 @@ export class MainMenuScene extends Phaser.Scene {
           lobbyButtonNameText.visible = false
           lobbyButtonCountText.visible = false
         }, 500)
-
-        console.log('sessions got ', scene.lobbies)
       }, 500)
 
       // var createButtonText = this.add.text(createButtonImage.x, createButtonImage.y, 'Create Game')

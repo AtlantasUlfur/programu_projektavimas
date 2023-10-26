@@ -127,7 +127,6 @@ export default class  SocketController
         this.socket?.emit("movePlayer", x, y)
     }
     public damagePlayer(damage : number, targetId: string){
-        console.log("dmg", damage);
         this.socket?.emit("damagePlayer", damage, targetId)
     }
     public getAttackAmount(){

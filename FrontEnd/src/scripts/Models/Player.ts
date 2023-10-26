@@ -17,7 +17,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   public mainGun: IRifle | IGrenadeLauncher;
   public secondaryGun: IPistol;
 
-  public gunImage: Phaser.GameObjects.Image
+  public gunImage: Phaser.GameObjects.Image 
 
   constructor(scene: Phaser.Scene, key: string) {
     super(scene, 0, 0, key)
@@ -104,11 +104,11 @@ export class Player extends Phaser.GameObjects.Sprite {
  }
 
   switchToMainArm(){
-    this.selectedGun = this.mainGun;
+    this.selectedGun = this.secondaryGun;
     this.setGunImage(this.selectedGun.gunFrame)
   }
   switchToSideArm(){
-    this.selectedGun = this.secondaryGun;
+    this.selectedGun = this.mainGun;
     this.setGunImage(this.selectedGun.gunFrame)
   }
 

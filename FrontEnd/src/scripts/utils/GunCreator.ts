@@ -17,7 +17,6 @@ export class GunCreator{
         for (const factory of gunFactories) {
             guns.push(factory.CreateWeakGun(), factory.CreateMiddleTierGun(), factory.CreateHighTierGun())
         }
-
         return guns;
     }
 }
