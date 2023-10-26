@@ -197,22 +197,6 @@ export default class GameUI extends Phaser.Scene {
       this.hotbarFour.clearTint()
     })
 
-    this.mainGunHotbar = this.add.sprite(0, 0, 'frame')
-    this.mainGunHotbar.displayHeight = 40
-    this.mainGunHotbar.displayWidth = 40
-    this.mainGunHotbar.setOrigin(1, 0)
-    this.mainGunHotbar.setPosition(790, 160)
-    this.mainGunHotbar.setInteractive()
-    this.mainGunHotbar.on('pointerdown', event => {
-      this.mainGunHotbar.setTint(0xeaebe7)
-      this.mainGunIcon.setTint(0xeaebe7)
-      sceneEvents.emit('changeGun', { gun: 'mainGun' })
-    })
-    this.mainGunHotbar.on('pointerup', event => {
-      this.mainGunHotbar.clearTint()
-      this.mainGunIcon.clearTint()
-    })
-
     //Switch Weapon
     this.switchWeaponBtn = this.add.sprite(0, 0, 'gun-switch');
     this.switchWeaponBtn.displayHeight = 40;
