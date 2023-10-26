@@ -104,11 +104,11 @@ export class Player extends Phaser.GameObjects.Sprite {
  }
 
   switchToMainArm(){
-    this.selectedGun = this.secondaryGun;
+    this.selectedGun = this.mainGun;
     this.setGunImage(this.selectedGun.gunFrame)
   }
   switchToSideArm(){
-    this.selectedGun = this.mainGun;
+    this.selectedGun = this.secondaryGun;
     this.setGunImage(this.selectedGun.gunFrame)
   }
 

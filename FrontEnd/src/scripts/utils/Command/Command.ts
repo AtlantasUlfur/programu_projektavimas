@@ -13,10 +13,10 @@ export class PlayerChangeWeapon implements ICommand{
     }
 
     execute() {
-        this.player.switchToMainArm();
+        this.player.switchToSideArm();
     }
     undo() {
-        this.player.switchToSideArm();
+        this.player.switchToMainArm();
     }
     
 }
