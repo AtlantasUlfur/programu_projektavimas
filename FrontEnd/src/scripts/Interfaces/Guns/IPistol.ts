@@ -1,5 +1,5 @@
-import { IGun } from "./IGun";
+import { IGun } from './IGun'
 
-export interface IPistol extends IGun{
-    pushback?: number
+export interface IPistol extends IGun {
+  pushback?: number
 }

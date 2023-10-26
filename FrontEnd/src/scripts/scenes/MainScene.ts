@@ -22,11 +22,11 @@ export default class MainScene extends Phaser.Scene {
   private tileMap: Phaser.Tilemaps.Tilemap
   //Players
   public playerList: Player[] = []
-  public alivePlayerCount : number = 0;
+  public alivePlayerCount: number = 0
   public player: Player
   public playersTurnId: string = ''
-  private allGuns: IGun[];
-  public theme: string;
+  private allGuns: IGun[]
+  public theme: string
 
   constructor() {
     super('MainScene')
@@ -34,14 +34,14 @@ export default class MainScene extends Phaser.Scene {
 
   init(data) {
     console.log(data)
-    this.theme = data.theme;
+    this.theme = data.theme
     this.currentPlayerData = data.payload.player
     this.allPlayerData = data.payload.sessionPlayers
-    this.alivePlayerCount = this.allPlayerData.length;
+    this.alivePlayerCount = this.allPlayerData.length
     this.playersTurnId = data.payload.playersTurnId
     this.socketInstance = SocketController.getInstance()
     this.socketInstance.setScene(this)
-    this.allGuns = GunCreator.CreateAllGuns();
+    this.allGuns = GunCreator.CreateAllGuns()
 
     //Fill map data disgusting
     this.mapData = [
@@ -68,56 +68,56 @@ export default class MainScene extends Phaser.Scene {
     ]
 
     data.payload.map.tileMap.forEach(tile => {
-      console.log("tile?? got foreach", tile)
+      console.log('tile?? got foreach', tile)
       switch (tile.entity?.id) {
         case 'wall':
-          switch(this.theme) {
-            case "cloud_background":
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL;
-              break;
-            case "hell_background":
+          switch (this.theme) {
+            case 'cloud_background':
+              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL
+              break
+            case 'hell_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_HELL
-              break;
-            case "city_background":
+              break
+            case 'city_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_CITY
-              break;
-            case "jungle_background":
+              break
+            case 'jungle_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_JUNGLE
-              break;
+              break
           }
-          break;
+          break
         case 'ground':
-          switch(this.theme) {
-            case "cloud_background":
+          switch (this.theme) {
+            case 'cloud_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
-              break;
-            case "hell_background":
+              break
+            case 'hell_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
-              break;
-            case "city_background":
+              break
+            case 'city_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
-              break;
-            case "jungle_background":
+              break
+            case 'jungle_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
-              break;
+              break
           }
-          break;
+          break
         case 'player':
-          switch(this.theme) {
-            case "cloud_background":
+          switch (this.theme) {
+            case 'cloud_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
-              break;
-            case "hell_background":
+              break
+            case 'hell_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
-              break;
-            case "city_background":
+              break
+            case 'city_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
-              break;
-            case "jungle_background":
+              break
+            case 'jungle_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
-              break;
+              break
           }
-          break;
+          break
       }
     })
   }
@@ -128,45 +128,45 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 26,
       frameHeight: 36
     })
-    this.load.spritesheet('dead', '../../assets/cloud_tileset.png',{
+    this.load.spritesheet('dead', '../../assets/cloud_tileset.png', {
       frameWidth: 16,
       frameHeight: 16
-    });
-    switch(this.theme) {
-      case "cloud_background":
+    })
+    switch (this.theme) {
+      case 'cloud_background':
         this.load.image('tiles', '../../assets/cloud_tileset.png')
         this.load.image('cloud_background', '../../assets/cloud_backround.png')
-        break;
-      case "hell_background":
+        break
+      case 'hell_background':
         this.load.image('tiles', '../../assets/hell_tileset.png')
         this.load.image('hell_background', '../../assets/hell_background.jpg')
-        break;
-      case "jungle_background":
+        break
+      case 'jungle_background':
         this.load.image('tiles', '../../assets/jungle_tileset.png')
         this.load.image('jungle_background', '../../assets/jungle_background.png')
-        break;
-      case "city_background":
+        break
+      case 'city_background':
         this.load.image('tiles', '../../assets/city_tileset.png')
         this.load.image('city_background', '../../assets/city_background.png')
-        
+
       default:
         this.load.image('tiles', '../../assets/cloud_tileset.png')
         this.load.image('cloud_background', '../../assets/cloud_backround.png')
-        break;
+        break
     }
 
-    this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 });
+    this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 })
   }
 
   create() {
     const scene = this
     this.socketInstance = SocketController.getInstance()
- 
-    let mapBuilder = new MapBuilder(scene);
-    mapBuilder.setBackground(this.theme);
-    mapBuilder.setTileMap(this.mapData, 16, 16);
-    mapBuilder.setTileSet('tile-set', 'tiles');
-    this.tileMap = mapBuilder.build();
+
+    let mapBuilder = new MapBuilder(scene)
+    mapBuilder.setBackground(this.theme)
+    mapBuilder.setTileMap(this.mapData, 16, 16)
+    mapBuilder.setTileSet('tile-set', 'tiles')
+    this.tileMap = mapBuilder.build()
 
     //Create all players
     this.allPlayerData = this.allPlayerData.sort((a, b) => {
@@ -175,18 +175,18 @@ export default class MainScene extends Phaser.Scene {
     const texture_frames = [49, 52, 55, 10]
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
-      console.log(playerData) 
+      console.log(playerData)
 
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
         //Create current player
-        builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y));
-        builder.setFrame(texture_frames[index]);
-        builder.setName(playerData.name);
+        builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
+        builder.setFrame(texture_frames[index])
+        builder.setName(playerData.name)
         builder.setColor('#008000')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(this.allGuns[0] as IPistol);
-        builder.setMainGun(this.allGuns[3] as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(this.allGuns[0] as IPistol)
+        builder.setMainGun(this.allGuns[3] as IRifle)
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -196,14 +196,14 @@ export default class MainScene extends Phaser.Scene {
         this.cameras.main.zoom = 2
       } else {
         //Create other player
-        builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y));
-        builder.setFrame(texture_frames[index]);
-        builder.setName(playerData.name);
+        builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
+        builder.setFrame(texture_frames[index])
+        builder.setName(playerData.name)
         builder.setColor('red')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(this.allGuns[0] as IPistol);
-        builder.setMainGun(this.allGuns[3] as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(this.allGuns[0] as IPistol)
+        builder.setMainGun(this.allGuns[3] as IRifle)
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
@@ -223,31 +223,30 @@ export default class MainScene extends Phaser.Scene {
 
     //Run UI Scenes
     this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
-    this.scene.run('GameOver');
+    this.scene.run('GameOver')
   }
-  private findPlayerById(id : string) : Player | null
-  {
-    var player : Player | null = null;
+  private findPlayerById(id: string): Player | null {
+    var player: Player | null = null
 
     this.playerList.forEach(element => {
-      if(element.id == id){
-        player = element;
+      if (element.id == id) {
+        player = element
       }
-    });
-    return player;
+    })
+    return player
   }
   handleGunChange(payload: any) {
     var playerToChangeGunFor = this.player
-    if(payload.player !== undefined){
+    if (payload.player !== undefined) {
       // change gun for other player
     }
 
-    var gunToChangeTo = this.player.selectedGun;
-    if(payload.gun === "secondaryGun"){
-      gunToChangeTo = this.player.secondaryGun;
+    var gunToChangeTo = this.player.selectedGun
+    if (payload.gun === 'secondaryGun') {
+      gunToChangeTo = this.player.secondaryGun
     }
-    if(payload.gun === "mainGun"){
-      gunToChangeTo = this.player.mainGun;
+    if (payload.gun === 'mainGun') {
+      gunToChangeTo = this.player.mainGun
     }
 
     playerToChangeGunFor.setGun(gunToChangeTo)
@@ -257,157 +256,177 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
-
     if (this.player.attackPower == 0) {
       this.socketInstance.getAttackAmount()
     }
-    if(this.alivePlayerCount == 1) {
-      sceneEvents.emit("gameOver", {victory: true});
+    if (this.alivePlayerCount == 1) {
+      sceneEvents.emit('gameOver', { victory: true })
     }
     this.player.update(time, delta)
   }
 
-  handleMovement(direction: DirectionEnum, commandCounter: number)
-  {
-      if(this.playersTurnId == this.player.id && !this.player.isDead())
-      {
-          var distance = 0;
-          switch (direction) {
-              case DirectionEnum.UP:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y-commandCounter, DirectionEnum.UP);
-                  if(distance != 0){
-                      this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y-distance);
-                      this.player.move(DirectionEnum.UP, distance);
-                      this.socketInstance.endTurn();
-                  }
-                break;
-              case DirectionEnum.DOWN:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x, this.player.tilePos.y+commandCounter, DirectionEnum.DOWN)
-                  if(distance != 0){
-                      this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y+distance);
-                      this.player.move(DirectionEnum.DOWN, distance);
-                      this.socketInstance.endTurn();
-                  }
-                break;
-              case DirectionEnum.LEFT:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x-commandCounter, this.player.tilePos.y, DirectionEnum.LEFT)
-                  if(distance != 0){
-                      this.socketInstance.movePlayer(this.player.tilePos.x-distance, this.player.tilePos.y);
-                      this.player.move(DirectionEnum.LEFT, distance);
-                      this.socketInstance.endTurn();
-                  }
-                break;
-              case DirectionEnum.RIGHT:
-                  distance = this.canPlayerMove(this, this.tileMap, this.player, this.player.tilePos.x+commandCounter, this.player.tilePos.y, DirectionEnum.RIGHT)
-                  if(distance != 0){
-                      this.socketInstance.movePlayer(this.player.tilePos.x+distance, this.player.tilePos.y);
-                      this.player.move(DirectionEnum.RIGHT,  distance);
-                      this.socketInstance.endTurn();
-                  }
-                break;
-              default:
-                console.log("Somethings wrong...")
-                break;
-          }
-      }
-  }
-
-  canPlayerMove(scene : MainScene, tileMap : Phaser.Tilemaps.Tilemap, player : Player, toX : number, toY : number, direction : DirectionEnum){
-    let distance = 0;
-        switch (direction) {
+  handleMovement(direction: DirectionEnum, commandCounter: number) {
+    if (this.playersTurnId == this.player.id && !this.player.isDead()) {
+      var distance = 0
+      switch (direction) {
         case DirectionEnum.UP:
-            distance = player.tilePos.y - toY;
-            var travelingY = player.tilePos.y;
-            for (let i = 0; i < distance; i++) {
-                travelingY--;
-                let tile = tileMap.getTileAt(toX, travelingY);
-                if(!scene.tileMoveCheck(scene, tile))
-                    return i;
-            }
-            return distance;
+          distance = this.canPlayerMove(
+            this,
+            this.tileMap,
+            this.player,
+            this.player.tilePos.x,
+            this.player.tilePos.y - commandCounter,
+            DirectionEnum.UP
+          )
+          if (distance != 0) {
+            this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - distance)
+            this.player.move(DirectionEnum.UP, distance)
+            this.socketInstance.endTurn()
+          }
+          break
         case DirectionEnum.DOWN:
-            distance = toY - player.tilePos.y;
-            var travelingY = player.tilePos.y;
-            for (let i = 0; i < distance; i++) {
-                travelingY++;
-                let tile = tileMap.getTileAt(toX, travelingY);
-                if(!scene.tileMoveCheck(scene, tile))
-                    return i;
-            }
-            return distance;
+          distance = this.canPlayerMove(
+            this,
+            this.tileMap,
+            this.player,
+            this.player.tilePos.x,
+            this.player.tilePos.y + commandCounter,
+            DirectionEnum.DOWN
+          )
+          if (distance != 0) {
+            this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + distance)
+            this.player.move(DirectionEnum.DOWN, distance)
+            this.socketInstance.endTurn()
+          }
+          break
         case DirectionEnum.LEFT:
-            distance = player.tilePos.x - toX;
-            var travelingX = player.tilePos.x;
-            for (let i = 0; i < distance; i++) {
-                travelingX--;
-                let tile = tileMap.getTileAt(travelingX, toY);
-                if(!scene.tileMoveCheck(scene, tile))
-                    return i;
-            }
-            return distance;
+          distance = this.canPlayerMove(
+            this,
+            this.tileMap,
+            this.player,
+            this.player.tilePos.x - commandCounter,
+            this.player.tilePos.y,
+            DirectionEnum.LEFT
+          )
+          if (distance != 0) {
+            this.socketInstance.movePlayer(this.player.tilePos.x - distance, this.player.tilePos.y)
+            this.player.move(DirectionEnum.LEFT, distance)
+            this.socketInstance.endTurn()
+          }
+          break
         case DirectionEnum.RIGHT:
-            distance = toX - player.tilePos.x;
-            var travelingX = player.tilePos.x;
-            for (let i = 0; i < distance; i++) {
-                travelingX++;
-                let tile = tileMap.getTileAt(travelingX, toY);
-                if(!scene.tileMoveCheck(scene, tile))
-                    return i;
-            }
-            return distance;
+          distance = this.canPlayerMove(
+            this,
+            this.tileMap,
+            this.player,
+            this.player.tilePos.x + commandCounter,
+            this.player.tilePos.y,
+            DirectionEnum.RIGHT
+          )
+          if (distance != 0) {
+            this.socketInstance.movePlayer(this.player.tilePos.x + distance, this.player.tilePos.y)
+            this.player.move(DirectionEnum.RIGHT, distance)
+            this.socketInstance.endTurn()
+          }
+          break
         default:
-            console.log("Somethings wrong...")
-            return distance;
+          console.log('Somethings wrong...')
+          break
+      }
     }
   }
 
-    private tileMoveCheck(scene : MainScene, toTile : Phaser.Tilemaps.Tile){
-        //Check if collides with player
-        var result = true;
-        scene.playerList.forEach(playerElem =>{
-            if(playerElem.id != scene.player.id){
-                var playerTile = scene.tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y);
-                if(playerTile.x == toTile.x && playerTile.y == toTile.y)
-                    result = false;
-            }
-        });
-        if(!result)
-            return result;
-
-        //Check if collides with tile types
-        switch (toTile.index) {
-            case TileTypeEnum.WALL:
-                return false;
-            case TileTypeEnum.WALL_CITY:
-                return false;
-            case TileTypeEnum.WALL_HELL:
-                return false;
-            case TileTypeEnum.WALL_JUNGLE:
-                return false;
-            default:
-                return true;
+  canPlayerMove(
+    scene: MainScene,
+    tileMap: Phaser.Tilemaps.Tilemap,
+    player: Player,
+    toX: number,
+    toY: number,
+    direction: DirectionEnum
+  ) {
+    let distance = 0
+    switch (direction) {
+      case DirectionEnum.UP:
+        distance = player.tilePos.y - toY
+        var travelingY = player.tilePos.y
+        for (let i = 0; i < distance; i++) {
+          travelingY--
+          let tile = tileMap.getTileAt(toX, travelingY)
+          if (!scene.tileMoveCheck(scene, tile)) return i
         }
-
-    }
-    handleDamage(targetId: string)
-    {
-        if (this.playersTurnId == this.player.id && !this.player.isDead()) {
-
-          var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId));
-          this.socketInstance.damagePlayer(damage, targetId);
-          this.socketInstance.endTurn();
+        return distance
+      case DirectionEnum.DOWN:
+        distance = toY - player.tilePos.y
+        var travelingY = player.tilePos.y
+        for (let i = 0; i < distance; i++) {
+          travelingY++
+          let tile = tileMap.getTileAt(toX, travelingY)
+          if (!scene.tileMoveCheck(scene, tile)) return i
         }
+        return distance
+      case DirectionEnum.LEFT:
+        distance = player.tilePos.x - toX
+        var travelingX = player.tilePos.x
+        for (let i = 0; i < distance; i++) {
+          travelingX--
+          let tile = tileMap.getTileAt(travelingX, toY)
+          if (!scene.tileMoveCheck(scene, tile)) return i
+        }
+        return distance
+      case DirectionEnum.RIGHT:
+        distance = toX - player.tilePos.x
+        var travelingX = player.tilePos.x
+        for (let i = 0; i < distance; i++) {
+          travelingX++
+          let tile = tileMap.getTileAt(travelingX, toY)
+          if (!scene.tileMoveCheck(scene, tile)) return i
+        }
+        return distance
+      default:
+        console.log('Somethings wrong...')
+        return distance
     }
-    private findDistanceToPlayer(targetId : string) : number
-    {
-      var target = this.findPlayerById(targetId);
-      if(target == null)
-        return -1;
-      
-      //Euclidean distance
-      var deltaX = Math.abs(this.player.tilePos.x - target?.tilePos.x);
-      var deltaY = Math.abs(this.player.tilePos.y - target?.tilePos.y);
-      return Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY)); // <- Distance
-    }
+  }
 
+  private tileMoveCheck(scene: MainScene, toTile: Phaser.Tilemaps.Tile) {
+    //Check if collides with player
+    var result = true
+    scene.playerList.forEach(playerElem => {
+      if (playerElem.id != scene.player.id) {
+        var playerTile = scene.tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y)
+        if (playerTile.x == toTile.x && playerTile.y == toTile.y) result = false
+      }
+    })
+    if (!result) return result
+
+    //Check if collides with tile types
+    switch (toTile.index) {
+      case TileTypeEnum.WALL:
+        return false
+      case TileTypeEnum.WALL_CITY:
+        return false
+      case TileTypeEnum.WALL_HELL:
+        return false
+      case TileTypeEnum.WALL_JUNGLE:
+        return false
+      default:
+        return true
+    }
+  }
+  handleDamage(targetId: string) {
+    if (this.playersTurnId == this.player.id && !this.player.isDead()) {
+      var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId))
+      this.socketInstance.damagePlayer(damage, targetId)
+      this.socketInstance.endTurn()
+    }
+  }
+  private findDistanceToPlayer(targetId: string): number {
+    var target = this.findPlayerById(targetId)
+    if (target == null) return -1
+
+    //Euclidean distance
+    var deltaX = Math.abs(this.player.tilePos.x - target?.tilePos.x)
+    var deltaY = Math.abs(this.player.tilePos.y - target?.tilePos.y)
+    return Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY)) // <- Distance
+  }
 }
