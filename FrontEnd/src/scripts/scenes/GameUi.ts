@@ -33,6 +33,11 @@ export default class GameUI extends Phaser.Scene
     arrowLeft
     arrowRight
     allguns
+    commandUp
+    commandDown
+    commandLabel
+    commandText
+    commandCounter
 	constructor()
 	{
 		super({ key: 'UIScene' })
@@ -51,6 +56,7 @@ export default class GameUI extends Phaser.Scene
         this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 });
     }
     init(data){
+        this.commandCounter = 1;
         console.log("data", data)
         this.player = data["playerObj"]
         this.playersTurnId = data["playersTurnId"]
@@ -274,6 +280,7 @@ export default class GameUI extends Phaser.Scene
             this.sideGunIcon.clearTint();
         });
 
+        // CONTROLS
 
         this.arrowUp = this.add.sprite(0,0, "arrowup")
         this.arrowUp.displayHeight = 24
@@ -331,6 +338,56 @@ export default class GameUI extends Phaser.Scene
             this.hotbarOne.clearTint();
         });
 
+        // COMMANDS
+
+        this.commandLabel = this.add.text(0, 0, "STEP", {
+			fontSize: '24'
+		})
+        this.commandLabel.scale = 1
+        this.commandLabel.setOrigin(1,0)
+        this.commandLabel.setPosition(770, 464)
+        this.commandLabel.setColor("white")
+
+        this.commandText = this.add.text(0, 0, this.commandCounter, {
+			fontSize: '50'
+		})
+        this.commandText.scale = 2
+        this.commandText.setOrigin(1,0)
+        this.commandText.setPosition(762, 484)
+        this.commandText.setColor("white")
+
+        this.commandUp = this.add.sprite(0,0, "arrowup")
+        this.commandUp.displayHeight = 24
+        this.commandUp.displayWidth = 24
+        this.commandUp.setOrigin(1,0)
+        this.commandUp.setPosition(800, 474)
+        this.commandUp.setInteractive();
+        this.commandUp.on('pointerdown', (event) => {
+            if (this.commandCounter < 5) {
+                this.commandCounter++;
+                this.commandText.setText(this.commandCounter)
+            }
+        });
+        this.commandUp.on('pointerup', (event) => {
+            this.commandUp.clearTint();
+        });
+
+        this.commandDown = this.add.sprite(0,0, "arrowdown")
+        this.commandDown.displayHeight = 24
+        this.commandDown.displayWidth = 24
+        this.commandDown.setOrigin(1,0)
+        this.commandDown.setPosition(800, 499)
+        this.commandDown.setInteractive();
+        this.commandDown.on('pointerdown', (event) => {
+            if (this.commandCounter > 1) {
+                this.commandCounter--;
+                this.commandText.setText(this.commandCounter)
+            }
+        });
+        this.commandDown.on('pointerup', (event) => {
+            this.commandDown.clearTint();
+        });
+
         this.MenuGroup = this.add.group()
         this.MenuGroup.add(this.baseSprite)
         this.MenuGroup.add(this.expandSprite)
@@ -350,6 +407,10 @@ export default class GameUI extends Phaser.Scene
         this.MenuGroup.add(this.arrowDown)
         this.MenuGroup.add(this.arrowLeft)
         this.MenuGroup.add(this.arrowRight)
+        this.MenuGroup.add(this.commandUp)
+        this.MenuGroup.add(this.commandDown)
+        this.MenuGroup.add(this.commandLabel)
+        this.MenuGroup.add(this.commandText)
 
 
         var i = 0;
