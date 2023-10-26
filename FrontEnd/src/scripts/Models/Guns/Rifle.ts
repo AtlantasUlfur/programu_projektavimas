@@ -1,6 +1,6 @@
 import { IRifle } from "../../Interfaces/Guns/IRifle";
 import { Player } from "../Player";
-import { GunDamageStrategy } from "../../utils/Strategy/GunStrategy";
+import { IGunDamageStrategy } from "../../utils/Strategy/GunStrategy";
 
 export class Rifle implements IRifle{
     gunFrame: number;
@@ -9,11 +9,11 @@ export class Rifle implements IRifle{
     fireRate: number;
     distance: number;
     price: number;
-    damageStrategy: GunDamageStrategy;
+    damageStrategy: IGunDamageStrategy;
 
     private _maxAmmo: number;
 
-    constructor(rifle: {gunFrame: number, ammo: number, damage: number, fireRate: number, distance: number, price: number, damageStrategy: GunDamageStrategy}){
+    constructor(rifle: {gunFrame: number, ammo: number, damage: number, fireRate: number, distance: number, price: number, damageStrategy: IGunDamageStrategy}){
         this.gunFrame = rifle.gunFrame;
         this.ammo = rifle.ammo;
         this._maxAmmo = rifle.ammo;
@@ -23,7 +23,7 @@ export class Rifle implements IRifle{
         this.price = rifle.price;
         this.damageStrategy = rifle.damageStrategy;
     }
-    setDamageStrategy(damageStrategy: GunDamageStrategy) {
+    setDamageStrategy(damageStrategy: IGunDamageStrategy) {
         this.damageStrategy = damageStrategy;
     }
 

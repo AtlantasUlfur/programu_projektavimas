@@ -1,10 +1,10 @@
 //Strategy interface
-export interface GunDamageStrategy {
+export interface IGunDamageStrategy {
     calculateDamage(distance: number, baseDamage : number): number;
 }
 
 //ShortRange Strategy
-export class ShortRangeGunStrategy implements GunDamageStrategy {
+export class ShortRangeGunStrategy implements IGunDamageStrategy {
     calculateDamage(distance: number, baseDamage : number): number {
         let maxDistance = 3;
         if(distance > maxDistance){
@@ -15,7 +15,7 @@ export class ShortRangeGunStrategy implements GunDamageStrategy {
 }
 
 //MediumRange Strategy
-export class MediumRangeGunStrategy implements GunDamageStrategy {
+export class MediumRangeGunStrategy implements IGunDamageStrategy {
     calculateDamage(distance: number, baseDamage : number): number {
         let maxDistance = 6;
         if(distance > maxDistance){
@@ -26,7 +26,7 @@ export class MediumRangeGunStrategy implements GunDamageStrategy {
 }
 
 //LongRange Strategy
-export class LongRangeGunStrategy implements GunDamageStrategy {
+export class LongRangeGunStrategy implements IGunDamageStrategy {
     calculateDamage(distance: number, baseDamage : number): number {
         let maxDistance = 9;
         if(distance > maxDistance){
@@ -36,7 +36,7 @@ export class LongRangeGunStrategy implements GunDamageStrategy {
     }
 }
 //MaxRange Strategy
-export class MaxRangeGunStrategy implements GunDamageStrategy {
+export class MaxRangeGunStrategy implements IGunDamageStrategy {
     calculateDamage(distance: number, baseDamage : number): number {
         return baseDamage;
     }

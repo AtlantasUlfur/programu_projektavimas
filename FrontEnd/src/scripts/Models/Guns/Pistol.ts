@@ -1,6 +1,6 @@
 import { IPistol } from "../../Interfaces/Guns/IPistol";
 import { Player } from "../Player";
-import { GunDamageStrategy } from "../../utils/Strategy/GunStrategy";
+import { IGunDamageStrategy } from "../../utils/Strategy/GunStrategy";
 
 export class Pistol implements IPistol{
     gunFrame: number;
@@ -9,10 +9,10 @@ export class Pistol implements IPistol{
     pushback?: number | undefined;
     distance: number;
     price: number;
-    damageStrategy: GunDamageStrategy;
+    damageStrategy: IGunDamageStrategy;
     private _maxAmmo: number;
 
-    constructor(pistol: {gunFrame: number, ammo:number, damage:number, distance: number, price: number, pushback: number | undefined, damageStrategy: GunDamageStrategy}){
+    constructor(pistol: {gunFrame: number, ammo:number, damage:number, distance: number, price: number, pushback: number | undefined, damageStrategy: IGunDamageStrategy}){
         this.gunFrame = pistol.gunFrame;
         this.ammo = pistol.ammo;
         this._maxAmmo = pistol.ammo;
@@ -22,7 +22,7 @@ export class Pistol implements IPistol{
         this.pushback = pistol.pushback;
         this.damageStrategy = pistol.damageStrategy;
     }
-    setDamageStrategy(damageStrategy: GunDamageStrategy) {
+    setDamageStrategy(damageStrategy: IGunDamageStrategy) {
         this.damageStrategy = damageStrategy;
     }
 

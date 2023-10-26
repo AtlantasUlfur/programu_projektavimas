@@ -185,7 +185,6 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('#008000')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setGun(this.allGuns[3]);
         builder.setSecondaryGun(this.allGuns[0] as IPistol);
         builder.setMainGun(this.allGuns[3] as IRifle);
         this.player = builder.build()
@@ -203,7 +202,6 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('red')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setGun(this.allGuns[3]);
         builder.setSecondaryGun(this.allGuns[0] as IPistol);
         builder.setMainGun(this.allGuns[3] as IRifle);
 

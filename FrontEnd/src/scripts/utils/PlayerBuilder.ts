@@ -12,7 +12,8 @@ interface PlayerBuilderInterface {
   setFrame(frame: number): void
   setColor(color: string): void
   setSocketId(socketId: string): void
-  setGun(gun : IGun): void;
+  setMainGun(gun: IRifle | IGrenadeLauncher) : void
+  setSecondaryGun(gun: IPistol) : void
   build(): Player;
 }
 
@@ -66,16 +67,7 @@ export default class PlayerBuilder implements PlayerBuilderInterface {
 
   setMainGun(gun: IRifle | IGrenadeLauncher){
     this.player.mainGun = gun;
-  }
-
-  setSecondaryGun(gun: IPistol)
-  {
-    this.player.secondaryGun = gun;
-  }
-
-  setGun(gun : IGun) : void {
-     // needs specific gun at some point
-     this.player.selectedGun = gun;
+    this.player.selectedGun = gun;
      this.player.gunImage = this.scene.add.image(
          0, 0, 'guns', this.player.selectedGun.gunFrame
      ).setScale(0.2);
@@ -84,6 +76,11 @@ export default class PlayerBuilder implements PlayerBuilderInterface {
      this.player.gunImage.setOrigin(0.5, 1.5);
  
      this.player.showChosenGun();
+  }
+
+  setSecondaryGun(gun: IPistol)
+  {
+    this.player.secondaryGun = gun;
   }
 
   build(): Player {

@@ -76,7 +76,6 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
   }
 
-
   onDamage(damage: integer) {
     this.currentHealth -= damage
   }
@@ -103,6 +102,15 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.selectedGun = gun;
     this.setGunImage(this.selectedGun.gunFrame)
  }
+
+  switchToMainArm(){
+    this.selectedGun = this.mainGun;
+    this.setGunImage(this.selectedGun.gunFrame)
+  }
+  switchToSideArm(){
+    this.selectedGun = this.secondaryGun;
+    this.setGunImage(this.selectedGun.gunFrame)
+  }
 
  setGunImage(gunFrame : number)
  {

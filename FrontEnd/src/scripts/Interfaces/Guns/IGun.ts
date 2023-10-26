@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { Player } from "../../Models/Player";
-import { GunDamageStrategy } from "../../utils/Strategy/GunStrategy";
+import { IGunDamageStrategy } from "../../utils/Strategy/GunStrategy";
 
 export interface IGun {
     gunFrame: number,
@@ -8,10 +8,10 @@ export interface IGun {
     damage: number,
     distance: number,
     price: number,
-    damageStrategy: GunDamageStrategy
+    damageStrategy: IGunDamageStrategy
 
     shoot(distance : number);
     refillAmmo();
     createGunImage(scene: Scene);
-    setDamageStrategy(damageStrategy : GunDamageStrategy);
+    setDamageStrategy(damageStrategy : IGunDamageStrategy);
 }
