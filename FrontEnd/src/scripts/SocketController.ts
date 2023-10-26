@@ -36,7 +36,8 @@ export default class  SocketController
             });
             this.socket.on("gameStart", (payload) =>{
                 const mainMenuScene = this.scene as MainMenuScene
-                mainMenuScene.scene.start("MainScene", payload);
+                mainMenuScene.startGame(payload);
+                //mainMenuScene.scene.start("MainScene", payload);
             });
             this.socket.on("turn", (payload) =>{
                 const mainScene = this.scene as MainScene;
@@ -114,8 +115,8 @@ export default class  SocketController
         this.socket?.emit("joinLobby", {name, playerName})
     }
 
-    public startGame(name : string | null){
-        this.socket?.emit("startGame", {name})
+    public startGame(name : string | null, theme: string | null){
+        this.socket?.emit("startGame", {name, theme})
     }
 
     public endTurn(){

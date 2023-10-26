@@ -143,6 +143,7 @@ io.on("connection", function (socket: Socket) {
   socket.on("startGame", function (payload) {
     console.log("Start game");
     const name = payload.name;
+    const theme = payload.theme;
 
     const session = getSession(name);
     if (!session) {
@@ -223,6 +224,7 @@ io.on("connection", function (socket: Socket) {
         player,
         sessionPlayers,
         playersTurnId: firstPlayer?.socketId,
+        theme
       });
 
       moveOrder = moveOrder + 1;
