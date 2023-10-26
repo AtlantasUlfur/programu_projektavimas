@@ -13,4 +13,5 @@ FrontEnd/node_modules/*
 /npm-debug.log
 node_modules
 dist
-/BackEnd/dist
+/BackEnd/dist/*
+BackEnd/dist/*
