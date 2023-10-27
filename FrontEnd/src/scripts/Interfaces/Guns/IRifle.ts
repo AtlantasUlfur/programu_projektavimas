@@ -1,5 +1,5 @@
-import { IGun } from "./IGun";
+import { IGun } from './IGun'
 
-export interface IRifle extends IGun{
-    fireRate: number
+export interface IRifle extends IGun {
+  fireRate: number
 }

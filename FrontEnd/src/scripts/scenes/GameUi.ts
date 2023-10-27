@@ -228,7 +228,7 @@ export default class GameUI extends Phaser.Scene {
       this.arrowUp.tint = 12
       const direction = DirectionEnum.UP
       const commandCounter = this.commandCounter
-      sceneEvents.emit('movement', {direction, commandCounter})
+      sceneEvents.emit('movement', { direction, commandCounter })
     })
     this.arrowUp.on('pointerup', event => {
       this.arrowUp.clearTint()
@@ -244,7 +244,7 @@ export default class GameUI extends Phaser.Scene {
       this.arrowDown.tint = 12
       const direction = DirectionEnum.DOWN
       const commandCounter = this.commandCounter
-      sceneEvents.emit('movement', {direction, commandCounter})
+      sceneEvents.emit('movement', { direction, commandCounter })
     })
     this.arrowDown.on('pointerup', event => {
       this.arrowDown.clearTint()
@@ -260,7 +260,7 @@ export default class GameUI extends Phaser.Scene {
       this.arrowLeft.tint = 12
       const direction = DirectionEnum.LEFT
       const commandCounter = this.commandCounter
-      sceneEvents.emit('movement', {direction, commandCounter})
+      sceneEvents.emit('movement', { direction, commandCounter })
     })
     this.arrowLeft.on('pointerup', event => {
       this.arrowLeft.clearTint()
@@ -276,7 +276,7 @@ export default class GameUI extends Phaser.Scene {
       this.arrowRight.tint = 12
       const direction = DirectionEnum.RIGHT
       const commandCounter = this.commandCounter
-      sceneEvents.emit('movement', {direction, commandCounter})
+      sceneEvents.emit('movement', { direction, commandCounter })
     })
     this.arrowRight.on('pointerup', event => {
       this.hotbarOne.clearTint()

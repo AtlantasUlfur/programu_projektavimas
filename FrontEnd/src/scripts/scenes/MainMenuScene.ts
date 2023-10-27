@@ -91,28 +91,28 @@ export class MainMenuScene extends Phaser.Scene {
     })
   }
   startGame(payload: any) {
-    var theme = payload.theme;
-    switch(theme) {
-      case "1":
-        theme = "cloud_background";
-        this.scene.start("MainScene", {payload, theme});
-        break;
-      case "2":
-        theme = "jungle_background";
-        this.scene.start("MainScene", {payload, theme});
-        break;
-      case "3":
-        theme = "city_background";
-        this.scene.start("MainScene", {payload, theme});
-        break;
-      case "4":
-        theme = "hell_background";
-        this.scene.start("MainScene", {payload, theme});
-        break;
+    var theme = payload.theme
+    switch (theme) {
+      case '1':
+        theme = 'cloud_background'
+        this.scene.start('MainScene', { payload, theme })
+        break
+      case '2':
+        theme = 'jungle_background'
+        this.scene.start('MainScene', { payload, theme })
+        break
+      case '3':
+        theme = 'city_background'
+        this.scene.start('MainScene', { payload, theme })
+        break
+      case '4':
+        theme = 'hell_background'
+        this.scene.start('MainScene', { payload, theme })
+        break
       default:
-        theme = "cloud_background";
-        this.scene.start("MainScene", {payload, theme});
-        break;
+        theme = 'cloud_background'
+        this.scene.start('MainScene', { payload, theme })
+        break
     }
   }
 
@@ -198,8 +198,8 @@ export class MainMenuScene extends Phaser.Scene {
     if (0 == index) {
       scene.socketInstance.createLobby(this.playerName)
       scene.lobbyStatus = LobbiesEnum.IN_LOBBY
-      while(!this.selectedTheme) {
-        this.selectedTheme = prompt("Enter a number for map theme(1:cloud, 2:jungle, 3:city, 4:hell)", "1");
+      while (!this.selectedTheme) {
+        this.selectedTheme = prompt('Enter a number for map theme(1:cloud, 2:jungle, 3:city, 4:hell)', '1')
       }
       scene.add.text(scene.scale.width * 0.5, scene.scale.height * 0.5, 'You are host').setOrigin(0.5)
       scene.playerCountText = scene.add
