@@ -42,7 +42,7 @@ export default class MainScene extends Phaser.Scene {
     this.socketInstance.setScene(this)
     this.allGuns = GunCreator.CreateAllGuns()
 
-    //Fill map data disgusting
+    //Fill map data
     this.mapData = [
       [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
       [367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367, 367],
@@ -171,6 +171,8 @@ export default class MainScene extends Phaser.Scene {
       return a.socketId.localeCompare(b.socketId)
     })
     const texture_frames = [49, 52, 55, 10]
+    var pistol = this.allGuns[0] as IPistol;
+    var rifle = this.allGuns[4] as IRifle;
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
@@ -181,8 +183,8 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('#008000')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(this.allGuns[0] as IPistol);
-        builder.setMainGun(this.allGuns[4] as IRifle);
+        builder.setSecondaryGun(pistol.clone());
+        builder.setMainGun(rifle.clone() as IRifle);
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -198,8 +200,8 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('red')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(this.allGuns[0] as IPistol);
-        builder.setMainGun(this.allGuns[4] as IRifle);
+        builder.setSecondaryGun(pistol.clone());
+        builder.setMainGun(rifle.clone() as IRifle);
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)

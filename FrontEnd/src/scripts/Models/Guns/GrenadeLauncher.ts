@@ -43,4 +43,16 @@ export class GrenadeLauncher implements IGrenadeLauncher {
   createGunImage() {
     throw new Error('Method not implemented.')
   }
+  clone(){
+    const clonedGun = new GrenadeLauncher({
+      gunFrame: this.gunFrame,
+      ammo: this.ammo,
+      explosionRadius: this.explosionRadius,
+      damage: this.damage,
+      distance: this.distance,
+      price: this.price,
+      damageStrategy: this.damageStrategy
+    });
+    return clonedGun;
+  }
 }

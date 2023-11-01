@@ -1,8 +1,9 @@
 import { Scene } from 'phaser'
 import { Player } from '../../Models/Player'
 import { IGunDamageStrategy } from '../../utils/Strategy/GunStrategy'
+import { IGunPrototype } from '../../utils/Prototype/IGunPrototype'
 
-export interface IGun {
+export interface IGun extends IGunPrototype {
   gunFrame: number
   ammo: number
   damage: number

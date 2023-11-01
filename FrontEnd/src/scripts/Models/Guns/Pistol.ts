@@ -43,4 +43,16 @@ export class Pistol implements IPistol {
   createGunImage(scene: Phaser.Scene) {
     throw new Error('Method not implemented.')
   }
+  clone(){
+    const clonedGun = new Pistol({
+      gunFrame: this.gunFrame,
+      ammo: this.ammo,
+      damage: this.damage,
+      distance: this.distance,
+      pushback: this.pushback,
+      price: this.price,
+      damageStrategy: this.damageStrategy
+    });
+    return clonedGun;
+  }
 }

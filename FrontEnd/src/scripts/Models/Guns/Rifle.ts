@@ -44,5 +44,17 @@ export class Rifle implements IRifle {
     createGunImage(scene: Phaser.Scene) {
         throw new Error("Method not implemented.");
     }
+    clone(){
+      const clonedGun = new Rifle({
+        gunFrame: this.gunFrame,
+        ammo: this.ammo,
+        damage: this.damage,
+        distance: this.distance,
+        fireRate: this.fireRate,
+        price: this.price,
+        damageStrategy: this.damageStrategy
+      });
+      return clonedGun;
+    }
 
 }
