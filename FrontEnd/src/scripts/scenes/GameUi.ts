@@ -24,7 +24,7 @@ export default class GameUI extends Phaser.Scene {
   mainGunHotbar: Phaser.GameObjects.Sprite
   mainGunIcon: Phaser.GameObjects.Image
   switchWeaponBtn: Phaser.GameObjects.Sprite
-  switchWeaponCommand : PlayerChangeWeapon;
+  switchWeaponCommand: PlayerChangeWeapon
   sideGunHotbar: Phaser.GameObjects.Sprite
   sideGunIcon: Phaser.GameObjects.Image
   playerList: Player[]
@@ -62,10 +62,14 @@ export default class GameUI extends Phaser.Scene {
     this.playerList = data['players']
   }
 
+  update() {
+    if (this.player.isBleeding && this.commandCounter > 3) this.commandCounter = 3;
+  }
+
   create() {
     const scene = this
 
-    this.switchWeaponCommand = new PlayerChangeWeapon(this.player);
+    this.switchWeaponCommand = new PlayerChangeWeapon(this.player)
 
     this.baseSprite = this.add.sprite(0, 0, 'base')
     this.baseSprite.displayHeight = 600
@@ -198,20 +202,17 @@ export default class GameUI extends Phaser.Scene {
     })
 
     //Switch Weapon
-    this.switchWeaponBtn = this.add.sprite(0, 0, 'gun-switch');
-    this.switchWeaponBtn.displayHeight = 40;
-    this.switchWeaponBtn.displayWidth = 40;
+    this.switchWeaponBtn = this.add.sprite(0, 0, 'gun-switch')
+    this.switchWeaponBtn.displayHeight = 40
+    this.switchWeaponBtn.displayWidth = 40
     this.switchWeaponBtn.setOrigin(1, 0)
     this.switchWeaponBtn.setPosition(940, 160)
     this.switchWeaponBtn.setInteractive()
     this.switchWeaponBtn.on('pointerdown', event => {
       this.switchWeaponBtn.setTint(0xeaebe7)
-      sceneEvents.emit("changeGun");
-      if(this.player.selectedGun == this.player.mainGun)
-        this.switchWeaponCommand.execute();
-      else
-        this.switchWeaponCommand.undo();
-      
+      sceneEvents.emit('changeGun')
+      if (this.player.selectedGun == this.player.mainGun) this.switchWeaponCommand.execute()
+      else this.switchWeaponCommand.undo()
     })
     this.switchWeaponBtn.on('pointerup', event => {
       this.switchWeaponBtn.clearTint()
@@ -308,7 +309,7 @@ export default class GameUI extends Phaser.Scene {
     this.commandUp.setPosition(800, 474)
     this.commandUp.setInteractive()
     this.commandUp.on('pointerdown', event => {
-      if (this.commandCounter < 5) {
+      if ((this.commandCounter < 5 && !this.player.isCrippled) || this.commandCounter < 3) {
         this.commandCounter++
         this.commandText.setText(this.commandCounter.toString())
       }

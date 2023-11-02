@@ -5,6 +5,8 @@ import { sceneEvents } from './Events/EventsController'
 import { Player } from './Models/Player'
 import _ from 'lodash'
 import { PlayerChangeWeapon } from './utils/Command/Command'
+import { PlayerDecorator } from './utils/Decorator/PlayerDecorator'
+
 
 //Singleton
 export default class SocketController {
@@ -65,6 +67,12 @@ export default class SocketController {
             if (playerObj.getCurrentHealth() == 0) {
               mainScene.alivePlayerCount--
               playerObj.die()
+            }
+            if (playerObj.getCurrentHealth() <= 75 && !playerObj.isBleeding) {
+              PlayerDecorator.addBleedingEffect(playerObj);
+            }
+            if (playerObj.getCurrentHealth() <= 30 && !playerObj.isCrippled) {
+              PlayerDecorator.addCrippledEffect(playerObj);
             }
           }
           if (mainScene.player.id == payload.player) {

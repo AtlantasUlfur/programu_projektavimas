@@ -265,6 +265,9 @@ export default class MainScene extends Phaser.Scene {
           if (distance != 0) {
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - distance)
             this.player.move(DirectionEnum.UP, distance)
+            if (this.player.isBleeding) {
+              this.socketInstance.damagePlayer(distance, this.player.id)
+            }
             this.socketInstance.endTurn()
           }
           break
@@ -280,6 +283,9 @@ export default class MainScene extends Phaser.Scene {
           if (distance != 0) {
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + distance)
             this.player.move(DirectionEnum.DOWN, distance)
+            if (this.player.isBleeding) {
+              this.socketInstance.damagePlayer(distance, this.player.id)
+            }
             this.socketInstance.endTurn()
           }
           break
@@ -295,6 +301,9 @@ export default class MainScene extends Phaser.Scene {
           if (distance != 0) {
             this.socketInstance.movePlayer(this.player.tilePos.x - distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.LEFT, distance)
+            if (this.player.isBleeding) {
+              this.socketInstance.damagePlayer(distance, this.player.id)
+            }
             this.socketInstance.endTurn()
           }
           break
@@ -310,6 +319,9 @@ export default class MainScene extends Phaser.Scene {
           if (distance != 0) {
             this.socketInstance.movePlayer(this.player.tilePos.x + distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.RIGHT, distance)
+            if (this.player.isBleeding) {
+              this.socketInstance.damagePlayer(distance, this.player.id)
+            }
             this.socketInstance.endTurn()
           }
           break

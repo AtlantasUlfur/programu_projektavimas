@@ -13,6 +13,8 @@ export class Player extends Phaser.GameObjects.Sprite {
   public tilePos: Phaser.Math.Vector2
   public attackPower: number = 0
   public selectedGun: IGun
+  public isBleeding?: boolean;
+  public isCrippled?: boolean;
 
   public mainGun: IRifle | IGrenadeLauncher
   public secondaryGun: IPistol
