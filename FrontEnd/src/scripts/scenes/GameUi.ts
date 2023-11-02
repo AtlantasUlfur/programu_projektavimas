@@ -206,6 +206,7 @@ export default class GameUI extends Phaser.Scene {
     this.switchWeaponBtn.setInteractive()
     this.switchWeaponBtn.on('pointerdown', event => {
       this.switchWeaponBtn.setTint(0xeaebe7)
+      sceneEvents.emit("changeGun");
       if(this.player.selectedGun == this.player.mainGun)
         this.switchWeaponCommand.execute();
       else

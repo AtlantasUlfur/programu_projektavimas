@@ -216,7 +216,7 @@ export default class MainScene extends Phaser.Scene {
       this.handleDamage(payload)
     })
     sceneEvents.on('changeGun', payload => {
-      this.handleGunChange(payload)
+      this.handleGunChange()
     })
 
     //Run UI Scenes
@@ -233,24 +233,8 @@ export default class MainScene extends Phaser.Scene {
     })
     return player
   }
-  handleGunChange(payload: any) {
-    var playerToChangeGunFor = this.player
-    if (payload.player !== undefined) {
-      // change gun for other player
-    }
-
-    var gunToChangeTo = this.player.selectedGun
-    if (payload.gun === 'secondaryGun') {
-      gunToChangeTo = this.player.secondaryGun
-    }
-    if (payload.gun === 'mainGun') {
-      gunToChangeTo = this.player.mainGun
-    }
-
-    playerToChangeGunFor.setGun(gunToChangeTo)
-    playerToChangeGunFor.showChosenGun()
-
-    this.socketInstance.changeGun(gunToChangeTo.gunFrame)
+  handleGunChange() {
+    this.socketInstance.changeGun()
   }
 
   update(time: number, delta: number) {
