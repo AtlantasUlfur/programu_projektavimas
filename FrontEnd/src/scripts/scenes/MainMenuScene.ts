@@ -229,20 +229,20 @@ export class MainMenuScene extends Phaser.Scene {
             scene.lobbies.map(lobby => `${lobby.playerCount}/4`).join('\n')
           )
           .setOrigin(0.5)
-
-        setTimeout(function () {
-          while (!lobby) {
-            lobby = prompt('Please enter the lobby you wish to join:', '')
-          }
-          scene.playerCountText = scene.add.text(lobbyButtonImage.x * 0.76, lobbyButtonImage.y, `Joining lobby...`)
-          scene.socketInstance.joinLobby(lobby, scene.playerName)
-          scene.lobbyStatus = LobbiesEnum.WAITING
-          lobbyTitleText.visible = false
-          lobbyCountText.visible = false
-          splitter.visible = false
-          lobbyButtonNameText.visible = false
-          lobbyButtonCountText.visible = false
-        }, 500)
+        scene.lobbies.map(lobby => `${lobby.name}`).forEach(lobby => {
+          let lobbyNameText = scene.add.text(lobbyButtonImage.x * 0.65, lobbyButtonImage.y, lobby)
+          .setOrigin(0.5).setInteractive().on('pointerdown', function(){
+            lobbyTitleText.visible = false
+            lobbyCountText.visible = false
+            splitter.visible = false
+            lobbyButtonNameText.visible = false
+            lobbyButtonCountText.visible = false
+            lobbyNameText.visible = false;
+            scene.playerCountText = scene.add.text(lobbyButtonImage.x * 0.76, lobbyButtonImage.y, `Joining lobby...`)
+            scene.socketInstance.joinLobby(lobby, scene.playerName)
+            scene.lobbyStatus = LobbiesEnum.WAITING
+          });
+        });
       }, 500)
 
       // var createButtonText = this.add.text(createButtonImage.x, createButtonImage.y, 'Create Game')
