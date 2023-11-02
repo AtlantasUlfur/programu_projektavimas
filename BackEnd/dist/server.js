@@ -189,9 +189,9 @@ io.on("connection", function (socket) {
             moveOrder = moveOrder + 1;
         });
     });
-    socket.on("changeGun", function (gunFrameIndex) {
-        console.log(`change weapons on ${gunFrameIndex}`);
-        socket.broadcast.emit("changeGun", { id: socket.id, frame: gunFrameIndex });
+    socket.on("changeGun", function (payload) {
+        console.log("changeGun");
+        socket.broadcast.emit("gunChange", { socketid: socket.id });
     });
     socket.on("endTurn", function () {
         var _a;

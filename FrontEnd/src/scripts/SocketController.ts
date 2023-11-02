@@ -88,17 +88,36 @@ export default class SocketController {
         const mainMenuScene = this.scene as MainMenuScene
         mainMenuScene.lobbies = payload.sessions
       })
-      this.socket.on('gunChange', payload => {
-        const mainScene = this.scene as MainScene
-        let player = _.find(mainScene.playerList, (player: Player) => player.id === payload)
-        if (player !== undefined) {
-          var switchWeaponCommand = new PlayerChangeWeapon(player);
-          if(player.selectedGun == player.mainGun)
-            switchWeaponCommand.execute();
-          else
-            switchWeaponCommand.undo();
+
+      class PayloadAdapter {
+        static adapt(payload: any): { id: string } | null {
+          try {
+            
+            return {
+              id: payload.socketid,
+            };
+          } catch (error) {
+            console.error("Error adapting payload:", error);
+            return null; 
+          }
         }
-      })
+      }
+      
+      this.socket.on('gunChange', payload => { 
+        console.log(payload);
+        const mainScene = this.scene as MainScene;
+        const adaptedPayload = PayloadAdapter.adapt(payload);
+        if (adaptedPayload !== null) {
+          let player = _.find(mainScene.playerList, (player: Player) => player.id === adaptedPayload.id);
+          if (player !== undefined) {
+            var switchWeaponCommand = new PlayerChangeWeapon(player);
+            if (player.selectedGun == player.mainGun)
+              switchWeaponCommand.execute();
+            else
+              switchWeaponCommand.undo();
+          }
+        }
+      });
     }
   }
 
