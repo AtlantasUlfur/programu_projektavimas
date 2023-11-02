@@ -43,7 +43,7 @@ export class Pistol implements IPistol {
   createGunImage(scene: Phaser.Scene) {
     throw new Error('Method not implemented.')
   }
-  clone(){
+  deepCopy(){
     const clonedGun = new Pistol({
       gunFrame: this.gunFrame,
       ammo: this.ammo,
@@ -55,4 +55,7 @@ export class Pistol implements IPistol {
     });
     return clonedGun;
   }
+  shallowCopy(){
+    return Object.assign({}, this);
+}
 }

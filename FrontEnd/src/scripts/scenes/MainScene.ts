@@ -183,8 +183,8 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('#008000')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.clone());
-        builder.setMainGun(rifle.clone() as IRifle);
+        builder.setSecondaryGun(pistol.deepCopy());
+        builder.setMainGun(rifle.shallowCopy() as IRifle);
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -200,8 +200,8 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('red')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.clone());
-        builder.setMainGun(rifle.clone() as IRifle);
+        builder.setSecondaryGun(pistol.deepCopy());
+        builder.setMainGun(rifle.shallowCopy() as IRifle);
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)

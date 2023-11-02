@@ -1,4 +1,5 @@
 import { IGrenadeLauncher } from '../../Interfaces/Guns/IGrenadeLauncher'
+import { IGun } from '../../Interfaces/Guns/IGun'
 import { IGunDamageStrategy } from '../../utils/Strategy/GunStrategy'
 import { Player } from '../Player'
 
@@ -43,7 +44,7 @@ export class GrenadeLauncher implements IGrenadeLauncher {
   createGunImage() {
     throw new Error('Method not implemented.')
   }
-  clone(){
+  deepCopy(){
     const clonedGun = new GrenadeLauncher({
       gunFrame: this.gunFrame,
       ammo: this.ammo,
@@ -54,5 +55,8 @@ export class GrenadeLauncher implements IGrenadeLauncher {
       damageStrategy: this.damageStrategy
     });
     return clonedGun;
+  }
+  shallowCopy(){
+      return Object.assign({}, this);
   }
 }
