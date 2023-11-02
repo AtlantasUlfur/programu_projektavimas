@@ -2,6 +2,7 @@ import { Scene } from 'phaser'
 import { Player } from '../../Models/Player'
 import { IGunDamageStrategy } from '../../utils/Strategy/GunStrategy'
 import { IGunPrototype } from '../../utils/Prototype/IGunPrototype'
+import { Bullet } from '../../Models/Bullet'
 
 export interface IGun extends IGunPrototype {
   gunFrame: number
@@ -10,6 +11,7 @@ export interface IGun extends IGunPrototype {
   distance: number
   price: number
   damageStrategy: IGunDamageStrategy
+  bullet : Bullet
 
   shoot(distance: number)
   refillAmmo()

@@ -3,14 +3,15 @@ import SocketController from '../SocketController'
 import { TileTypeEnum, SizeEnum, DirectionEnum } from '../Models/Enums'
 import { PlayerServer } from '../Models/ServerModels'
 import { Player } from '../Models/Player'
-import PlayerBuilder from '../utils/PlayerBuilder'
+import PlayerBuilder from '../utils/Builder/PlayerBuilder'
 import { sceneEvents } from '../Events/EventsController'
 import { IGun } from '../Interfaces/Guns/IGun'
 import { GunCreator } from '../utils/GunCreator'
 import { IRifle } from '../Interfaces/Guns/IRifle'
 import { IPistol } from '../Interfaces/Guns/IPistol'
-import MapBuilder from '../utils/MapBuilder'
+import MapBuilder from '../utils/Builder/MapBuilder'
 import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
+import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 
 export default class MainScene extends Phaser.Scene {
   //Utils
@@ -175,6 +176,31 @@ export default class MainScene extends Phaser.Scene {
     const texture_frames = [49, 52, 55, 10]
     var pistol = this.allGuns[0] as IPistol
     var rifle = this.allGuns[4] as IRifle
+    var deepPistol = pistol.deepCopy()
+    var shallowPistol = pistol.shallowCopy() as IPistol;
+    console.log("original pistol", pistol)
+    console.log("shallowPistol", shallowPistol)
+    console.log("changed shallow copy bullet object")
+    shallowPistol.bullet.dmg = 123;
+    console.log("----------")
+    console.log("original pistol", pistol)
+    console.log("shallowPistol", shallowPistol)
+    console.log("original pistol", pistol)
+    console.log("deepPistol", deepPistol)
+    console.log("changed deep copy pistol bullet damage")
+    deepPistol.bullet.dmg = 444
+    console.log("pistol", pistol)
+    console.log("deepPistol", deepPistol)
+    // console.log(pistol === shallowPistol); // false, different objects
+    // console.log(pistol.damageStrategy === shallowPistol.damageStrategy); // true, references to nested objects, change in shallow copy will reflect in original object
+
+    // console.log(pistol === deepPistol); // false
+    // console.log(pistol.damageStrategy === deepPistol.damageStrategy); // false, changes in the deep copy won't affect the original object
+
+  
+
+
+  
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
@@ -183,10 +209,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('#008000')
-        builder.setHP(playerData.currentHP)
-        builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(pistol.clone())
-        builder.setMainGun(rifle.clone() as IRifle)
+        builder.setHP(playerData.currentHP);
+        builder.setSocketId(playerData.socketId);
+        builder.setSecondaryGun(pistol.deepCopy());
+        builder.setMainGun(rifle.shallowCopy() as IRifle);
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -200,10 +226,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('red')
-        builder.setHP(playerData.currentHP)
-        builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(pistol.clone())
-        builder.setMainGun(rifle.clone() as IRifle)
+        builder.setHP(playerData.currentHP);
+        builder.setSocketId(playerData.socketId);
+        builder.setSecondaryGun(pistol.deepCopy());
+        builder.setMainGun(rifle.shallowCopy() as IRifle);
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)

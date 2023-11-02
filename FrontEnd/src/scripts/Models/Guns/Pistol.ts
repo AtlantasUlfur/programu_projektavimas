@@ -1,6 +1,7 @@
 import { IPistol } from '../../Interfaces/Guns/IPistol'
 import { Player } from '../Player'
 import { IGunDamageStrategy } from '../../utils/Strategy/GunStrategy'
+import { Bullet } from '../Bullet'
 
 export class Pistol implements IPistol {
   gunFrame: number
@@ -11,6 +12,7 @@ export class Pistol implements IPistol {
   price: number
   damageStrategy: IGunDamageStrategy
   private _maxAmmo: number
+  bullet : Bullet;
 
   constructor(pistol: {
     gunFrame: number
@@ -20,6 +22,7 @@ export class Pistol implements IPistol {
     price: number
     pushback: number | undefined
     damageStrategy: IGunDamageStrategy
+    bullet: Bullet
   }) {
     this.gunFrame = pistol.gunFrame
     this.ammo = pistol.ammo
@@ -29,6 +32,7 @@ export class Pistol implements IPistol {
     this.price = pistol.price
     this.pushback = pistol.pushback
     this.damageStrategy = pistol.damageStrategy
+    this.bullet = pistol.bullet;
   }
   setDamageStrategy(damageStrategy: IGunDamageStrategy) {
     this.damageStrategy = damageStrategy
@@ -43,7 +47,7 @@ export class Pistol implements IPistol {
   createGunImage(scene: Phaser.Scene) {
     throw new Error('Method not implemented.')
   }
-  clone(){
+  deepCopy(){
     const clonedGun = new Pistol({
       gunFrame: this.gunFrame,
       ammo: this.ammo,
@@ -51,8 +55,12 @@ export class Pistol implements IPistol {
       distance: this.distance,
       pushback: this.pushback,
       price: this.price,
-      damageStrategy: this.damageStrategy
+      damageStrategy: this.damageStrategy,
+      bullet: new Bullet(this.bullet.dmg)
     });
     return clonedGun;
   }
+  shallowCopy(){
+    return Object.assign({}, this);
+}
 }

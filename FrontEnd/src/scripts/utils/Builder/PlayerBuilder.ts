@@ -1,9 +1,9 @@
-import { IGrenadeLauncher } from '../Interfaces/Guns/IGrenadeLauncher'
-import { IGun } from '../Interfaces/Guns/IGun'
-import { IPistol } from '../Interfaces/Guns/IPistol'
-import { IRifle } from '../Interfaces/Guns/IRifle'
-import { SizeEnum } from '../Models/Enums'
-import { Player } from '../Models/Player'
+import { IGrenadeLauncher } from '../../Interfaces/Guns/IGrenadeLauncher'
+import { IGun } from '../../Interfaces/Guns/IGun'
+import { IPistol } from '../../Interfaces/Guns/IPistol'
+import { IRifle } from '../../Interfaces/Guns/IRifle'
+import { SizeEnum } from '../../Models/Enums'
+import { Player } from '../../Models/Player'
 
 interface PlayerBuilderInterface {
   setPosition(tilePos: Phaser.Math.Vector2): void
