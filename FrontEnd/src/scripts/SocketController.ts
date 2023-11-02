@@ -121,21 +121,21 @@ export default class SocketController {
     this.socket?.emit('endTurn')
   }
 
-    public movePlayer(x :number, y : number){
-        this.socket?.emit("movePlayer", x, y)
-    }
-    public damagePlayer(damage : number, targetId: string){
-        this.socket?.emit("damagePlayer", damage, targetId)
-    }
-    public getAttackAmount(){
-        this.socket?.emit("getAttackAmount");
-    }
-    public getLobbies() {
-        this.socket?.emit("getLobbies");
-    }
-    public removeTurn(){
-        this.socket?.emit("disconnect");
-    }
+  public movePlayer(x: number, y: number) {
+    this.socket?.emit('movePlayer', x, y)
+  }
+  public damagePlayer(damage: number, targetId: string) {
+    this.socket?.emit('damagePlayer', damage, targetId)
+  }
+  public getAttackAmount() {
+    this.socket?.emit('getAttackAmount')
+  }
+  public getLobbies() {
+    this.socket?.emit('getLobbies')
+  }
+  public removeTurn() {
+    this.socket?.emit('disconnect')
+  }
 
   public changeGun(index: number) {
     this.socket?.emit('changeGun', index)

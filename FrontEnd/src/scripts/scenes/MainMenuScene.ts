@@ -3,6 +3,7 @@ import SocketController from '../SocketController'
 import { Button } from '../Models/Button'
 import { LobbiesEnum } from '../Models/Enums'
 import { SessionServer } from '../Models/ServerModels'
+import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
 
 export class MainMenuScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
@@ -17,6 +18,7 @@ export class MainMenuScene extends Phaser.Scene {
   public playerName: string | null
   public lobbies: SessionServer[] = []
   public selectedTheme: string | null
+  private sceneManager: SceneManagerFacade
 
   constructor() {
     super('MainMenu')
@@ -28,6 +30,7 @@ export class MainMenuScene extends Phaser.Scene {
     // //Socket initialise
     this.socketInstance = SocketController.getInstance()
     this.socketInstance.connect('http://localhost:8081', this)
+    this.sceneManager = new SceneManagerFacade(this.scene)
   }
 
   preload() {
@@ -90,30 +93,9 @@ export class MainMenuScene extends Phaser.Scene {
       this.buttonClick(scene, 1)
     })
   }
+
   startGame(payload: any) {
-    var theme = payload.theme
-    switch (theme) {
-      case '1':
-        theme = 'cloud_background'
-        this.scene.start('MainScene', { payload, theme })
-        break
-      case '2':
-        theme = 'jungle_background'
-        this.scene.start('MainScene', { payload, theme })
-        break
-      case '3':
-        theme = 'city_background'
-        this.scene.start('MainScene', { payload, theme })
-        break
-      case '4':
-        theme = 'hell_background'
-        this.scene.start('MainScene', { payload, theme })
-        break
-      default:
-        theme = 'cloud_background'
-        this.scene.start('MainScene', { payload, theme })
-        break
-    }
+    this.sceneManager?.startMainScene(payload)
   }
 
   selectButton(index: number) {
@@ -177,7 +159,7 @@ export class MainMenuScene extends Phaser.Scene {
       case LobbiesEnum.DENIED:
         alert('Lobby not found')
         this.lobbyStatus = LobbiesEnum.MENU
-        this.scene.restart()
+        this.sceneManager?.restartCurrentScene()
         break
       default:
         break

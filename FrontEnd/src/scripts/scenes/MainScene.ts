@@ -10,6 +10,7 @@ import { GunCreator } from '../utils/GunCreator'
 import { IRifle } from '../Interfaces/Guns/IRifle'
 import { IPistol } from '../Interfaces/Guns/IPistol'
 import MapBuilder from '../utils/MapBuilder'
+import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
 
 export default class MainScene extends Phaser.Scene {
   //Utils
@@ -33,7 +34,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.theme = data.theme;
+    this.theme = data.theme
     this.currentPlayerData = data.payload.player
     this.allPlayerData = data.payload.sessionPlayers
     this.alivePlayerCount = this.allPlayerData.length
@@ -158,6 +159,7 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     const scene = this
+    const sceneManager = new SceneManagerFacade(this.scene)
     this.socketInstance = SocketController.getInstance()
 
     let mapBuilder = new MapBuilder(scene)
@@ -171,8 +173,8 @@ export default class MainScene extends Phaser.Scene {
       return a.socketId.localeCompare(b.socketId)
     })
     const texture_frames = [49, 52, 55, 10]
-    var pistol = this.allGuns[0] as IPistol;
-    var rifle = this.allGuns[4] as IRifle;
+    var pistol = this.allGuns[0] as IPistol
+    var rifle = this.allGuns[4] as IRifle
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
@@ -181,10 +183,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('#008000')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.clone());
-        builder.setMainGun(rifle.clone() as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(pistol.clone())
+        builder.setMainGun(rifle.clone() as IRifle)
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -198,10 +200,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('red')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.clone());
-        builder.setMainGun(rifle.clone() as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(pistol.clone())
+        builder.setMainGun(rifle.clone() as IRifle)
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
@@ -220,8 +222,8 @@ export default class MainScene extends Phaser.Scene {
     })
 
     //Run UI Scenes
-    this.scene.run('UIScene', { playerObj: this.player, players: this.playerList, playersTurnId: this.playersTurnId })
-    this.scene.run('GameOver')
+    sceneManager.runGameUIScene(this.player, this.playerList, this.playersTurnId)
+    sceneManager.runGameOverScene()
   }
   private findPlayerById(id: string): Player | null {
     var player: Player | null = null
