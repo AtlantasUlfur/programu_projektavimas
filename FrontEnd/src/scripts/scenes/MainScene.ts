@@ -216,7 +216,6 @@ export default class MainScene extends Phaser.Scene {
       this.handleDamage(payload)
     })
     sceneEvents.on('changeGun', payload => {
-      debugger;
       this.handleGunChange()
     })
 
