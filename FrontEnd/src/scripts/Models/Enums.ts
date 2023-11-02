@@ -8,8 +8,8 @@ export enum LobbiesEnum {
 export enum TileTypeEnum {
   GROUND = 367,
   WALL = 712,
-  GROUND_HELL = 162,
-  WALL_HELL = 516,
+  GROUND_HELL = 396,
+  WALL_HELL = 290,
   GROUND_CITY = 20,
   WALL_CITY = 28,
   GROUND_JUNGLE = 46,

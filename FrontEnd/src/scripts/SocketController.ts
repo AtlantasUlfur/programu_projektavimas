@@ -88,17 +88,35 @@ export default class SocketController {
         const mainMenuScene = this.scene as MainMenuScene
         mainMenuScene.lobbies = payload.sessions
       })
-      this.socket.on('gunChange', payload => {
-        const mainScene = this.scene as MainScene
-        let player = _.find(mainScene.playerList, (player: Player) => player.id === payload)
-        if (player !== undefined) {
-          var switchWeaponCommand = new PlayerChangeWeapon(player);
-          if(player.selectedGun == player.mainGun)
-            switchWeaponCommand.execute();
-          else
-            switchWeaponCommand.undo();
+
+      class PayloadAdapter {
+        static adapt(payload: any): { id: string } | null {
+          try {
+            return {
+              id: payload.socketid as string,
+            };
+          } catch (error) {
+            console.error("Error adapting payload:", error);
+            return null; 
+          }
         }
-      })
+      }
+      
+      this.socket.on('gunChange', payload => { 
+        console.log(payload);
+        const mainScene = this.scene as MainScene;
+        const adaptedPayload = PayloadAdapter.adapt(payload);
+        if (adaptedPayload !== null) {
+          let player = _.find(mainScene.playerList, (player: Player) => player.id === adaptedPayload.id);
+          if (player !== undefined) {
+            var switchWeaponCommand = new PlayerChangeWeapon(player);
+            if (player.selectedGun == player.mainGun)
+              switchWeaponCommand.execute();
+            else
+              switchWeaponCommand.undo();
+          }
+        }
+      });
     }
   }
 
@@ -126,20 +144,20 @@ export default class SocketController {
     this.socket?.emit('endTurn')
   }
 
-  public movePlayer(x :number, y : number){
-      this.socket?.emit("movePlayer", x, y)
+  public movePlayer(x: number, y: number) {
+    this.socket?.emit('movePlayer', x, y)
   }
-  public damagePlayer(damage : number, targetId: string){
-      this.socket?.emit("damagePlayer", damage, targetId)
+  public damagePlayer(damage: number, targetId: string) {
+    this.socket?.emit('damagePlayer', damage, targetId)
   }
-  public getAttackAmount(){
-      this.socket?.emit("getAttackAmount");
+  public getAttackAmount() {
+    this.socket?.emit('getAttackAmount')
   }
   public getLobbies() {
-      this.socket?.emit("getLobbies");
+    this.socket?.emit('getLobbies')
   }
-  public removeTurn(){
-      this.socket?.emit("disconnect");
+  public removeTurn() {
+    this.socket?.emit('disconnect')
   }
 
   public changeGun() {
