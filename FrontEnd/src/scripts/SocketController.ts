@@ -4,6 +4,7 @@ import MainScene from './scenes/MainScene'
 import { sceneEvents } from './Events/EventsController'
 import { Player } from './Models/Player'
 import _ from 'lodash'
+import { PlayerChangeWeapon } from './utils/Command/Command'
 
 //Singleton
 export default class SocketController {
@@ -87,11 +88,15 @@ export default class SocketController {
         const mainMenuScene = this.scene as MainMenuScene
         mainMenuScene.lobbies = payload.sessions
       })
-      this.socket.on('changeGun', payload => {
+      this.socket.on('gunChange', payload => {
         const mainScene = this.scene as MainScene
-        let player = _.find(mainScene.playerList, (player: Player) => player.id === payload.id)
+        let player = _.find(mainScene.playerList, (player: Player) => player.id === payload)
         if (player !== undefined) {
-          player.setGunImage(payload.frame)
+          var switchWeaponCommand = new PlayerChangeWeapon(player);
+          if(player.selectedGun == player.mainGun)
+            switchWeaponCommand.execute();
+          else
+            switchWeaponCommand.undo();
         }
       })
     }
@@ -121,23 +126,23 @@ export default class SocketController {
     this.socket?.emit('endTurn')
   }
 
-    public movePlayer(x :number, y : number){
-        this.socket?.emit("movePlayer", x, y)
-    }
-    public damagePlayer(damage : number, targetId: string){
-        this.socket?.emit("damagePlayer", damage, targetId)
-    }
-    public getAttackAmount(){
-        this.socket?.emit("getAttackAmount");
-    }
-    public getLobbies() {
-        this.socket?.emit("getLobbies");
-    }
-    public removeTurn(){
-        this.socket?.emit("disconnect");
-    }
+  public movePlayer(x :number, y : number){
+      this.socket?.emit("movePlayer", x, y)
+  }
+  public damagePlayer(damage : number, targetId: string){
+      this.socket?.emit("damagePlayer", damage, targetId)
+  }
+  public getAttackAmount(){
+      this.socket?.emit("getAttackAmount");
+  }
+  public getLobbies() {
+      this.socket?.emit("getLobbies");
+  }
+  public removeTurn(){
+      this.socket?.emit("disconnect");
+  }
 
-  public changeGun(index: number) {
-    this.socket?.emit('changeGun', index)
+  public changeGun() {
+    this.socket?.emit('changeGun')
   }
 }
