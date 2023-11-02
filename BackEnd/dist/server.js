@@ -27,26 +27,29 @@ const getDefaultTileMap = () => {
                 a === MAP_DIMENSIONS - 1) {
                 entity = { id: "wall", x: i, y: a };
             }
-            if (i === 5 && a > 4 && a < 11) {
+            else if (i === 5 && a > 4 && a < 11) {
                 entity = { id: "wall", x: i, y: a };
             }
-            if (i === 6 && a > 16 && a < 20) {
+            else if (i === 6 && a > 16 && a < 20) {
                 entity = { id: "wall", x: i, y: a };
             }
-            if (i === 12 && a > 14 && a < 16) {
+            else if (i === 12 && a > 14 && a < 16) {
                 entity = { id: "wall", x: i, y: a };
             }
-            if (a === 10 && i > 16 && i < 20) {
+            else if (a === 10 && i > 16 && i < 20) {
                 entity = { id: "wall", x: i, y: a };
             }
-            if (a === 7 && i > 14 && i < 20) {
+            else if (a === 7 && i > 14 && i < 20) {
                 entity = { id: "wall", x: i, y: a };
             }
-            if (a === 16 && i > 7 && i < 11) {
+            else if (a === 16 && i > 7 && i < 11) {
                 entity = { id: "wall", x: i, y: a };
             }
-            if (a === 16 && i > 16 && i < 20) {
+            else if (a === 16 && i > 16 && i < 20) {
                 entity = { id: "wall", x: i, y: a };
+            }
+            else {
+                entity = { id: "ground", x: i, y: a };
             }
             tileMap.push({ x: i, y: a, entity });
         }
@@ -116,6 +119,7 @@ io.on("connection", function (socket) {
     socket.on("startGame", function (payload) {
         console.log("Start game");
         const name = payload.name;
+        const theme = payload.theme;
         const session = getSession(name);
         if (!session) {
             socket.emit("lobbyStatus", 3);
@@ -180,6 +184,7 @@ io.on("connection", function (socket) {
                 player,
                 sessionPlayers,
                 playersTurnId: firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId,
+                theme
             });
             moveOrder = moveOrder + 1;
         });
@@ -235,23 +240,25 @@ io.on("connection", function (socket) {
         console.log("Damaged");
         console.log("DMG", damage);
         console.log(targetId);
-        const player = getPlayerBySocketId(targetId);
-        console.log("BEFORE HP", player.currentHP);
-        player.currentHP =
-            player.currentHP == undefined ? 0 : player.currentHP - damage;
-        if (player.currentHP < 0) {
-            player.currentHP = 0;
-        }
-        console.log("AFTER HP", player.currentHP);
-        const sessionId = player.sessionId;
-        const sessionPlayers = getSessionPlayers(sessionId);
-        _.forEach(sessionPlayers, function (currentPlayer) {
-            const playerSocket = sockets[currentPlayer.socketId];
-            playerSocket.emit("playerDamage", {
-                player: targetId,
-                currentHP: player.currentHP,
+        if (damage != 0) {
+            const player = getPlayerBySocketId(targetId);
+            console.log("BEFORE HP", player.currentHP);
+            player.currentHP =
+                player.currentHP == undefined ? 0 : player.currentHP - damage;
+            if (player.currentHP < 0) {
+                player.currentHP = 0;
+            }
+            console.log("AFTER HP", player.currentHP);
+            const sessionId = player.sessionId;
+            const sessionPlayers = getSessionPlayers(sessionId);
+            _.forEach(sessionPlayers, function (currentPlayer) {
+                const playerSocket = sockets[currentPlayer.socketId];
+                playerSocket.emit("playerDamage", {
+                    player: targetId,
+                    currentHP: player.currentHP,
+                });
             });
-        });
+        }
     });
     socket.on("getAttackAmount", function () {
         console.log("Getting attack amount");
