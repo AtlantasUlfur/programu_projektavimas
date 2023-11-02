@@ -92,9 +92,8 @@ export default class SocketController {
       class PayloadAdapter {
         static adapt(payload: any): { id: string } | null {
           try {
-            
             return {
-              id: payload.socketid,
+              id: payload.socketid as string,
             };
           } catch (error) {
             console.error("Error adapting payload:", error);
