@@ -1,6 +1,7 @@
 import { IRifle } from '../../Interfaces/Guns/IRifle'
 import { Player } from '../Player'
 import { IGunDamageStrategy } from '../../utils/Strategy/GunStrategy'
+import { Bullet } from '../Bullet'
 
 export class Rifle implements IRifle {
   gunFrame: number
@@ -10,6 +11,7 @@ export class Rifle implements IRifle {
   distance: number
   price: number
   damageStrategy: IGunDamageStrategy
+  bullet : Bullet
 
   private _maxAmmo: number
 

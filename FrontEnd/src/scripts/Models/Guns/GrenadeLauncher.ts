@@ -1,6 +1,7 @@
 import { IGrenadeLauncher } from '../../Interfaces/Guns/IGrenadeLauncher'
 import { IGun } from '../../Interfaces/Guns/IGun'
 import { IGunDamageStrategy } from '../../utils/Strategy/GunStrategy'
+import { Bullet } from '../Bullet'
 import { Player } from '../Player'
 
 export class GrenadeLauncher implements IGrenadeLauncher {
@@ -12,6 +13,7 @@ export class GrenadeLauncher implements IGrenadeLauncher {
   price: number
   damageStrategy: IGunDamageStrategy
   private _maxAmmo: number
+  bullet : Bullet
 
   constructor(grenadeLauncher: {
     gunFrame: number
