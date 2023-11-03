@@ -191,7 +191,7 @@ io.on("connection", function (socket) {
     });
     socket.on("changeGun", function (payload) {
         console.log("changeGun");
-        socket.broadcast.emit("gunChange", { socketid: socket.id });
+        socket.broadcast.emit("gunChange", socket.id);
     });
     socket.on("endTurn", function () {
         var _a;

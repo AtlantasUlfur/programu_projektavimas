@@ -5,6 +5,8 @@ import { sceneEvents } from './Events/EventsController'
 import { Player } from './Models/Player'
 import _ from 'lodash'
 import { PlayerChangeWeapon } from './utils/Command/Command'
+import { PlayerDecorator } from './utils/Decorator/PlayerDecorator'
+
 
 //Singleton
 export default class SocketController {
@@ -66,6 +68,12 @@ export default class SocketController {
               mainScene.alivePlayerCount--
               playerObj.die()
             }
+            if (playerObj.getCurrentHealth() <= 75 && !playerObj.isBleeding) {
+              PlayerDecorator.addBleedingEffect(playerObj);
+            }
+            if (playerObj.getCurrentHealth() <= 30 && !playerObj.isCrippled) {
+              PlayerDecorator.addCrippledEffect(playerObj);
+            }
           }
           if (mainScene.player.id == payload.player) {
             sceneEvents.emit('hpChange')
@@ -89,25 +97,14 @@ export default class SocketController {
         mainMenuScene.lobbies = payload.sessions
       })
 
-      class PayloadAdapter {
-        static adapt(payload: any): { id: string } | null {
-          try {
-            return {
-              id: payload.socketid as string,
-            };
-          } catch (error) {
-            console.error("Error adapting payload:", error);
-            return null; 
-          }
-        }
-      }
+
       
       this.socket.on('gunChange', payload => { 
         console.log(payload);
         const mainScene = this.scene as MainScene;
-        const adaptedPayload = PayloadAdapter.adapt(payload);
-        if (adaptedPayload !== null) {
-          let player = _.find(mainScene.playerList, (player: Player) => player.id === adaptedPayload.id);
+ 
+        if (payload !== null) {
+          let player = _.find(mainScene.playerList, (player: Player) => player.id === payload);
           if (player !== undefined) {
             var switchWeaponCommand = new PlayerChangeWeapon(player);
             if (player.selectedGun == player.mainGun)
