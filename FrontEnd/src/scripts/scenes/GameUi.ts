@@ -81,7 +81,11 @@ export default class GameUI extends Phaser.Scene {
     else {
       this.bleeding.setVisible(false)
     }
-    if (this.player.isBleeding && this.commandCounter > 3) this.commandCounter = 3;
+    if (this.player.isBleeding && this.commandCounter > 3){
+      this.commandCounter = 3;
+      this.commandText.setText(this.commandCounter.toString());
+    } 
+
   }
 
   create() {
