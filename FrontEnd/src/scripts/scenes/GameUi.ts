@@ -35,6 +35,8 @@ export default class GameUI extends Phaser.Scene {
   arrowRight: Phaser.GameObjects.Sprite
   commandUp: Phaser.GameObjects.Sprite
   commandDown: Phaser.GameObjects.Sprite
+  brokenBone: Phaser.GameObjects.Sprite
+  bleeding: Phaser.GameObjects.Sprite
   commandLabel: Phaser.GameObjects.Text
   commandText: Phaser.GameObjects.Text
   commandCounter: number
@@ -54,6 +56,8 @@ export default class GameUI extends Phaser.Scene {
     this.load.spritesheet('arrowright', '../../assets/arrow_right.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 })
     this.load.spritesheet('gun-switch', '../../assets/GunSwitch.png', { frameWidth: 130, frameHeight: 130 })
+    this.load.spritesheet('broken_bone', '../../assets/broken_bone.png', { frameWidth: 128, frameHeight: 128 })
+    this.load.spritesheet('bleeding', '../../assets/bleeding.png', { frameWidth: 128, frameHeight: 128 })
   }
   init(data) {
     this.commandCounter = 1
@@ -63,6 +67,20 @@ export default class GameUI extends Phaser.Scene {
   }
 
   update() {
+    if (this.player.isCrippled && this.baseSprite.visible) 
+    {
+      this.brokenBone.setVisible(true)
+    }
+    else {
+      this.brokenBone.setVisible(false)
+    }
+    if (this.player.isBleeding && this.baseSprite.visible) 
+    {
+      this.bleeding.setVisible(true)
+    }
+    else {
+      this.bleeding.setVisible(false)
+    }
     if (this.player.isBleeding && this.commandCounter > 3) this.commandCounter = 3;
   }
 
@@ -218,6 +236,22 @@ export default class GameUI extends Phaser.Scene {
       this.switchWeaponBtn.clearTint()
     })
 
+    //Broken bone status
+    this.brokenBone = this.add.sprite(0, 0, 'broken_bone')
+    this.brokenBone.displayHeight = 40
+    this.brokenBone.displayWidth = 40
+    this.brokenBone.setOrigin(1, 0)
+    this.brokenBone.setPosition(780, 160)
+    this.brokenBone.setVisible(false)
+
+    //Bleeding  status
+    this.bleeding = this.add.sprite(0, 0, 'bleeding')
+    this.bleeding.displayHeight = 40
+    this.bleeding.displayWidth = 40
+    this.bleeding.setOrigin(1, 0)
+    this.bleeding.setPosition(780, 115)
+    this.bleeding.setVisible(false)
+
     // CONTROLS
 
     this.arrowUp = this.add.sprite(0, 0, 'arrowup')
@@ -354,6 +388,8 @@ export default class GameUI extends Phaser.Scene {
     this.MenuGroup.add(this.commandDown)
     this.MenuGroup.add(this.commandLabel)
     this.MenuGroup.add(this.commandText)
+    this.MenuGroup.add(this.brokenBone)
+    this.MenuGroup.add(this.bleeding)
 
     var i = 0
     this.playerList.forEach(playerInList => {
