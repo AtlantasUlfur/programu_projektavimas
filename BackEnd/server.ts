@@ -236,7 +236,7 @@ io.on("connection", function (socket: Socket) {
 
   socket.on("changeGun", function(payload) {
     console.log("changeGun")
-    socket.broadcast.emit("gunChange", {socketid: socket.id})
+    socket.broadcast.emit("gunChange", socket.id)
   })
   socket.on("endTurn", function () {
     console.log("End Turn");

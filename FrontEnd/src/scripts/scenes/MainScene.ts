@@ -10,10 +10,13 @@ import { GunCreator } from '../utils/GunCreator'
 import { IRifle } from '../Interfaces/Guns/IRifle'
 import { IPistol } from '../Interfaces/Guns/IPistol'
 import MapBuilder from '../utils/MapBuilder'
+import MathAdapter from '../utils/Adapter/MathAdapter'
+
 
 export default class MainScene extends Phaser.Scene {
   //Utils
   private socketInstance: SocketController
+
   //Init Data
   private mapData
   private currentPlayerData: PlayerServer
@@ -27,7 +30,7 @@ export default class MainScene extends Phaser.Scene {
   public playersTurnId: string = ''
   private allGuns: IGun[]
   public theme: string
-
+  public mathAdapter : MathAdapter = new MathAdapter()
   constructor() {
     super('MainScene')
   }
@@ -405,10 +408,10 @@ export default class MainScene extends Phaser.Scene {
   private findDistanceToPlayer(targetId: string): number {
     var target = this.findPlayerById(targetId)
     if (target == null) return -1
-
+    
     //Euclidean distance
-    var deltaX = Math.abs(this.player.tilePos.x - target?.tilePos.x)
-    var deltaY = Math.abs(this.player.tilePos.y - target?.tilePos.y)
-    return Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY)) // <- Distance
+    return this.mathAdapter.calculateEuclidean(this.player.tilePos, target.tilePos) // <- Distance
   }
 }
+
+
