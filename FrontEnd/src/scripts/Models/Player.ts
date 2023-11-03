@@ -5,14 +5,17 @@ import { IRifle } from '../Interfaces/Guns/IRifle'
 import { IGrenadeLauncher } from '../Interfaces/Guns/IGrenadeLauncher'
 import { IPistol } from '../Interfaces/Guns/IPistol'
 import _ from 'lodash'
+import { IGunOwnerAbstraction } from '../Interfaces/BridgeAbstraction/IGunOwnerAbstraction'
 
-export class Player extends Phaser.GameObjects.Sprite {
+export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstraction{
   public id: string
   public playerName: Phaser.GameObjects.Text
   public currentHealth: integer
   public tilePos: Phaser.Math.Vector2
   public attackPower: number = 0
   public selectedGun: IGun
+  public isBleeding?: boolean;
+  public isCrippled?: boolean;
 
   public mainGun: IRifle | IGrenadeLauncher
   public secondaryGun: IPistol

@@ -1,6 +1,7 @@
 import { IRifle } from '../../Interfaces/Guns/IRifle'
 import { Player } from '../Player'
 import { IGunDamageStrategy } from '../../utils/Strategy/GunStrategy'
+import { Bullet } from '../Bullet'
 
 export class Rifle implements IRifle {
   gunFrame: number
@@ -10,6 +11,7 @@ export class Rifle implements IRifle {
   distance: number
   price: number
   damageStrategy: IGunDamageStrategy
+  bullet : Bullet
 
   private _maxAmmo: number
 
@@ -44,7 +46,7 @@ export class Rifle implements IRifle {
     createGunImage(scene: Phaser.Scene) {
         throw new Error("Method not implemented.");
     }
-    clone(){
+    deepCopy(){
       const clonedGun = new Rifle({
         gunFrame: this.gunFrame,
         ammo: this.ammo,
@@ -56,5 +58,7 @@ export class Rifle implements IRifle {
       });
       return clonedGun;
     }
-
+    shallowCopy(){
+      return Object.assign({}, this);
+  }
 }
