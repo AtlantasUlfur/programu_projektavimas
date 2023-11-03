@@ -13,7 +13,7 @@ import MapBuilder from '../utils/Builder/MapBuilder'
 import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
 import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
-
+import { Turret } from '../Models/Turret'
 
 export default class MainScene extends Phaser.Scene {
   //Utils
@@ -32,6 +32,10 @@ export default class MainScene extends Phaser.Scene {
   public playersTurnId: string = ''
   private allGuns: IGun[]
   public theme: string
+
+  private turretCount = 1;
+  private turretPositions: Array<{x: integer, y: integer}> = [];
+  private turrets: Array<Turret> = [];
   public mathAdapter : MathAdapter = new MathAdapter()
   constructor() {
     super('MainScene')
@@ -74,6 +78,11 @@ export default class MainScene extends Phaser.Scene {
     data.payload.map.tileMap.forEach(tile => {
       switch (tile.entity?.id) {
         case 'wall':
+          if(this.turretCount > 0)
+          {
+            this.turretCount -= 1;
+            this.turretPositions.push({x: tile.x as integer, y: tile.y as integer})
+          }
           switch (this.theme) {
             case 'cloud_background':
               this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL
@@ -126,7 +135,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    //Load textures
+    this.load.spritesheet('turret', '../../assets/turret.png', {
+       frameWidth: 254, frameHeight: 254
+    });
+    //Load texturesW
     this.load.spritesheet('player', '../../assets/characters.png', {
       frameWidth: 26,
       frameHeight: 36
@@ -163,6 +175,16 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     const scene = this
+
+    this.turretPositions.forEach(turretPosition => {
+      console.log(`adding turret at ${turretPosition.x}:${turretPosition.y}`)
+      var turret = new Turret(scene, 'turret', 0.125);
+      turret.setDepth(100)
+      turret.setPos(new Phaser.Math.Vector2(turretPosition.x, turretPosition.y));
+      this.add.existing(turret)
+      this.turrets.push(turret)
+    })
+
     const sceneManager = new SceneManagerFacade(this.scene)
     this.socketInstance = SocketController.getInstance()
 
