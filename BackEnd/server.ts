@@ -33,29 +33,21 @@ const getDefaultTileMap: () => Tile[] = () => {
         a === MAP_DIMENSIONS - 1
       ) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else if (i === 5 && a > 4 && a < 11) {
+      } else if (i === 5 && a > 4 && a < 11) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else if (i === 6 && a > 16 && a < 20) {
+      } else if (i === 6 && a > 16 && a < 20) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else if (i === 12 && a > 14 && a < 16) {
+      } else if (i === 12 && a > 14 && a < 16) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else if (a === 10 && i > 16 && i < 20) {
+      } else if (a === 10 && i > 16 && i < 20) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else if (a === 7 && i > 14 && i < 20) {
+      } else if (a === 7 && i > 14 && i < 20) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else if (a === 16 && i > 7 && i < 11) {
+      } else if (a === 16 && i > 7 && i < 11) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else if (a === 16 && i > 16 && i < 20) {
+      } else if (a === 16 && i > 16 && i < 20) {
         entity = { id: "wall", x: i, y: a };
-      }
-      else {
+      } else {
         entity = { id: "ground", x: i, y: a };
       }
       tileMap.push({ x: i, y: a, entity });
@@ -75,21 +67,25 @@ io.on("connection", function (socket: Socket) {
 
   socket.on("disconnect", function () {
     console.log("user disconnected");
-    // remove this player from our players object
-    const removedPlayer: Player[] = _.remove(
-      players,
-      (player: Player) => player.socketId === socket.id
-    );
-    _.remove(sockets, (scoket: Socket) => scoket.id === socket.id);
+    try {
+      // remove this player from our players object
+      const removedPlayer: Player[] = _.remove(
+        players,
+        (player: Player) => player.socketId === socket.id
+      );
+      _.remove(sockets, (scoket: Socket) => scoket.id === socket.id);
 
-    _.remove(sessions, (session: Session) => {
-      if (session.id === removedPlayer[0].sessionId) {
-        const sessionPlayers = getSessionPlayers(session.id);
-        if (sessionPlayers.length == 0) {
-          return true;
+      _.remove(sessions, (session: Session) => {
+        if (session.id === removedPlayer[0].sessionId) {
+          const sessionPlayers = getSessionPlayers(session.id);
+          if (sessionPlayers.length == 0) {
+            return true;
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   socket.on("createLobby", function (payload) {
@@ -227,17 +223,17 @@ io.on("connection", function (socket: Socket) {
         player,
         sessionPlayers,
         playersTurnId: firstPlayer?.socketId,
-        theme
+        theme,
       });
 
       moveOrder = moveOrder + 1;
     });
   });
 
-  socket.on("changeGun", function(payload) {
-    console.log("changeGun")
-    socket.broadcast.emit("gunChange", socket.id)
-  })
+  socket.on("changeGun", function (payload) {
+    console.log("changeGun");
+    socket.broadcast.emit("gunChange", socket.id);
+  });
   socket.on("endTurn", function () {
     console.log("End Turn");
 
@@ -267,8 +263,8 @@ io.on("connection", function (socket: Socket) {
         (player: Player) => player.moveOrder
       );
       nextPlayer = sessionPlayersSorted[0];
-    };
-    
+    }
+
     player.isTurn = false;
     nextPlayer.isTurn = true;
 
@@ -302,8 +298,7 @@ io.on("connection", function (socket: Socket) {
     console.log("DMG", damage);
     console.log(targetId);
 
-    if(damage != 0)
-    {
+    if (damage != 0) {
       const player = getPlayerBySocketId(targetId);
       console.log("BEFORE HP", player.currentHP);
       player.currentHP =
