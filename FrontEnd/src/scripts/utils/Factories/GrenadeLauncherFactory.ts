@@ -3,6 +3,7 @@ import { IGrenadeLauncher } from '../../Interfaces/Guns/IGrenadeLauncher'
 import { IGun } from '../../Interfaces/Guns/IGun'
 import { GrenadeLauncher } from '../../Models/Guns/GrenadeLauncher'
 import { ShortRangeGunStrategy, MediumRangeGunStrategy, LongRangeGunStrategy } from '../Strategy/GunStrategy'
+import { Bullet } from '../../Models/Bullet'
 
 export class GrenadeLauncherFactory implements IAbstractGunFactory {
   CreateWeakGun(): IGrenadeLauncher {
@@ -13,7 +14,8 @@ export class GrenadeLauncherFactory implements IAbstractGunFactory {
       damage: 15,
       distance: 2,
       price: 100,
-      damageStrategy: new ShortRangeGunStrategy()
+      damageStrategy: new ShortRangeGunStrategy(),
+      bullet: new Bullet(1)
     })
   }
 
@@ -25,7 +27,8 @@ export class GrenadeLauncherFactory implements IAbstractGunFactory {
       damage: 20,
       distance: 3,
       price: 200,
-      damageStrategy: new MediumRangeGunStrategy()
+      damageStrategy: new MediumRangeGunStrategy(),
+      bullet: new Bullet(5)
     })
   }
 
@@ -37,7 +40,8 @@ export class GrenadeLauncherFactory implements IAbstractGunFactory {
       damage: 25,
       distance: 3,
       price: 300,
-      damageStrategy: new LongRangeGunStrategy()
+      damageStrategy: new LongRangeGunStrategy(),
+      bullet: new Bullet(10)
     })
   }
 }

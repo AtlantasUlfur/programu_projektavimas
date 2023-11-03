@@ -23,6 +23,7 @@ export class GrenadeLauncher implements IGrenadeLauncher {
     distance: number
     price: number
     damageStrategy: IGunDamageStrategy
+    bullet: Bullet
   }) {
     this.gunFrame = grenadeLauncher.gunFrame
     this.ammo = grenadeLauncher.ammo
@@ -32,6 +33,7 @@ export class GrenadeLauncher implements IGrenadeLauncher {
     this.distance = grenadeLauncher.distance
     this.price = grenadeLauncher.price
     this.damageStrategy = grenadeLauncher.damageStrategy
+    this.bullet = grenadeLauncher.bullet
   }
   setDamageStrategy(damageStrategy: IGunDamageStrategy) {
     this.damageStrategy = damageStrategy
@@ -54,7 +56,8 @@ export class GrenadeLauncher implements IGrenadeLauncher {
       damage: this.damage,
       distance: this.distance,
       price: this.price,
-      damageStrategy: this.damageStrategy
+      damageStrategy: this.damageStrategy,
+      bullet: new Bullet(this.bullet.dmg)
     });
     return clonedGun;
   }

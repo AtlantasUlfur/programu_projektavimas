@@ -23,6 +23,7 @@ export class Rifle implements IRifle {
     distance: number
     price: number
     damageStrategy: IGunDamageStrategy
+    bullet: Bullet
   }) {
     this.gunFrame = rifle.gunFrame
     this.ammo = rifle.ammo
@@ -32,6 +33,7 @@ export class Rifle implements IRifle {
     this.distance = rifle.distance
     this.price = rifle.price
     this.damageStrategy = rifle.damageStrategy
+    this.bullet = rifle.bullet
   }
   setDamageStrategy(damageStrategy: IGunDamageStrategy) {
     this.damageStrategy = damageStrategy
@@ -54,7 +56,8 @@ export class Rifle implements IRifle {
         distance: this.distance,
         fireRate: this.fireRate,
         price: this.price,
-        damageStrategy: this.damageStrategy
+        damageStrategy: this.damageStrategy,
+        bullet: new Bullet(this.bullet.dmg)
       });
       return clonedGun;
     }

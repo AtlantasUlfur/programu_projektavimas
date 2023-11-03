@@ -2,6 +2,7 @@ import { IAbstractGunFactory } from '../AbstractFactories/IAbstractGunFactory'
 import { IRifle } from '../../Interfaces/Guns/IRifle'
 import { Rifle } from '../../Models/Guns/Rifle'
 import { ShortRangeGunStrategy, MediumRangeGunStrategy, LongRangeGunStrategy } from '../Strategy/GunStrategy'
+import { Bullet } from '../../Models/Bullet'
 
 export class RifleFactory implements IAbstractGunFactory {
   CreateWeakGun(): IRifle {
@@ -12,7 +13,8 @@ export class RifleFactory implements IAbstractGunFactory {
       fireRate: 2,
       distance: 4,
       price: 150,
-      damageStrategy: new ShortRangeGunStrategy()
+      damageStrategy: new ShortRangeGunStrategy(),
+      bullet: new Bullet(1)
     })
   }
   CreateMiddleTierGun(): IRifle {
@@ -23,7 +25,8 @@ export class RifleFactory implements IAbstractGunFactory {
       fireRate: 2,
       distance: 5,
       price: 300,
-      damageStrategy: new MediumRangeGunStrategy()
+      damageStrategy: new MediumRangeGunStrategy(),
+      bullet: new Bullet(5)
     })
   }
   CreateHighTierGun(): IRifle {
@@ -34,7 +37,8 @@ export class RifleFactory implements IAbstractGunFactory {
       fireRate: 3,
       distance: 6,
       price: 350,
-      damageStrategy: new LongRangeGunStrategy()
+      damageStrategy: new LongRangeGunStrategy(),
+      bullet: new Bullet(10)
     })
   }
 }

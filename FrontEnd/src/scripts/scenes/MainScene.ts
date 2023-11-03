@@ -191,16 +191,7 @@ export default class MainScene extends Phaser.Scene {
     deepPistol.bullet.dmg = 444
     console.log("pistol", pistol)
     console.log("deepPistol", deepPistol)
-    // console.log(pistol === shallowPistol); // false, different objects
-    // console.log(pistol.damageStrategy === shallowPistol.damageStrategy); // true, references to nested objects, change in shallow copy will reflect in original object
 
-    // console.log(pistol === deepPistol); // false
-    // console.log(pistol.damageStrategy === deepPistol.damageStrategy); // false, changes in the deep copy won't affect the original object
-
-  
-
-
-  
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
       if (playerData.x == scene.currentPlayerData.x && playerData.y == scene.currentPlayerData.y) {
@@ -425,6 +416,7 @@ export default class MainScene extends Phaser.Scene {
   }
   handleDamage(targetId: string) {
     if (this.playersTurnId == this.player.id && !this.player.isDead()) {
+      console.log("player shoot", this.player)
       var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId))
       this.socketInstance.damagePlayer(damage, targetId)
       this.socketInstance.endTurn()
