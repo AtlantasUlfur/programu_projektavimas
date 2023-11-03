@@ -228,7 +228,7 @@ export default class MainScene extends Phaser.Scene {
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
         builder.setSecondaryGun(pistol.deepCopy());
-        builder.setMainGun(rifle.shallowCopy() as IRifle);
+        builder.setMainGun(rifle.deepCopy() as IRifle);
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -245,7 +245,7 @@ export default class MainScene extends Phaser.Scene {
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);
         builder.setSecondaryGun(pistol.deepCopy());
-        builder.setMainGun(rifle.shallowCopy() as IRifle);
+        builder.setMainGun(rifle.deepCopy() as IRifle);
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
