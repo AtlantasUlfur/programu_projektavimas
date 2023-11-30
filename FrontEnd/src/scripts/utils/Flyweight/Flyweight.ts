@@ -3,7 +3,7 @@ export default class flyweight {
   
     static load(key: string, type: string, path: string, options: any, scene: Phaser.Scene) {
       if (!this.assets[key]) {
-        console.log("dont have loading")
+        
         switch (type) {
           case 'image':
             this.assets[key] = scene.load.image(key, path);
