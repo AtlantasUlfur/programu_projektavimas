@@ -6,13 +6,13 @@ import { Player } from './Models/Player'
 import _ from 'lodash'
 import { PlayerChangeWeapon } from './utils/Command/Command'
 import { PlayerDecorator } from './utils/Decorator/PlayerDecorator'
-
+import { BaseScene } from './utils/Template/BaseScene'
 
 //Singleton
 export default class SocketController {
   private static _instance: SocketController | null = null
   private socket: Socket | null = null
-  private scene: MainMenuScene | MainScene
+  private scene: BaseScene | MainMenuScene | MainScene
 
   private constructor() {}
 
@@ -121,7 +121,7 @@ export default class SocketController {
     return this.socket
   }
 
-  public setScene(Scene: MainMenuScene | MainScene) {
+  public setScene(Scene: BaseScene | MainMenuScene | MainScene) {
     this.scene = Scene
   }
 

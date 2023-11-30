@@ -3,10 +3,10 @@ import Phaser from 'phaser'
 import { sceneEvents } from '../Events/EventsController'
 import { Player } from '../Models/Player'
 import { DirectionEnum } from '../Models/Enums'
-import { GunCreator } from '../utils/GunCreator'
+import { BaseScene } from '../utils/Template/BaseScene'
 import { PlayerChangeWeapon } from '../utils/Command/Command'
 
-export default class GameUI extends Phaser.Scene {
+export default class GameUI extends BaseScene {
   MenuGroup: Phaser.GameObjects.Group
   baseSprite: Phaser.GameObjects.Sprite
   expandSprite: Phaser.GameObjects.Sprite

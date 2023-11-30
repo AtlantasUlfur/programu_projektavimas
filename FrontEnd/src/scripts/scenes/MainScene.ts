@@ -14,10 +14,9 @@ import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
 import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
+import { BaseScene } from '../utils/Template/BaseScene'
 
-export default class MainScene extends Phaser.Scene {
-  //Utils
-  private socketInstance: SocketController
+export default class MainScene extends BaseScene {
 
   //Init Data
   private mapData

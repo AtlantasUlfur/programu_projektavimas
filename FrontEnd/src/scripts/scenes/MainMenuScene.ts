@@ -4,13 +4,14 @@ import { Button } from '../Models/Button'
 import { LobbiesEnum } from '../Models/Enums'
 import { SessionServer } from '../Models/ServerModels'
 import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
+import { BaseScene } from '../utils/Template/BaseScene'
 
-export class MainMenuScene extends Phaser.Scene {
+
+export class MainMenuScene extends BaseScene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   private buttons: Button[] = []
   private selectedButtonIndex = 0
   private buttonSelector!: Phaser.GameObjects.Image
-  private socketInstance: SocketController
   public playerCount: number = 0
   private checkPlayerCount: boolean = false
   private playerCountText: Phaser.GameObjects.Text
