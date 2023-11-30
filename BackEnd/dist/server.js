@@ -64,17 +64,22 @@ io.on("connection", function (socket) {
     sockets[socket.id] = socket;
     socket.on("disconnect", function () {
         console.log("user disconnected");
-        // remove this player from our players object
-        const removedPlayer = _.remove(players, (player) => player.socketId === socket.id);
-        _.remove(sockets, (scoket) => scoket.id === socket.id);
-        _.remove(sessions, (session) => {
-            if (session.id === removedPlayer[0].sessionId) {
-                const sessionPlayers = getSessionPlayers(session.id);
-                if (sessionPlayers.length == 0) {
-                    return true;
+        try {
+            // remove this player from our players object
+            const removedPlayer = _.remove(players, (player) => player.socketId === socket.id);
+            _.remove(sockets, (scoket) => scoket.id === socket.id);
+            _.remove(sessions, (session) => {
+                if (session.id === removedPlayer[0].sessionId) {
+                    const sessionPlayers = getSessionPlayers(session.id);
+                    if (sessionPlayers.length == 0) {
+                        return true;
+                    }
                 }
-            }
-        });
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
     });
     socket.on("createLobby", function (payload) {
         console.log("New lobby");
@@ -184,7 +189,7 @@ io.on("connection", function (socket) {
                 player,
                 sessionPlayers,
                 playersTurnId: firstPlayer === null || firstPlayer === void 0 ? void 0 : firstPlayer.socketId,
-                theme
+                theme,
             });
             moveOrder = moveOrder + 1;
         });
@@ -212,7 +217,6 @@ io.on("connection", function (socket) {
             const sessionPlayersSorted = _.sortBy(sessionPlayers, (player) => player.moveOrder);
             nextPlayer = sessionPlayersSorted[0];
         }
-        ;
         player.isTurn = false;
         nextPlayer.isTurn = true;
         _.forEach(sessionPlayers, function (player) {

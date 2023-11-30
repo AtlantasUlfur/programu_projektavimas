@@ -14,7 +14,7 @@ import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
 import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
-
+import Flyweight from '../utils/Flyweight/Flyweight';
 export default class MainScene extends Phaser.Scene {
   //Utils
   private socketInstance: SocketController
@@ -139,14 +139,16 @@ export default class MainScene extends Phaser.Scene {
        frameWidth: 254, frameHeight: 254
     });
     //Load texturesW
-    this.load.spritesheet('player', '../../assets/characters.png', {
+    Flyweight.load('player', 'spritesheet', '../../assets/characters.png', {
       frameWidth: 26,
       frameHeight: 36
-    })
-    this.load.spritesheet('dead', '../../assets/cloud_tileset.png', {
+    }, this);
+
+    Flyweight.load('dead', 'spritesheet', '../../assets/cloud_tileset.png', {
       frameWidth: 16,
       frameHeight: 16
-    })
+    }, this);
+
     switch (this.theme) {
       case 'cloud_background':
         this.load.image('tiles', '../../assets/cloud_tileset.png')
@@ -169,8 +171,10 @@ export default class MainScene extends Phaser.Scene {
         this.load.image('cloud_background', '../../assets/cloud_backround.png')
         break
     }
-
-    this.load.spritesheet('guns', '../../assets/guns.png', { frameWidth: 160, frameHeight: 160 })
+    Flyweight.load('guns', 'spritesheet', '../../assets/guns.png', {
+      frameWidth: 160,
+      frameHeight: 160
+    }, this);
   }
 
   create() {
