@@ -223,7 +223,7 @@ export default class MainScene extends Phaser.Scene {
         //Create current player
         builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
         builder.setFrame(texture_frames[index])
-        builder.setName(playerData.name)
+        builder.setName(playerData.name) 
         builder.setColor('#008000')
         builder.setHP(playerData.currentHP);
         builder.setSocketId(playerData.socketId);

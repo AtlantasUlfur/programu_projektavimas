@@ -11,7 +11,7 @@ export class Rifle implements IRifle {
   distance: number
   price: number
   damageStrategy: IGunDamageStrategy
-  bullet : Bullet
+  bullet: Bullet
 
   private _maxAmmo: number
 
@@ -39,29 +39,29 @@ export class Rifle implements IRifle {
     this.damageStrategy = damageStrategy
   }
 
-    shoot(distance: number) {
-        return this.damageStrategy.calculateDamage(distance, this.damage);
-    }
-    refillAmmo() {
-        this.ammo = this._maxAmmo;
-    }
-    createGunImage(scene: Phaser.Scene) {
-        throw new Error("Method not implemented.");
-    }
-    deepCopy(){
-      const clonedGun = new Rifle({
-        gunFrame: this.gunFrame,
-        ammo: this.ammo,
-        damage: this.damage,
-        distance: this.distance,
-        fireRate: this.fireRate,
-        price: this.price,
-        damageStrategy: this.damageStrategy,
-        bullet: new Bullet(this.bullet.dmg)
-      });
-      return clonedGun;
-    }
-    shallowCopy(){
-      return Object.assign({}, this);
+  shoot(distance: number) {
+    return this.damageStrategy.calculateDamage(distance, this.damage)
+  }
+  refillAmmo() {
+    this.ammo = this._maxAmmo
+  }
+  createGunImage(scene: Phaser.Scene) {
+    throw new Error('Method not implemented.')
+  }
+  deepCopy() {
+    const clonedGun = new Rifle({
+      gunFrame: this.gunFrame,
+      ammo: this.ammo,
+      damage: this.damage,
+      distance: this.distance,
+      fireRate: this.fireRate,
+      price: this.price,
+      damageStrategy: this.damageStrategy,
+      bullet: new Bullet(this.bullet.dmg)
+    })
+    return clonedGun
+  }
+  shallowCopy() {
+    return Object.assign({}, this)
   }
 }
