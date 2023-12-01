@@ -105,6 +105,24 @@ io.on("connection", function (socket: Socket) {
     socket.emit("playerCount", 1);
   });
 
+  socket.on("destroyedWall", function (payload)
+  {
+    const x = payload.x;
+    const y = payload.y;
+
+    const player = getPlayerBySocketId(socket.id);
+    const sessionId = player.sessionId;
+    const sessionPlayers = getSessionPlayers(sessionId);
+
+    _.forEach(sessionPlayers, function (playerCurrent: Player) {
+      const playerSocket = sockets[playerCurrent.socketId];
+      playerSocket.emit("destroyWall", {
+        x: x,
+        y: y
+      });
+    });
+    socket.emit("destroyWall", {x, y});
+  });
   socket.on("joinLobby", function (payload) {
     console.log("Join lobby");
     console.log(payload);

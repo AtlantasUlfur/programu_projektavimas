@@ -32,6 +32,11 @@ export default class SocketController {
         const mainMenuScene = this.scene as MainMenuScene
         mainMenuScene.playerCount = payload
       })
+      this.socket.on('destroyWall', payload => {
+        const mainScene = this.scene as MainScene
+        console.log(`destroy wall event: ${payload.x}, ${payload.y}`)
+        mainScene.map.tryDestroyTile(payload.x, payload.y);
+      })
       this.socket.on('lobbyStatus', payload => {
         const mainMenuScene = this.scene as MainMenuScene
         mainMenuScene.lobbyStatus = payload
@@ -128,7 +133,10 @@ export default class SocketController {
   public createLobby(name: string | null) {
     this.socket?.emit('createLobby', { name })
   }
-
+  public destroyWall(x: number | undefined, y:number | undefined)
+  {
+    this.socket?.emit('destroyedWall', { x, y })
+  }
   public joinLobby(name: string | null, playerName: string | null) {
     this.socket?.emit('joinLobby', { name, playerName })
   }

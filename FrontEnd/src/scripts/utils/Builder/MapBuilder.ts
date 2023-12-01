@@ -1,8 +1,10 @@
+import { Map } from '../../Models/Map';
+
 interface MapBuilderInterface {
   setBackground(mapImage: string): void
   setTileMap(mapData: any, tileWidth: number, tileHeight: number): void
   setTileSet(tileSetName: string, tileSetKey: string): void
-  build(): Phaser.Tilemaps.Tilemap
+  build(): Map
 }
 
 export default class MapBuilder implements MapBuilderInterface {
@@ -24,8 +26,8 @@ export default class MapBuilder implements MapBuilderInterface {
     this.map.createLayer(0, tiles, 0, 0)
   }
 
-  build(): Phaser.Tilemaps.Tilemap {
-    const result = this.map
-    return result
+  build(): Map {
+    //const result = this.map
+    return new Map(this.map)
   }
 }

@@ -15,7 +15,9 @@ import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
 import Flyweight from '../utils/Flyweight/Flyweight';
-import { BaseScene } from '../utils/Template/BaseScene'
+import { BaseScene } from '../utils/Template/BaseScene';
+import { Map } from '../Models/Map';
+import { Tile } from '../utils/Composite/Tile'
 
 export default class MainScene extends BaseScene {
 
@@ -24,7 +26,7 @@ export default class MainScene extends BaseScene {
   private currentPlayerData: PlayerServer
   private allPlayerData: PlayerServer[]
   //Map
-  private tileMap: Phaser.Tilemaps.Tilemap
+  public map: Map
   //Players
   public playerList: Player[] = []
   public alivePlayerCount: number = 0
@@ -196,8 +198,9 @@ export default class MainScene extends BaseScene {
     mapBuilder.setBackground(this.theme)
     mapBuilder.setTileMap(this.mapData, 16, 16)
     mapBuilder.setTileSet('tile-set', 'tiles')
-    this.tileMap = mapBuilder.build()
+    this.map = mapBuilder.build()
 
+    console.log(this.map)
     //Create all players
     this.allPlayerData = this.allPlayerData.sort((a, b) => {
       return a.socketId.localeCompare(b.socketId)
@@ -298,17 +301,26 @@ export default class MainScene extends BaseScene {
   handleMovement(direction: DirectionEnum, commandCounter: number) {
     if (this.playersTurnId == this.player.id && !this.player.isDead()) {
       var distance = 0
+      var destroyWall: boolean = false;
+      var wallX: number | undefined = undefined;
+      var wallY: number | undefined = undefined;
       switch (direction) {
         case DirectionEnum.UP:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x,
             this.player.tilePos.y - commandCounter,
             DirectionEnum.UP
           )
+          console.log(distance);
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - distance)
             this.player.move(DirectionEnum.UP, distance)
             if (this.player.isBleeding) {
@@ -318,15 +330,20 @@ export default class MainScene extends BaseScene {
           }
           break
         case DirectionEnum.DOWN:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x,
             this.player.tilePos.y + commandCounter,
             DirectionEnum.DOWN
           )
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + distance)
             this.player.move(DirectionEnum.DOWN, distance)
             if (this.player.isBleeding) {
@@ -336,15 +353,20 @@ export default class MainScene extends BaseScene {
           }
           break
         case DirectionEnum.LEFT:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x - commandCounter,
             this.player.tilePos.y,
             DirectionEnum.LEFT
           )
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x - distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.LEFT, distance)
             if (this.player.isBleeding) {
@@ -354,15 +376,20 @@ export default class MainScene extends BaseScene {
           }
           break
         case DirectionEnum.RIGHT:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x + commandCounter,
             this.player.tilePos.y,
             DirectionEnum.RIGHT
           )
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x + distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.RIGHT, distance)
             if (this.player.isBleeding) {
@@ -385,7 +412,7 @@ export default class MainScene extends BaseScene {
     toX: number,
     toY: number,
     direction: DirectionEnum
-  ) {
+  ) : [number, boolean, number?, number?] {
     let distance = 0
     switch (direction) {
       case DirectionEnum.UP:
@@ -394,39 +421,52 @@ export default class MainScene extends BaseScene {
         for (let i = 0; i < distance; i++) {
           travelingY--
           let tile = tileMap.getTileAt(toX, travelingY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, toX, travelingY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
+
       case DirectionEnum.DOWN:
         distance = toY - player.tilePos.y
         var travelingY = player.tilePos.y
         for (let i = 0; i < distance; i++) {
           travelingY++
           let tile = tileMap.getTileAt(toX, travelingY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, toX, travelingY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
       case DirectionEnum.LEFT:
         distance = player.tilePos.x - toX
         var travelingX = player.tilePos.x
         for (let i = 0; i < distance; i++) {
           travelingX--
           let tile = tileMap.getTileAt(travelingX, toY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, travelingX, toY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
       case DirectionEnum.RIGHT:
         distance = toX - player.tilePos.x
         var travelingX = player.tilePos.x
         for (let i = 0; i < distance; i++) {
           travelingX++
           let tile = tileMap.getTileAt(travelingX, toY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, travelingX, toY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
       default:
         console.log('Somethings wrong...')
-        return distance
+        return [distance, false, undefined, undefined]
     }
   }
 
@@ -435,7 +475,7 @@ export default class MainScene extends BaseScene {
     var result = true
     scene.playerList.forEach(playerElem => {
       if (playerElem.id != scene.player.id) {
-        var playerTile = scene.tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y)
+        var playerTile = scene.map.tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y)
         if (playerTile.x == toTile.x && playerTile.y == toTile.y) result = false
       }
     })
