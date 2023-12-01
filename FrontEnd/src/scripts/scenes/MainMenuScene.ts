@@ -16,7 +16,7 @@ export class MainMenuScene extends BaseScene {
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   public buttons: Button[] = []
   private selectedButtonIndex = 0
-  private buttonSelector!: Phaser.GameObjects.Image
+  public buttonSelector!: Phaser.GameObjects.Image
   public playerCount: number = 0
   private checkPlayerCount: boolean = false
   public playerCountText: Phaser.GameObjects.Text

@@ -14,13 +14,13 @@ import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
 import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
-import Flyweight from '../utils/Flyweight/Flyweight';
+import Flyweight from '../utils/Flyweight/Flyweight'
 import { BaseScene } from '../utils/Template/BaseScene';
 import { Map } from '../Models/Map';
 import { Tile } from '../utils/Composite/Tile'
+import { GroundTileHandler, PlayerTileHandler, TileHandler, WallTileHandler } from '../utils/Chain/Handler'
 
 export default class MainScene extends BaseScene {
-
   //Init Data
   private mapData
   private currentPlayerData: PlayerServer
@@ -35,12 +35,20 @@ export default class MainScene extends BaseScene {
   private allGuns: IGun[]
   public theme: string
 
-  private turretCount = 1;
-  private turretPositions: Array<{x: integer, y: integer}> = [];
-  private turrets: Array<Turret> = [];
-  public mathAdapter : MathAdapter = new MathAdapter()
+  private turretCount = 1
+  private turretPositions: Array<{ x: integer; y: integer }> = []
+  private turrets: Array<Turret> = []
+  public mathAdapter: MathAdapter = new MathAdapter()
+  private tileHandler: TileHandler;
   constructor() {
-    super('MainScene')
+    super('MainScene');
+
+    const wallTileHandler = new WallTileHandler();
+    const groundTileHandler = new GroundTileHandler();
+    const playerTileHandler = new PlayerTileHandler();
+
+    wallTileHandler.setNext(groundTileHandler).setNext(playerTileHandler);
+    this.tileHandler = wallTileHandler;
   }
 
   init(data) {
@@ -78,78 +86,41 @@ export default class MainScene extends BaseScene {
     ]
 
     data.payload.map.tileMap.forEach(tile => {
-      switch (tile.entity?.id) {
-        case 'wall':
-          if(this.turretCount > 0)
-          {
-            this.turretCount -= 1;
-            this.turretPositions.push({x: tile.x as integer, y: tile.y as integer})
-          }
-          switch (this.theme) {
-            case 'cloud_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL
-              break
-            case 'hell_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_HELL
-              break
-            case 'city_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_CITY
-              break
-            case 'jungle_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_JUNGLE
-              break
-          }
-          break
-        case 'ground':
-          switch (this.theme) {
-            case 'cloud_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
-              break
-            case 'hell_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
-              break
-            case 'city_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
-              break
-            case 'jungle_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
-              break
-          }
-          break
-        case 'player':
-          switch (this.theme) {
-            case 'cloud_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
-              break
-            case 'hell_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
-              break
-            case 'city_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
-              break
-            case 'jungle_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
-              break
-          }
-          break
+      this.mapData[tile.y as integer][tile.x as integer] = this.tileHandler.handle(tile.entity.id, this.theme);
+      if (this.turretCount > 0 && tile.entity.id === 'wall') {
+        this.turretCount -= 1
+        this.turretPositions.push({ x: tile.x as integer, y: tile.y as integer })
       }
     })
   }
 
   preload() {
     this.load.spritesheet('turret', '../../assets/turret.png', {
-       frameWidth: 254, frameHeight: 254
-    });
+      frameWidth: 254,
+      frameHeight: 254
+    })
     //Load texturesW
-    Flyweight.load('player', 'spritesheet', '../../assets/characters.png', {
-      frameWidth: 26,
-      frameHeight: 36
-    }, this);
+    Flyweight.load(
+      'player',
+      'spritesheet',
+      '../../assets/characters.png',
+      {
+        frameWidth: 26,
+        frameHeight: 36
+      },
+      this
+    )
 
-    Flyweight.load('dead', 'spritesheet', '../../assets/cloud_tileset.png', {
-      frameWidth: 16,
-      frameHeight: 16
-    }, this);
+    Flyweight.load(
+      'dead',
+      'spritesheet',
+      '../../assets/cloud_tileset.png',
+      {
+        frameWidth: 16,
+        frameHeight: 16
+      },
+      this
+    )
 
     switch (this.theme) {
       case 'cloud_background':
@@ -173,10 +144,16 @@ export default class MainScene extends BaseScene {
         this.load.image('cloud_background', '../../assets/cloud_backround.png')
         break
     }
-    Flyweight.load('guns', 'spritesheet', '../../assets/guns.png', {
-      frameWidth: 160,
-      frameHeight: 160
-    }, this);
+    Flyweight.load(
+      'guns',
+      'spritesheet',
+      '../../assets/guns.png',
+      {
+        frameWidth: 160,
+        frameHeight: 160
+      },
+      this
+    )
   }
 
   create() {
@@ -184,9 +161,9 @@ export default class MainScene extends BaseScene {
 
     this.turretPositions.forEach(turretPosition => {
       console.log(`adding turret at ${turretPosition.x}:${turretPosition.y}`)
-      var turret = new Turret(scene, 'turret', 0.125);
+      var turret = new Turret(scene, 'turret', 0.125)
       turret.setDepth(100)
-      turret.setPos(new Phaser.Math.Vector2(turretPosition.x, turretPosition.y));
+      turret.setPos(new Phaser.Math.Vector2(turretPosition.x, turretPosition.y))
       this.add.existing(turret)
       this.turrets.push(turret)
     })
@@ -209,20 +186,20 @@ export default class MainScene extends BaseScene {
     var pistol = this.allGuns[0] as IPistol
     var rifle = this.allGuns[4] as IRifle
     var deepPistol = pistol.deepCopy()
-    var shallowPistol = pistol.shallowCopy() as IPistol;
-    console.log("original pistol", pistol)
-    console.log("shallowPistol", shallowPistol)
-    console.log("changed shallow copy bullet object")
-    shallowPistol.bullet.dmg = 123;
-    console.log("----------")
-    console.log("original pistol", pistol)
-    console.log("shallowPistol", shallowPistol)
-    console.log("original pistol", pistol)
-    console.log("deepPistol", deepPistol)
-    console.log("changed deep copy pistol bullet damage")
+    var shallowPistol = pistol.shallowCopy() as IPistol
+    console.log('original pistol', pistol)
+    console.log('shallowPistol', shallowPistol)
+    console.log('changed shallow copy bullet object')
+    shallowPistol.bullet.dmg = 123
+    console.log('----------')
+    console.log('original pistol', pistol)
+    console.log('shallowPistol', shallowPistol)
+    console.log('original pistol', pistol)
+    console.log('deepPistol', deepPistol)
+    console.log('changed deep copy pistol bullet damage')
     deepPistol.bullet.dmg = 444
-    console.log("pistol", pistol)
-    console.log("deepPistol", deepPistol)
+    console.log('pistol', pistol)
+    console.log('deepPistol', deepPistol)
 
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
@@ -230,12 +207,12 @@ export default class MainScene extends BaseScene {
         //Create current player
         builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
         builder.setFrame(texture_frames[index])
-        builder.setName(playerData.name) 
+        builder.setName(playerData.name)
         builder.setColor('#008000')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.deepCopy());
-        builder.setMainGun(rifle.deepCopy() as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(pistol.deepCopy())
+        builder.setMainGun(rifle.deepCopy() as IRifle)
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -249,10 +226,10 @@ export default class MainScene extends BaseScene {
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('red')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.deepCopy());
-        builder.setMainGun(rifle.deepCopy() as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(pistol.deepCopy())
+        builder.setMainGun(rifle.deepCopy() as IRifle)
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
@@ -497,7 +474,7 @@ export default class MainScene extends BaseScene {
   }
   handleDamage(targetId: string) {
     if (this.playersTurnId == this.player.id && !this.player.isDead()) {
-      console.log("player shoot", this.player)
+      console.log('player shoot', this.player)
       var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId))
       this.socketInstance.damagePlayer(damage, targetId)
       this.socketInstance.endTurn()
@@ -506,10 +483,8 @@ export default class MainScene extends BaseScene {
   private findDistanceToPlayer(targetId: string): number {
     var target = this.findPlayerById(targetId)
     if (target == null) return -1
-    
+
     //Euclidean distance
     return this.mathAdapter.calculateEuclidean(this.player.tilePos, target.tilePos) // <- Distance
   }
 }
-
-
