@@ -2,6 +2,7 @@ import { IGrenadeLauncher } from '../../Interfaces/Guns/IGrenadeLauncher'
 import { IGun } from '../../Interfaces/Guns/IGun'
 import { IPistol } from '../../Interfaces/Guns/IPistol'
 import { IRifle } from '../../Interfaces/Guns/IRifle'
+import { IItem } from '../../Interfaces/IItem'
 import { SizeEnum } from '../../Models/Enums'
 import { Player } from '../../Models/Player'
 
@@ -83,6 +84,12 @@ export default class PlayerBuilder implements PlayerBuilderInterface {
 
   setSecondaryGun(gun: IPistol) {
     this.player.secondaryGun = gun
+  }
+
+  setItems(items: Array<IItem>) {
+    items.forEach(item => {
+      this.player.addItem(item);
+    });
   }
 
   build(): Player {

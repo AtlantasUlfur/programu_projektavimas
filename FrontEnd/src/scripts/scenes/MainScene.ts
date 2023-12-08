@@ -14,18 +14,23 @@ import { SceneManagerFacade } from '../utils/Facade/SceneManagerFacade'
 import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
-import Flyweight from '../utils/Flyweight/Flyweight';
-export default class MainScene extends Phaser.Scene {
-  //Utils
-  private socketInstance: SocketController
+import Flyweight from '../utils/Flyweight/Flyweight'
+import { Map } from '../Models/Map';
+import { Tile } from '../utils/Composite/Tile'
+import { GroundTileHandler, PlayerTileHandler, TileHandler, WallTileHandler } from '../utils/Chain/Handler'
+import { IItem } from '../Interfaces/IItem'
+import { HealthItem } from '../Models/Items'
+import { HealthEffect } from '../utils/Template/ConcreteEffects'
+import { BoostedItemVisitor, ItemVisitor, SuperBoostedItemVisitor } from '../utils/Visitor/Visitor'
 
+export default class MainScene extends Phaser.Scene {
   //Init Data
   private mapData
   private currentPlayerData: PlayerServer
   private allPlayerData: PlayerServer[]
   private flyweight_: Flyweight = new Flyweight();
   //Map
-  private tileMap: Phaser.Tilemaps.Tilemap
+  public map: Map
   //Players
   public playerList: Player[] = []
   public alivePlayerCount: number = 0
@@ -33,13 +38,21 @@ export default class MainScene extends Phaser.Scene {
   public playersTurnId: string = ''
   private allGuns: IGun[]
   public theme: string
-
-  private turretCount = 1;
-  private turretPositions: Array<{x: integer, y: integer}> = [];
-  private turrets: Array<Turret> = [];
-  public mathAdapter : MathAdapter = new MathAdapter()
+  public socketInstance: SocketController
+  private turretCount = 1
+  private turretPositions: Array<{ x: integer; y: integer }> = []
+  private turrets: Array<Turret> = []
+  public mathAdapter: MathAdapter = new MathAdapter()
+  private tileHandler: TileHandler;
   constructor() {
-    super('MainScene')
+    super('MainScene');
+
+    const wallTileHandler = new WallTileHandler();
+    const groundTileHandler = new GroundTileHandler();
+    const playerTileHandler = new PlayerTileHandler();
+
+    wallTileHandler.setNext(groundTileHandler).setNext(playerTileHandler);
+    this.tileHandler = wallTileHandler;
   }
 
   init(data) {
@@ -77,68 +90,19 @@ export default class MainScene extends Phaser.Scene {
     ]
 
     data.payload.map.tileMap.forEach(tile => {
-      switch (tile.entity?.id) {
-        case 'wall':
-          if(this.turretCount > 0)
-          {
-            this.turretCount -= 1;
-            this.turretPositions.push({x: tile.x as integer, y: tile.y as integer})
-          }
-          switch (this.theme) {
-            case 'cloud_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL
-              break
-            case 'hell_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_HELL
-              break
-            case 'city_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_CITY
-              break
-            case 'jungle_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.WALL_JUNGLE
-              break
-          }
-          break
-        case 'ground':
-          switch (this.theme) {
-            case 'cloud_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
-              break
-            case 'hell_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
-              break
-            case 'city_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
-              break
-            case 'jungle_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
-              break
-          }
-          break
-        case 'player':
-          switch (this.theme) {
-            case 'cloud_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND
-              break
-            case 'hell_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_HELL
-              break
-            case 'city_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_CITY
-              break
-            case 'jungle_background':
-              this.mapData[tile.y as integer][tile.x as integer] = TileTypeEnum.GROUND_JUNGLE
-              break
-          }
-          break
+      this.mapData[tile.y as integer][tile.x as integer] = this.tileHandler.handle(tile.entity.id, this.theme);
+      if (this.turretCount > 0 && tile.entity.id === 'wall') {
+        this.turretCount -= 1
+        this.turretPositions.push({ x: tile.x as integer, y: tile.y as integer })
       }
     })
   }
 
   preload() {
     this.load.spritesheet('turret', '../../assets/turret.png', {
-       frameWidth: 254, frameHeight: 254
-    });
+      frameWidth: 254,
+      frameHeight: 254
+    })
     //Load texturesW
     this.flyweight_.load('player', 'spritesheet', '../../assets/characters.png', {
       frameWidth: 26,
@@ -183,9 +147,9 @@ export default class MainScene extends Phaser.Scene {
 
     this.turretPositions.forEach(turretPosition => {
       console.log(`adding turret at ${turretPosition.x}:${turretPosition.y}`)
-      var turret = new Turret(scene, 'turret', 0.125);
+      var turret = new Turret(scene, 'turret', 0.125)
       turret.setDepth(100)
-      turret.setPos(new Phaser.Math.Vector2(turretPosition.x, turretPosition.y));
+      turret.setPos(new Phaser.Math.Vector2(turretPosition.x, turretPosition.y))
       this.add.existing(turret)
       this.turrets.push(turret)
     })
@@ -197,8 +161,9 @@ export default class MainScene extends Phaser.Scene {
     mapBuilder.setBackground(this.theme)
     mapBuilder.setTileMap(this.mapData, 16, 16)
     mapBuilder.setTileSet('tile-set', 'tiles')
-    this.tileMap = mapBuilder.build()
+    this.map = mapBuilder.build()
 
+    console.log(this.map)
     //Create all players
     this.allPlayerData = this.allPlayerData.sort((a, b) => {
       return a.socketId.localeCompare(b.socketId)
@@ -207,20 +172,20 @@ export default class MainScene extends Phaser.Scene {
     var pistol = this.allGuns[0] as IPistol
     var rifle = this.allGuns[4] as IRifle
     var deepPistol = pistol.deepCopy()
-    var shallowPistol = pistol.shallowCopy() as IPistol;
-    console.log("original pistol", pistol)
-    console.log("shallowPistol", shallowPistol)
-    console.log("changed shallow copy bullet object")
-    shallowPistol.bullet.dmg = 123;
-    console.log("----------")
-    console.log("original pistol", pistol)
-    console.log("shallowPistol", shallowPistol)
-    console.log("original pistol", pistol)
-    console.log("deepPistol", deepPistol)
-    console.log("changed deep copy pistol bullet damage")
+    var shallowPistol = pistol.shallowCopy() as IPistol
+    console.log('original pistol', pistol)
+    console.log('shallowPistol', shallowPistol)
+    console.log('changed shallow copy bullet object')
+    shallowPistol.bullet.dmg = 123
+    console.log('----------')
+    console.log('original pistol', pistol)
+    console.log('shallowPistol', shallowPistol)
+    console.log('original pistol', pistol)
+    console.log('deepPistol', deepPistol)
+    console.log('changed deep copy pistol bullet damage')
     deepPistol.bullet.dmg = 444
-    console.log("pistol", pistol)
-    console.log("deepPistol", deepPistol)
+    console.log('pistol', pistol)
+    console.log('deepPistol', deepPistol)
 
     let builder = new PlayerBuilder(scene, 'player')
     this.allPlayerData.forEach((playerData, index) => {
@@ -228,12 +193,13 @@ export default class MainScene extends Phaser.Scene {
         //Create current player
         builder.setPosition(new Phaser.Math.Vector2(playerData.x, playerData.y))
         builder.setFrame(texture_frames[index])
-        builder.setName(playerData.name) 
+        builder.setName(playerData.name)
         builder.setColor('#008000')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.deepCopy());
-        builder.setMainGun(rifle.deepCopy() as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(pistol.deepCopy())
+        builder.setMainGun(rifle.deepCopy() as IRifle)
+        builder.setItems(this.generateItems())
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -247,10 +213,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setFrame(texture_frames[index])
         builder.setName(playerData.name)
         builder.setColor('red')
-        builder.setHP(playerData.currentHP);
-        builder.setSocketId(playerData.socketId);
-        builder.setSecondaryGun(pistol.deepCopy());
-        builder.setMainGun(rifle.deepCopy() as IRifle);
+        builder.setHP(playerData.currentHP)
+        builder.setSocketId(playerData.socketId)
+        builder.setSecondaryGun(pistol.deepCopy())
+        builder.setMainGun(rifle.deepCopy() as IRifle)
 
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
@@ -271,6 +237,13 @@ export default class MainScene extends Phaser.Scene {
       console.log("undooooo")
       this.socketInstance.loadState()
     })
+    sceneEvents.on('useItem', payload => {
+      console.log("ItemUsed",payload);
+      this.player.getItem(payload).use(this.socketInstance);
+      this.player.removeItem(payload);
+      this.socketInstance.endTurn();
+    })
+
     //Run UI Scenes
     sceneManager.runGameUIScene(this.player, this.playerList, this.playersTurnId)
     sceneManager.runGameOverScene()
@@ -302,17 +275,26 @@ export default class MainScene extends Phaser.Scene {
   handleMovement(direction: DirectionEnum, commandCounter: number) {
     if (this.playersTurnId == this.player.id && !this.player.isDead()) {
       var distance = 0
+      var destroyWall: boolean = false;
+      var wallX: number | undefined = undefined;
+      var wallY: number | undefined = undefined;
       switch (direction) {
         case DirectionEnum.UP:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x,
             this.player.tilePos.y - commandCounter,
             DirectionEnum.UP
           )
+          console.log(distance);
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - distance)
             this.player.move(DirectionEnum.UP, distance)
             if (this.player.isBleeding) {
@@ -322,15 +304,20 @@ export default class MainScene extends Phaser.Scene {
           }
           break
         case DirectionEnum.DOWN:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x,
             this.player.tilePos.y + commandCounter,
             DirectionEnum.DOWN
           )
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + distance)
             this.player.move(DirectionEnum.DOWN, distance)
             if (this.player.isBleeding) {
@@ -340,15 +327,20 @@ export default class MainScene extends Phaser.Scene {
           }
           break
         case DirectionEnum.LEFT:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x - commandCounter,
             this.player.tilePos.y,
             DirectionEnum.LEFT
           )
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x - distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.LEFT, distance)
             if (this.player.isBleeding) {
@@ -358,15 +350,20 @@ export default class MainScene extends Phaser.Scene {
           }
           break
         case DirectionEnum.RIGHT:
-          distance = this.canPlayerMove(
+          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
-            this.tileMap,
+            this.map.tileMap,
             this.player,
             this.player.tilePos.x + commandCounter,
             this.player.tilePos.y,
             DirectionEnum.RIGHT
           )
           if (distance != 0) {
+            if(destroyWall)
+            {
+              this.map.tryDestroyTile(wallX, wallY);
+              this.socketInstance.destroyWall(wallX, wallY);
+            }
             this.socketInstance.movePlayer(this.player.tilePos.x + distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.RIGHT, distance)
             if (this.player.isBleeding) {
@@ -389,7 +386,7 @@ export default class MainScene extends Phaser.Scene {
     toX: number,
     toY: number,
     direction: DirectionEnum
-  ) {
+  ) : [number, boolean, number?, number?] {
     let distance = 0
     switch (direction) {
       case DirectionEnum.UP:
@@ -398,39 +395,52 @@ export default class MainScene extends Phaser.Scene {
         for (let i = 0; i < distance; i++) {
           travelingY--
           let tile = tileMap.getTileAt(toX, travelingY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, toX, travelingY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
+
       case DirectionEnum.DOWN:
         distance = toY - player.tilePos.y
         var travelingY = player.tilePos.y
         for (let i = 0; i < distance; i++) {
           travelingY++
           let tile = tileMap.getTileAt(toX, travelingY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, toX, travelingY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
       case DirectionEnum.LEFT:
         distance = player.tilePos.x - toX
         var travelingX = player.tilePos.x
         for (let i = 0; i < distance; i++) {
           travelingX--
           let tile = tileMap.getTileAt(travelingX, toY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, travelingX, toY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
       case DirectionEnum.RIGHT:
         distance = toX - player.tilePos.x
         var travelingX = player.tilePos.x
         for (let i = 0; i < distance; i++) {
           travelingX++
           let tile = tileMap.getTileAt(travelingX, toY)
-          if (!scene.tileMoveCheck(scene, tile)) return i
+          if (!scene.tileMoveCheck(scene, tile))
+          {
+            return [i, i > 0, travelingX, toY]
+          }
         }
-        return distance
+        return [distance, false, undefined, undefined]
       default:
         console.log('Somethings wrong...')
-        return distance
+        return [distance, false, undefined, undefined]
     }
   }
 
@@ -439,7 +449,7 @@ export default class MainScene extends Phaser.Scene {
     var result = true
     scene.playerList.forEach(playerElem => {
       if (playerElem.id != scene.player.id) {
-        var playerTile = scene.tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y)
+        var playerTile = scene.map.tileMap.getTileAt(playerElem.tilePos.x, playerElem.tilePos.y)
         if (playerTile.x == toTile.x && playerTile.y == toTile.y) result = false
       }
     })
@@ -461,7 +471,7 @@ export default class MainScene extends Phaser.Scene {
   }
   handleDamage(targetId: string) {
     if (this.playersTurnId == this.player.id && !this.player.isDead()) {
-      console.log("player shoot", this.player)
+      console.log('player shoot', this.player)
       var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId))
       this.socketInstance.damagePlayer(damage, targetId)
       this.socketInstance.endTurn()
@@ -470,10 +480,16 @@ export default class MainScene extends Phaser.Scene {
   private findDistanceToPlayer(targetId: string): number {
     var target = this.findPlayerById(targetId)
     if (target == null) return -1
-    
+
     //Euclidean distance
     return this.mathAdapter.calculateEuclidean(this.player.tilePos, target.tilePos) // <- Distance
   }
+
+  private generateItems() : Array<IItem> {
+    var items : Array<IItem> = [new HealthItem("health-potion", new HealthEffect(), new ItemVisitor()),
+                                new HealthItem("health-potion", new HealthEffect(), new BoostedItemVisitor()),
+                                new HealthItem("health-potion", new HealthEffect(), new ItemVisitor()),
+                                new HealthItem("health-potion", new HealthEffect(), new SuperBoostedItemVisitor())];
+    return items;
+  }
 }
-
-

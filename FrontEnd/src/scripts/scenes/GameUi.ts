@@ -3,8 +3,8 @@ import Phaser from 'phaser'
 import { sceneEvents } from '../Events/EventsController'
 import { Player } from '../Models/Player'
 import { DirectionEnum } from '../Models/Enums'
-import { GunCreator } from '../utils/GunCreator'
 import { PlayerChangeWeapon } from '../utils/Command/Command'
+import { IItem } from '../Interfaces/IItem'
 
 export default class GameUI extends Phaser.Scene {
   MenuGroup: Phaser.GameObjects.Group
@@ -59,6 +59,7 @@ export default class GameUI extends Phaser.Scene {
     this.load.spritesheet('gun-switch', '../../assets/GunSwitch.png', { frameWidth: 130, frameHeight: 130 })
     this.load.spritesheet('broken_bone', '../../assets/broken_bone.png', { frameWidth: 128, frameHeight: 128 })
     this.load.spritesheet('bleeding', '../../assets/bleeding.png', { frameWidth: 128, frameHeight: 128 })
+    this.load.spritesheet('health-potion', '../../assets/health-potion.png', { frameWidth: 32, frameHeight: 32 })
   }
   init(data) {
     this.commandCounter = 1
@@ -432,6 +433,23 @@ export default class GameUI extends Phaser.Scene {
         this.MenuGroup.add(attackBtn)
         this.MenuGroup.add(spriteLocal)
       }
+    })
+
+    this.player.inventory.forEach((item: IItem, index: number) => {
+      let positionX = 790 + (50 * index);
+      let itemBar = this.add.sprite(0, 0, item.getTexture());
+      itemBar.displayHeight = 40
+      itemBar.displayWidth = 40
+      itemBar.setOrigin(1, 0)
+      itemBar.setPosition(positionX, 260)
+      itemBar.setInteractive()
+      itemBar.on('pointerdown', event => {
+        itemBar.setTint(0xeaebe7)
+        sceneEvents.emit('useItem', index);
+      })
+      itemBar.on('pointerup', event => {
+        itemBar.destroy();
+      })
     })
   }
 }

@@ -12,11 +12,11 @@ var GAME_OVER_KEY = 'GameOver'
 class Game extends Phaser.Game {
   constructor() {
     super(config)
-
     this.scene.add(MAIN_MENU_KEY, MainMenuScene)
     this.scene.add(MAIN_KEY, MainScene)
     this.scene.add(UI_KEY, GameUI)
     this.scene.add(GAME_OVER_KEY, GameOverScene)
+
     this.scene.start(MAIN_MENU_KEY)
   }
 }

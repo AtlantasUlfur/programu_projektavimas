@@ -10,14 +10,13 @@ import { InLobbyState } from '../utils/State/InLobbyState'
 import { WaitingState } from '../utils/State/WaitingState'
 import { DeniedState } from '../utils/State/DeniedState'
 
-
 export class MainMenuScene extends Phaser.Scene {
   private state: MainMenuState
+  public socketInstance: SocketController
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   public buttons: Button[] = []
   private selectedButtonIndex = 0
   public buttonSelector!: Phaser.GameObjects.Image
-  public socketInstance: SocketController
   public playerCount: number = 0
   private checkPlayerCount: boolean = false
   public playerCountText: Phaser.GameObjects.Text

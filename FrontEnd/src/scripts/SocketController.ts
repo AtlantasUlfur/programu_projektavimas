@@ -7,7 +7,6 @@ import _ from 'lodash'
 import { PlayerChangeWeapon } from './utils/Command/Command'
 import { PlayerDecorator } from './utils/Decorator/PlayerDecorator'
 
-
 //Singleton
 export default class SocketController {
   private static _instance: SocketController | null = null
@@ -31,6 +30,11 @@ export default class SocketController {
       this.socket.on('playerCount', payload => {
         const mainMenuScene = this.scene as MainMenuScene
         mainMenuScene.playerCount = payload
+      })
+      this.socket.on('destroyWall', payload => {
+        const mainScene = this.scene as MainScene
+        console.log(`destroy wall event: ${payload.x}, ${payload.y}`)
+        mainScene.map.tryDestroyTile(payload.x, payload.y);
       })
       this.socket.on('lobbyStatus', payload => {
         const mainMenuScene = this.scene as MainMenuScene
@@ -149,7 +153,10 @@ export default class SocketController {
     console.log("socketController")
     this.socket?.emit('loadState') 
   }
-
+  public destroyWall(x: number | undefined, y:number | undefined)
+  {
+    this.socket?.emit('destroyedWall', { x, y })
+  }
   public joinLobby(name: string | null, playerName: string | null) {
     this.socket?.emit('joinLobby', { name, playerName })
   }
@@ -180,5 +187,10 @@ export default class SocketController {
 
   public changeGun() {
     this.socket?.emit('changeGun')
+  }
+
+  public healPlayer(healthIncrease : number){
+    console.log("Healed", healthIncrease);
+    this.socket?.emit('healPlayer', healthIncrease);
   }
 }

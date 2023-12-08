@@ -14,7 +14,8 @@ export enum TileTypeEnum {
   WALL_CITY = 28,
   GROUND_JUNGLE = 46,
   WALL_JUNGLE = 423,
-  TURRET = 0
+  TURRET = 0,
+  ERROR = -1
 }
 
 export enum SizeEnum {
