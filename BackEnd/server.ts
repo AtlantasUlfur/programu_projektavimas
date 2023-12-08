@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { Tile, Entity, Session, GameMap, Player } from "./models";
+import { Tile, Entity, Session, GameMap, Player, PlayerMemento } from "./models";
 const { uuid } = require("uuidv4");
 const express = require("express");
 const _ = require("lodash");
@@ -100,6 +100,7 @@ io.on("connection", function (socket: Socket) {
       sessionId,
       currentHP: 100,
       name: payload.name,
+      memento: null
     });
 
     socket.emit("playerCount", 1);
@@ -124,6 +125,7 @@ io.on("connection", function (socket: Socket) {
       sessionId: session.id,
       currentHP: 100,
       name: payload.playerName,
+      memento: null
     });
 
     //NOTE(HB) collect players in updated session
@@ -238,7 +240,8 @@ io.on("connection", function (socket: Socket) {
     console.log("End Turn");
 
     const player = getPlayerBySocketId(socket.id);
-    const sessionId = player.sessionId;
+    
+    const sessionId = player.sessionId; //ZaidimoID
     let moveOrder = player.moveOrder ?? 0;
 
     const sessionPlayers = getSessionPlayers(sessionId);
@@ -272,12 +275,16 @@ io.on("connection", function (socket: Socket) {
       const playerSocket = sockets[player.socketId];
       playerSocket.emit("turn", nextPlayer.socketId);
     });
+    
+    
+    console.log("memento")
   });
 
   socket.on("movePlayer", function (x: number, y: number) {
     console.log("Move");
 
     const player = getPlayerBySocketId(socket.id);
+    player.memento = new PlayerMemento({ x: player.x, y: player.y }, player.currentHP || 0, player.isTurn || false, player.moveOrder || 0);
     player.x = x;
     player.y = y;
     const sessionId = player.sessionId;
@@ -300,6 +307,17 @@ io.on("connection", function (socket: Socket) {
 
     if (damage != 0) {
       const player = getPlayerBySocketId(targetId);
+      if (player.memento) {
+        if (player.currentHP !== undefined) {
+          player.memento.health = player.currentHP;
+        } else {
+       
+        }
+      }
+      const playerSocket = getPlayerBySocketId(socket.id);
+      playerSocket.memento = new PlayerMemento({ x: playerSocket.x, y: playerSocket.y }, playerSocket.currentHP || 0, playerSocket.isTurn || false, playerSocket.moveOrder || 0);
+
+
       console.log("BEFORE HP", player.currentHP);
       player.currentHP =
         player.currentHP == undefined ? 0 : player.currentHP - damage;
@@ -333,7 +351,39 @@ io.on("connection", function (socket: Socket) {
       currentAttack: randomNumber,
     });
   });
+  socket.on("loadState", function () {
+    console.log("loadState")
+    const player = getPlayerBySocketId(socket.id);
+    const sessionId = player.sessionId; //ZaidimoID
+    let moveOrder = player.moveOrder ?? 0;
 
+    const sessionPlayers = getSessionPlayers(sessionId);
+  
+    _.forEach(sessionPlayers, function (player: Player) {
+      
+      player.x = player.memento?.getPosition().x;
+      player.y = player.memento?.getPosition().y;
+      player.currentHP = player.memento?.getHealth();
+      //player.currentMoveCount = player.currentMoveCount === undefined ? undefined : player.currentMoveCount - 1;
+      player.isTurn = player.memento?.getTurnStatus();
+      //player.memento = null;
+
+      console.log(player)
+    });
+    _.forEach(sessionPlayers, function (player: Player) {
+      
+      _.forEach(sessionPlayers, function (sessionPlayer: Player) {
+        const playerSocket = sockets[sessionPlayer.socketId];
+        playerSocket.emit("playersState", player);
+        console.log("emitting")
+      });
+      
+      
+    });
+
+
+
+  });
   socket.on("getLobbies", function () {
     console.log("Getting lobbies");
 

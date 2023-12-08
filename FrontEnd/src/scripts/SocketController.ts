@@ -48,12 +48,29 @@ export default class SocketController {
       })
       this.socket.on('playerMove', payload => {
         const mainScene = this.scene as MainScene
+        console.log(mainScene)
         mainScene.playerList.forEach(playerObj => {
           if (playerObj.id == payload.player) {
             playerObj.setTilePos(payload.x, payload.y)
           }
         })
       })
+      this.socket.on('playersState', payload => {
+        console.log(payload)
+        const mainScene = this.scene as MainScene
+        mainScene.playerList.forEach(playerObj => {
+
+          if (playerObj.id == payload.socketId) {
+            
+            playerObj.setTilePos(payload.x, payload.y)
+            console.log(playerObj)
+            playerObj.setHP(payload.currentHP)
+            sceneEvents.emit('hpChange')
+            console.log(playerObj)
+          }
+        })
+      })
+      //TODO: ^^^^
       this.socket.on('playerDamage', payload => {
         const mainScene = this.scene as MainScene
         mainScene.playerList.forEach(playerObj => {
@@ -127,6 +144,10 @@ export default class SocketController {
 
   public createLobby(name: string | null) {
     this.socket?.emit('createLobby', { name })
+  }
+  public loadState() {
+    console.log("socketController")
+    this.socket?.emit('loadState') 
   }
 
   public joinLobby(name: string | null, playerName: string | null) {

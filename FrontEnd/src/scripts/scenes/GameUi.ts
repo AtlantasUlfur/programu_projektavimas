@@ -33,6 +33,7 @@ export default class GameUI extends Phaser.Scene {
   arrowDown: Phaser.GameObjects.Sprite
   arrowLeft: Phaser.GameObjects.Sprite
   arrowRight: Phaser.GameObjects.Sprite
+  Undo: Phaser.GameObjects.Sprite
   commandUp: Phaser.GameObjects.Sprite
   commandDown: Phaser.GameObjects.Sprite
   brokenBone: Phaser.GameObjects.Sprite
@@ -370,6 +371,21 @@ export default class GameUI extends Phaser.Scene {
     })
     this.commandDown.on('pointerup', event => {
       this.commandDown.clearTint()
+    })
+
+    this.Undo= this.add.sprite(0, 0, 'arrowright')
+    this.Undo.displayHeight = 24
+    this.Undo.displayWidth = 24
+    this.Undo.setOrigin(1, 0)
+    this.Undo.setPosition(885, 550)
+    this.Undo.setInteractive()
+    this.Undo.on('pointerdown', event => {
+      this.Undo.tint = 12
+    console.log("pressed")
+      sceneEvents.emit('Undo')
+    })
+    this.Undo.on('pointerup', event => {
+      this.hotbarOne.clearTint()
     })
 
     this.MenuGroup = this.add.group()

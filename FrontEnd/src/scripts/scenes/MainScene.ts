@@ -23,6 +23,7 @@ export default class MainScene extends Phaser.Scene {
   private mapData
   private currentPlayerData: PlayerServer
   private allPlayerData: PlayerServer[]
+  private flyweight_: Flyweight = new Flyweight();
   //Map
   private tileMap: Phaser.Tilemaps.Tilemap
   //Players
@@ -139,12 +140,12 @@ export default class MainScene extends Phaser.Scene {
        frameWidth: 254, frameHeight: 254
     });
     //Load texturesW
-    Flyweight.load('player', 'spritesheet', '../../assets/characters.png', {
+    this.flyweight_.load('player', 'spritesheet', '../../assets/characters.png', {
       frameWidth: 26,
       frameHeight: 36
     }, this);
 
-    Flyweight.load('dead', 'spritesheet', '../../assets/cloud_tileset.png', {
+    this.flyweight_.load('dead', 'spritesheet', '../../assets/cloud_tileset.png', {
       frameWidth: 16,
       frameHeight: 16
     }, this);
@@ -171,7 +172,7 @@ export default class MainScene extends Phaser.Scene {
         this.load.image('cloud_background', '../../assets/cloud_backround.png')
         break
     }
-    Flyweight.load('guns', 'spritesheet', '../../assets/guns.png', {
+    this.flyweight_.load('guns', 'spritesheet', '../../assets/guns.png', {
       frameWidth: 160,
       frameHeight: 160
     }, this);
@@ -266,7 +267,10 @@ export default class MainScene extends Phaser.Scene {
     sceneEvents.on('changeGun', payload => {
       this.handleGunChange()
     })
-
+    sceneEvents.on('Undo', payload => {
+      console.log("undooooo")
+      this.socketInstance.loadState()
+    })
     //Run UI Scenes
     sceneManager.runGameUIScene(this.player, this.playerList, this.playersTurnId)
     sceneManager.runGameOverScene()

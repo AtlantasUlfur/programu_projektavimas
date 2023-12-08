@@ -21,6 +21,7 @@ export type Player = Entity & {
   isTurn?: Boolean;
   isWinner?: Boolean;
   moveOrder?: number;
+  memento: PlayerMemento | null;
 };
 
 export type Tile = {
@@ -39,3 +40,32 @@ export type Session = {
   id: string;
   playerCount: Number;
 };
+export class PlayerMemento {
+   position: { x: Number | undefined; y: Number | undefined };
+   health: number;
+   isTurn: Boolean;
+   moveOrder: number;
+
+  constructor(position: { x: Number | undefined; y: Number | undefined }, health: number, isTurn: Boolean, moveOrder: number) {
+    this.position = { ...position };
+    this.health = health;
+    this.isTurn = isTurn;
+    this.moveOrder = moveOrder;
+  }
+
+  getPosition(): { x: Number | undefined; y: Number | undefined } {
+    return this.position;
+  }
+
+  getHealth(): number {
+    return this.health;
+  }
+
+  getTurnStatus(): Boolean {
+    return this.isTurn;
+  }
+  getMoveOrder():number{
+    return this.moveOrder;
+  }
+  
+}
