@@ -1,4 +1,5 @@
 import { Player } from '../../Models/Player'
+import GunsIterator from '../Iterator/GunsIterator'
 
 export interface ICommand {
   execute(): any
@@ -13,10 +14,10 @@ export class PlayerChangeWeapon implements ICommand {
   }
 
     execute() {
-        this.player.switchToSideArm();
+      this.player.selectNextGun();
     }
     undo() {
-        this.player.switchToMainArm();
+      this.player.selectPreviousGun();
     }
     
 }

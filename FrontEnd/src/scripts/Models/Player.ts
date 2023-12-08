@@ -7,6 +7,8 @@ import { IPistol } from '../Interfaces/Guns/IPistol'
 import _ from 'lodash'
 import { IGunOwnerAbstraction } from '../Interfaces/BridgeAbstraction/IGunOwnerAbstraction'
 import { IItem } from '../Interfaces/IItem'
+import GunsArray from '../utils/Iterator/GunsArray'
+import GunsIterator from '../utils/Iterator/GunsIterator'
 
 export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstraction{
   public id: string
@@ -17,10 +19,16 @@ export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstra
   public selectedGun: IGun
   public isBleeding?: boolean;
   public isCrippled?: boolean;
-
-  public mainGun: IRifle | IGrenadeLauncher
-  public secondaryGun: IPistol
-
+  private gunsIterator: GunsIterator;
+  private allGuns_: GunsArray;
+  set allGuns(value: GunsArray)
+  {
+    this.allGuns_ = value;
+    this.gunsIterator = value.getIterator();
+  }
+  get allGuns(){
+    return this.allGuns_
+  }
   public gunImage: Phaser.GameObjects.Image 
 
   private MAX_INVENTORY_SIZE = 4;
@@ -29,6 +37,8 @@ export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstra
   constructor(scene: Phaser.Scene, key: string) {
     super(scene, 0, 0, key)
   }
+
+  
 
   update(time: number, delta: number) {
     this.showPlayerNickname()
@@ -129,16 +139,19 @@ export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstra
     this.selectedGun = gun
     this.setGunImage(this.selectedGun.gunFrame)
   }
-
-  switchToMainArm(){
-    this.selectedGun = this.mainGun;
-    this.setGunImage(this.selectedGun.gunFrame)
+  selectNextGun(){
+    if(this.gunsIterator.hasNext())
+    {
+      this.selectedGun = this.gunsIterator.next();
+      this.setGunImage(this.selectedGun.gunFrame);
+    }
   }
-  switchToSideArm(){
-    this.selectedGun = this.secondaryGun;
-    this.setGunImage(this.selectedGun.gunFrame)
+  selectPreviousGun(){
+    if(this.gunsIterator.hasPrevious()){
+      this.selectedGun = this.gunsIterator.previous();
+      this.setGunImage(this.selectedGun.gunFrame);
+    }
   }
-
   setGunImage(gunFrame: number) {
     if (this.gunImage !== undefined) {
       this.gunImage.destroy()

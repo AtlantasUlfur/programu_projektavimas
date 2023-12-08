@@ -23,6 +23,7 @@ import { IItem } from '../Interfaces/IItem'
 import { HealthItem, TimeTravelItem } from '../Models/Items'
 import { HealthEffect, TimeTravelEffect } from '../utils/Template/ConcreteEffects'
 import { BoostedItemVisitor, ItemVisitor, SuperBoostedItemVisitor } from '../utils/Visitor/Visitor'
+import GunsArray from '../utils/Iterator/GunsArray'
 
 export default class MainScene extends Phaser.Scene {
   //Init Data
@@ -37,7 +38,7 @@ export default class MainScene extends Phaser.Scene {
   public alivePlayerCount: number = 0
   public player: Player
   public playersTurnId: string = ''
-  private allGuns: IGun[]
+  private allGuns: GunsArray
   public theme: string
   private consoleTerminal: ConsoleTerminal  
   public socketInstance: SocketController
@@ -181,8 +182,8 @@ export default class MainScene extends Phaser.Scene {
       return a.socketId.localeCompare(b.socketId)
     })
     const texture_frames = [49, 52, 55, 10]
-    var pistol = this.allGuns[0] as IPistol
-    var rifle = this.allGuns[4] as IRifle
+    var pistol = this.allGuns.items[0] as IPistol
+    var rifle = this.allGuns.items[4] as IRifle
     var deepPistol = pistol.deepCopy()
     var shallowPistol = pistol.shallowCopy() as IPistol
     console.log('original pistol', pistol)
@@ -209,8 +210,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('#008000')
         builder.setHP(playerData.currentHP)
         builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(pistol.deepCopy())
-        builder.setMainGun(rifle.deepCopy() as IRifle)
+        //builder.setSecondaryGun(pistol.deepCopy())
+        //builder.setMainGun(rifle.deepCopy() as IRifle)
+        builder.setAllGuns(this.allGuns)
+        builder.setSelectedGun(this.allGuns.items[0])
         builder.setItems(this.generateItems())
         this.player = builder.build()
         scene.playerList.push(this.player)
@@ -227,9 +230,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('red')
         builder.setHP(playerData.currentHP)
         builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(pistol.deepCopy())
-        builder.setMainGun(rifle.deepCopy() as IRifle)
-
+        //builder.setSecondaryGun(pistol.deepCopy())
+        //builder.setMainGun(rifle.deepCopy() as IRifle)
+        builder.setAllGuns(this.allGuns)
+        builder.setSelectedGun(this.allGuns.items[0])
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
       }
@@ -249,7 +253,7 @@ export default class MainScene extends Phaser.Scene {
       this.handleKill(payload)
     })
     sceneEvents.on('changeGun', payload => {
-      this.handleGunChange()
+      this.handleGunChange(payload)
     })
     sceneEvents.on('Undo', payload => {
       this.socketInstance.loadState()
@@ -276,8 +280,8 @@ export default class MainScene extends Phaser.Scene {
     })
     return player
   }
-  handleGunChange() {
-    this.socketInstance.changeGun()
+  handleGunChange(payload) {
+      this.socketInstance.changeGun(payload);
   }
 
   update(time: number, delta: number) {
