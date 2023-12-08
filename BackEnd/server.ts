@@ -362,6 +362,28 @@ io.on("connection", function (socket: Socket) {
     });
     socket.emit("lobbies", { sessions });
   });
+
+  socket.on("healPlayer", function (healthIncrease: number) {
+    console.log("HealingPlayer ", socket.id, " by ", healthIncrease);
+
+    const player = getPlayerBySocketId(socket.id);
+    player.currentHP =
+        player.currentHP == undefined ? 0 : player.currentHP + healthIncrease;
+    if (player.currentHP > 100) {
+      player.currentHP = 100;
+    }
+
+    const sessionId = player.sessionId;
+    const sessionPlayers = getSessionPlayers(sessionId);
+
+      _.forEach(sessionPlayers, function (currentPlayer: Player) {
+        const playerSocket = sockets[currentPlayer.socketId];
+        playerSocket.emit("playerDamage", { //devious usage
+          player: socket.id,
+          currentHP: player.currentHP,
+        });
+      });
+  });
 });
 
 server.listen(8081, function () {

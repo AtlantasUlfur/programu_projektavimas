@@ -6,13 +6,12 @@ import { Player } from './Models/Player'
 import _ from 'lodash'
 import { PlayerChangeWeapon } from './utils/Command/Command'
 import { PlayerDecorator } from './utils/Decorator/PlayerDecorator'
-import { BaseScene } from './utils/Template/BaseScene'
 
 //Singleton
 export default class SocketController {
   private static _instance: SocketController | null = null
   private socket: Socket | null = null
-  private scene: BaseScene | MainMenuScene | MainScene
+  private scene: MainMenuScene | MainScene
 
   private constructor() {}
 
@@ -126,7 +125,7 @@ export default class SocketController {
     return this.socket
   }
 
-  public setScene(Scene: BaseScene | MainMenuScene | MainScene) {
+  public setScene(Scene: MainMenuScene | MainScene) {
     this.scene = Scene
   }
 
@@ -167,5 +166,10 @@ export default class SocketController {
 
   public changeGun() {
     this.socket?.emit('changeGun')
+  }
+
+  public healPlayer(healthIncrease : number){
+    console.log("Healed", healthIncrease);
+    this.socket?.emit('healPlayer', healthIncrease);
   }
 }

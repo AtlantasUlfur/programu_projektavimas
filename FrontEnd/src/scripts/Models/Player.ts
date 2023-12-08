@@ -6,6 +6,7 @@ import { IGrenadeLauncher } from '../Interfaces/Guns/IGrenadeLauncher'
 import { IPistol } from '../Interfaces/Guns/IPistol'
 import _ from 'lodash'
 import { IGunOwnerAbstraction } from '../Interfaces/BridgeAbstraction/IGunOwnerAbstraction'
+import { IItem } from '../Interfaces/IItem'
 
 export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstraction{
   public id: string
@@ -21,6 +22,9 @@ export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstra
   public secondaryGun: IPistol
 
   public gunImage: Phaser.GameObjects.Image 
+
+  private MAX_INVENTORY_SIZE = 4;
+  public inventory: Array<IItem> = [];
 
   constructor(scene: Phaser.Scene, key: string) {
     super(scene, 0, 0, key)
@@ -146,5 +150,21 @@ export class Player extends Phaser.GameObjects.Sprite implements IGunOwnerAbstra
     this.gunImage.setOrigin(0.5, 1.5)
 
     this.showChosenGun()
+  }
+
+  addItem(item : IItem){
+    //FIXME: if item was removed from the inventory it becomes undefined.
+    // Check for undefined and replace with new object
+    if(this.inventory.length < this.MAX_INVENTORY_SIZE){
+      this.inventory.push(item);
+    }
+  }
+
+  removeItem(itemIndex : number){
+    delete this.inventory[itemIndex];
+  }
+
+  getItem(itemIndex : number){
+    return this.inventory[itemIndex];
   }
 }

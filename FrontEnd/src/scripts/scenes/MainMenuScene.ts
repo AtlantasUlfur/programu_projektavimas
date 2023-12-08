@@ -9,10 +9,10 @@ import { MenuState } from '../utils/State/MenuState'
 import { InLobbyState } from '../utils/State/InLobbyState'
 import { WaitingState } from '../utils/State/WaitingState'
 import { DeniedState } from '../utils/State/DeniedState'
-import { BaseScene } from '../utils/Template/BaseScene'
 
-export class MainMenuScene extends BaseScene {
+export class MainMenuScene extends Phaser.Scene {
   private state: MainMenuState
+  public socketInstance: SocketController
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   public buttons: Button[] = []
   private selectedButtonIndex = 0

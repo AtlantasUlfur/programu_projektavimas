@@ -15,12 +15,15 @@ import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
 import Flyweight from '../utils/Flyweight/Flyweight'
-import { BaseScene } from '../utils/Template/BaseScene';
 import { Map } from '../Models/Map';
 import { Tile } from '../utils/Composite/Tile'
 import { GroundTileHandler, PlayerTileHandler, TileHandler, WallTileHandler } from '../utils/Chain/Handler'
+import { IItem } from '../Interfaces/IItem'
+import { HealthItem } from '../Models/Items'
+import { HealthEffect } from '../utils/Template/ConcreteEffects'
+import { BoostedItemVisitor, ItemVisitor, SuperBoostedItemVisitor } from '../utils/Visitor/Visitor'
 
-export default class MainScene extends BaseScene {
+export default class MainScene extends Phaser.Scene {
   //Init Data
   private mapData
   private currentPlayerData: PlayerServer
@@ -34,7 +37,7 @@ export default class MainScene extends BaseScene {
   public playersTurnId: string = ''
   private allGuns: IGun[]
   public theme: string
-
+  public socketInstance: SocketController
   private turretCount = 1
   private turretPositions: Array<{ x: integer; y: integer }> = []
   private turrets: Array<Turret> = []
@@ -154,6 +157,16 @@ export default class MainScene extends BaseScene {
       },
       this
     )
+    Flyweight.load(
+      'health-potion',
+      'spritesheet',
+      '../../assets/health-potion.png',
+      {
+        frameWidth: 32,
+        frameHeight: 32
+      },
+      this
+    )
   }
 
   create() {
@@ -213,6 +226,7 @@ export default class MainScene extends BaseScene {
         builder.setSocketId(playerData.socketId)
         builder.setSecondaryGun(pistol.deepCopy())
         builder.setMainGun(rifle.deepCopy() as IRifle)
+        builder.setItems(this.generateItems())
         this.player = builder.build()
         scene.playerList.push(this.player)
 
@@ -245,6 +259,13 @@ export default class MainScene extends BaseScene {
     })
     sceneEvents.on('changeGun', payload => {
       this.handleGunChange()
+    })
+
+    sceneEvents.on('useItem', payload => {
+      console.log("ItemUsed",payload);
+      this.player.getItem(payload).use(this.socketInstance);
+      this.player.removeItem(payload);
+      this.socketInstance.endTurn();
     })
 
     //Run UI Scenes
@@ -486,5 +507,13 @@ export default class MainScene extends BaseScene {
 
     //Euclidean distance
     return this.mathAdapter.calculateEuclidean(this.player.tilePos, target.tilePos) // <- Distance
+  }
+
+  private generateItems() : Array<IItem> {
+    var items : Array<IItem> = [new HealthItem("health-potion", new HealthEffect(), new ItemVisitor()),
+                                new HealthItem("health-potion", new HealthEffect(), new BoostedItemVisitor()),
+                                new HealthItem("health-potion", new HealthEffect(), new ItemVisitor()),
+                                new HealthItem("health-potion", new HealthEffect(), new SuperBoostedItemVisitor())];
+    return items;
   }
 }
