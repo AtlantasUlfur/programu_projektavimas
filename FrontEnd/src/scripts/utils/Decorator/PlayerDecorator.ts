@@ -3,8 +3,16 @@ export class PlayerDecorator {
         player.isBleeding = true;
     }
 
+    static removeBleedingEffect(player) {
+        player.isBleeding = false;
+    }
+
     static addCrippledEffect(player) {
         player.isCrippled = true;
+    }
+
+    static removeCrippledEffect(player) {
+        player.isCrippled = false;
     }
   }
   

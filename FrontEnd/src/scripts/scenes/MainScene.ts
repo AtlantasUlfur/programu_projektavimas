@@ -20,8 +20,8 @@ import { Tile } from '../utils/Composite/Tile'
 import { GroundTileHandler, PlayerTileHandler, TileHandler, WallTileHandler } from '../utils/Chain/Handler'
 import { ConsoleTerminal } from '../utils/Interpreter/ConsoleTerminal'
 import { IItem } from '../Interfaces/IItem'
-import { HealthItem } from '../Models/Items'
-import { HealthEffect } from '../utils/Template/ConcreteEffects'
+import { HealthItem, TimeTravelItem } from '../Models/Items'
+import { HealthEffect, TimeTravelEffect } from '../utils/Template/ConcreteEffects'
 import { BoostedItemVisitor, ItemVisitor, SuperBoostedItemVisitor } from '../utils/Visitor/Visitor'
 
 export default class MainScene extends Phaser.Scene {
@@ -142,6 +142,16 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 160,
       frameHeight: 160
     }, this);
+
+    this.flyweight_.load('health-potion', 'spritesheet', '../../assets/health-potion.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    }, this);
+
+    this.flyweight_.load('clock', 'spritesheet', '../../assets/clock.png', {
+      frameWidth: 120,
+      frameHeight: 120
+    }, this);
   }
 
   create() {
@@ -246,7 +256,7 @@ export default class MainScene extends Phaser.Scene {
     })
     sceneEvents.on('useItem', payload => {
       console.log("ItemUsed",payload);
-      this.player.getItem(payload).use(this.socketInstance);
+      this.player.getItem(payload).use();
       this.player.removeItem(payload);
       this.socketInstance.endTurn();
     })
@@ -495,10 +505,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private generateItems() : Array<IItem> {
-    var items : Array<IItem> = [new HealthItem("health-potion", new HealthEffect(), new ItemVisitor()),
-                                new HealthItem("health-potion", new HealthEffect(), new BoostedItemVisitor()),
-                                new HealthItem("health-potion", new HealthEffect(), new ItemVisitor()),
-                                new HealthItem("health-potion", new HealthEffect(), new SuperBoostedItemVisitor())];
+    var items : Array<IItem> = [new TimeTravelItem("clock", new TimeTravelEffect(), new ItemVisitor(this.socketInstance, sceneEvents)),
+                                new HealthItem("health-potion", new HealthEffect(), new BoostedItemVisitor(this.socketInstance, sceneEvents)),
+                                new HealthItem("health-potion", new HealthEffect(), new ItemVisitor(this.socketInstance, sceneEvents)),
+                                new HealthItem("health-potion", new HealthEffect(), new SuperBoostedItemVisitor(this.socketInstance, sceneEvents))];
     return items;
   }
 }

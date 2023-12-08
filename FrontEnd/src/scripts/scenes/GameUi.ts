@@ -60,6 +60,7 @@ export default class GameUI extends Phaser.Scene {
     this.load.spritesheet('broken_bone', '../../assets/broken_bone.png', { frameWidth: 128, frameHeight: 128 })
     this.load.spritesheet('bleeding', '../../assets/bleeding.png', { frameWidth: 128, frameHeight: 128 })
     this.load.spritesheet('health-potion', '../../assets/health-potion.png', { frameWidth: 32, frameHeight: 32 })
+    this.load.spritesheet('clock', '../../assets/clock.png', { frameWidth: 120, frameHeight: 120 })
   }
   init(data) {
     this.commandCounter = 1
