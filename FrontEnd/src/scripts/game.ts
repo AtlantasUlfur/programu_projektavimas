@@ -4,7 +4,6 @@ import { MainMenuScene } from './scenes/MainMenuScene'
 import MainScene from './scenes/MainScene'
 import GameUI from './scenes/GameUi'
 import GameOverScene from './scenes/GameOverScene'
-import { BaseScene } from './utils/Template/BaseScene'
 import { ConsoleTerminal } from './utils/Interpreter/ConsoleTerminal'
 
 var MAIN_MENU_KEY = 'MainMenu'
@@ -15,17 +14,13 @@ var CONSOLE_TERMINAL_KEY = "ConsoleTerminal"
 class Game extends Phaser.Game {
   constructor() {
     super(config)
+    this.scene.add(MAIN_MENU_KEY, MainMenuScene)
+    this.scene.add(MAIN_KEY, MainScene)
+    this.scene.add(UI_KEY, GameUI)
+    this.scene.add(GAME_OVER_KEY, GameOverScene)
 
-    this.loadScene(MAIN_MENU_KEY, MainMenuScene)
-    this.loadScene(MAIN_KEY, MainScene)
-    this.loadScene(UI_KEY, GameUI)
-    this.loadScene(GAME_OVER_KEY, GameOverScene)
-    this.loadScene(CONSOLE_TERMINAL_KEY, ConsoleTerminal)
+    this.scene.add(CONSOLE_TERMINAL_KEY, ConsoleTerminal)
     this.scene.start(MAIN_MENU_KEY)
-  }
-  
-  loadScene(key: string, scene : typeof BaseScene){
-    this.scene.add(key, scene)
   }
 }
 

@@ -1,8 +1,7 @@
 import Phaser from 'phaser'
-import { BaseScene } from '../utils/Template/BaseScene'
 import { sceneEvents } from '../Events/EventsController'
 
-export default class GameOverScene extends BaseScene {
+export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super('GameOver')
   }
