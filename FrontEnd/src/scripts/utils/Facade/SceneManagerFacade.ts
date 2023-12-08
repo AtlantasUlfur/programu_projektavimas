@@ -32,11 +32,17 @@ export class SceneManagerFacade {
   }
 
   runGameOverScene() {
+    console.log("running game over scene")
     this.scene.run('GameOver')
   }
 
   runGameUIScene(player, playerList, playersTurnId) {
+    console.log("run ui scene")
     this.scene.run('UIScene', { playerObj: player, players: playerList, playersTurnId: playersTurnId })
+  }
+  runConsoleTerminalScene(playerList) {
+    console.log("running console scene")
+    this.scene.run('ConsoleTerminal', { playerList })
   }
 
   restartCurrentScene() {

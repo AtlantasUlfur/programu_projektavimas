@@ -10,11 +10,12 @@ import { InLobbyState } from '../utils/State/InLobbyState'
 import { WaitingState } from '../utils/State/WaitingState'
 import { DeniedState } from '../utils/State/DeniedState'
 import { BaseScene } from '../utils/Template/BaseScene'
-
+import { ConsoleTerminal } from '../utils/Interpreter/ConsoleTerminal'
 export class MainMenuScene extends BaseScene {
   private state: MainMenuState
   public cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   public buttons: Button[] = []
+  private consoleTerminal : ConsoleTerminal
   private selectedButtonIndex = 0
   public buttonSelector!: Phaser.GameObjects.Image
   public playerCount: number = 0
@@ -47,6 +48,8 @@ export class MainMenuScene extends BaseScene {
 
   create() {
     const scene = this
+    console.log("main menu width:", this.sys.game.config.width)
+    console.log("main menu height:", this.sys.game.config.height)
     this.state.createInput(this)
   }
 

@@ -15,10 +15,11 @@ import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
 import Flyweight from '../utils/Flyweight/Flyweight'
-import { BaseScene } from '../utils/Template/BaseScene';
-import { Map } from '../Models/Map';
+import { BaseScene } from '../utils/Template/BaseScene'
+import { Map } from '../Models/Map'
 import { Tile } from '../utils/Composite/Tile'
 import { GroundTileHandler, PlayerTileHandler, TileHandler, WallTileHandler } from '../utils/Chain/Handler'
+import { ConsoleTerminal } from '../utils/Interpreter/ConsoleTerminal'
 
 export default class MainScene extends BaseScene {
   //Init Data
@@ -34,21 +35,21 @@ export default class MainScene extends BaseScene {
   public playersTurnId: string = ''
   private allGuns: IGun[]
   public theme: string
-
+  private consoleTerminal: ConsoleTerminal
   private turretCount = 1
   private turretPositions: Array<{ x: integer; y: integer }> = []
   private turrets: Array<Turret> = []
   public mathAdapter: MathAdapter = new MathAdapter()
-  private tileHandler: TileHandler;
+  private tileHandler: TileHandler
   constructor() {
-    super('MainScene');
+    super('MainScene')
 
-    const wallTileHandler = new WallTileHandler();
-    const groundTileHandler = new GroundTileHandler();
-    const playerTileHandler = new PlayerTileHandler();
+    const wallTileHandler = new WallTileHandler()
+    const groundTileHandler = new GroundTileHandler()
+    const playerTileHandler = new PlayerTileHandler()
 
-    wallTileHandler.setNext(groundTileHandler).setNext(playerTileHandler);
-    this.tileHandler = wallTileHandler;
+    wallTileHandler.setNext(groundTileHandler).setNext(playerTileHandler)
+    this.tileHandler = wallTileHandler
   }
 
   init(data) {
@@ -86,7 +87,7 @@ export default class MainScene extends BaseScene {
     ]
 
     data.payload.map.tileMap.forEach(tile => {
-      this.mapData[tile.y as integer][tile.x as integer] = this.tileHandler.handle(tile.entity.id, this.theme);
+      this.mapData[tile.y as integer][tile.x as integer] = this.tileHandler.handle(tile.entity.id, this.theme)
       if (this.turretCount > 0 && tile.entity.id === 'wall') {
         this.turretCount -= 1
         this.turretPositions.push({ x: tile.x as integer, y: tile.y as integer })
@@ -243,6 +244,9 @@ export default class MainScene extends BaseScene {
     sceneEvents.on('damage', payload => {
       this.handleDamage(payload)
     })
+    sceneEvents.on('kill', payload => {
+      this.handleKill(payload)
+    })
     sceneEvents.on('changeGun', payload => {
       this.handleGunChange()
     })
@@ -250,6 +254,7 @@ export default class MainScene extends BaseScene {
     //Run UI Scenes
     sceneManager.runGameUIScene(this.player, this.playerList, this.playersTurnId)
     sceneManager.runGameOverScene()
+    sceneManager.runConsoleTerminalScene(this.playerList)
   }
   private findPlayerById(id: string): Player | null {
     var player: Player | null = null
@@ -278,12 +283,12 @@ export default class MainScene extends BaseScene {
   handleMovement(direction: DirectionEnum, commandCounter: number) {
     if (this.playersTurnId == this.player.id && !this.player.isDead()) {
       var distance = 0
-      var destroyWall: boolean = false;
-      var wallX: number | undefined = undefined;
-      var wallY: number | undefined = undefined;
+      var destroyWall: boolean = false
+      var wallX: number | undefined = undefined
+      var wallY: number | undefined = undefined
       switch (direction) {
         case DirectionEnum.UP:
-          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
             this.map.tileMap,
             this.player,
@@ -291,12 +296,11 @@ export default class MainScene extends BaseScene {
             this.player.tilePos.y - commandCounter,
             DirectionEnum.UP
           )
-          console.log(distance);
+          console.log(distance)
           if (distance != 0) {
-            if(destroyWall)
-            {
-              this.map.tryDestroyTile(wallX, wallY);
-              this.socketInstance.destroyWall(wallX, wallY);
+            if (destroyWall) {
+              this.map.tryDestroyTile(wallX, wallY)
+              this.socketInstance.destroyWall(wallX, wallY)
             }
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - distance)
             this.player.move(DirectionEnum.UP, distance)
@@ -307,7 +311,7 @@ export default class MainScene extends BaseScene {
           }
           break
         case DirectionEnum.DOWN:
-          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
             this.map.tileMap,
             this.player,
@@ -316,10 +320,9 @@ export default class MainScene extends BaseScene {
             DirectionEnum.DOWN
           )
           if (distance != 0) {
-            if(destroyWall)
-            {
-              this.map.tryDestroyTile(wallX, wallY);
-              this.socketInstance.destroyWall(wallX, wallY);
+            if (destroyWall) {
+              this.map.tryDestroyTile(wallX, wallY)
+              this.socketInstance.destroyWall(wallX, wallY)
             }
             this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + distance)
             this.player.move(DirectionEnum.DOWN, distance)
@@ -330,7 +333,7 @@ export default class MainScene extends BaseScene {
           }
           break
         case DirectionEnum.LEFT:
-          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
             this.map.tileMap,
             this.player,
@@ -339,10 +342,9 @@ export default class MainScene extends BaseScene {
             DirectionEnum.LEFT
           )
           if (distance != 0) {
-            if(destroyWall)
-            {
-              this.map.tryDestroyTile(wallX, wallY);
-              this.socketInstance.destroyWall(wallX, wallY);
+            if (destroyWall) {
+              this.map.tryDestroyTile(wallX, wallY)
+              this.socketInstance.destroyWall(wallX, wallY)
             }
             this.socketInstance.movePlayer(this.player.tilePos.x - distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.LEFT, distance)
@@ -353,7 +355,7 @@ export default class MainScene extends BaseScene {
           }
           break
         case DirectionEnum.RIGHT:
-          [distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
             this.map.tileMap,
             this.player,
@@ -362,10 +364,9 @@ export default class MainScene extends BaseScene {
             DirectionEnum.RIGHT
           )
           if (distance != 0) {
-            if(destroyWall)
-            {
-              this.map.tryDestroyTile(wallX, wallY);
-              this.socketInstance.destroyWall(wallX, wallY);
+            if (destroyWall) {
+              this.map.tryDestroyTile(wallX, wallY)
+              this.socketInstance.destroyWall(wallX, wallY)
             }
             this.socketInstance.movePlayer(this.player.tilePos.x + distance, this.player.tilePos.y)
             this.player.move(DirectionEnum.RIGHT, distance)
@@ -389,7 +390,7 @@ export default class MainScene extends BaseScene {
     toX: number,
     toY: number,
     direction: DirectionEnum
-  ) : [number, boolean, number?, number?] {
+  ): [number, boolean, number?, number?] {
     let distance = 0
     switch (direction) {
       case DirectionEnum.UP:
@@ -398,8 +399,7 @@ export default class MainScene extends BaseScene {
         for (let i = 0; i < distance; i++) {
           travelingY--
           let tile = tileMap.getTileAt(toX, travelingY)
-          if (!scene.tileMoveCheck(scene, tile))
-          {
+          if (!scene.tileMoveCheck(scene, tile)) {
             return [i, i > 0, toX, travelingY]
           }
         }
@@ -411,8 +411,7 @@ export default class MainScene extends BaseScene {
         for (let i = 0; i < distance; i++) {
           travelingY++
           let tile = tileMap.getTileAt(toX, travelingY)
-          if (!scene.tileMoveCheck(scene, tile))
-          {
+          if (!scene.tileMoveCheck(scene, tile)) {
             return [i, i > 0, toX, travelingY]
           }
         }
@@ -423,8 +422,7 @@ export default class MainScene extends BaseScene {
         for (let i = 0; i < distance; i++) {
           travelingX--
           let tile = tileMap.getTileAt(travelingX, toY)
-          if (!scene.tileMoveCheck(scene, tile))
-          {
+          if (!scene.tileMoveCheck(scene, tile)) {
             return [i, i > 0, travelingX, toY]
           }
         }
@@ -435,8 +433,7 @@ export default class MainScene extends BaseScene {
         for (let i = 0; i < distance; i++) {
           travelingX++
           let tile = tileMap.getTileAt(travelingX, toY)
-          if (!scene.tileMoveCheck(scene, tile))
-          {
+          if (!scene.tileMoveCheck(scene, tile)) {
             return [i, i > 0, travelingX, toY]
           }
         }
@@ -479,6 +476,9 @@ export default class MainScene extends BaseScene {
       this.socketInstance.damagePlayer(damage, targetId)
       this.socketInstance.endTurn()
     }
+  }
+  handleKill(targetId: string) {
+    this.socketInstance.damagePlayer(9999, targetId)
   }
   private findDistanceToPlayer(targetId: string): number {
     var target = this.findPlayerById(targetId)
