@@ -17,12 +17,57 @@ export class HealthItem implements IItem{
         return this.Texture;
     }
     
-    public use(socketInstance : SocketController): void {
-        this.Visitor.useHealthItem(this, socketInstance);
+    public use(): void {
+        this.Visitor.useHealthItem(this);
     }
 
     public useEffect(): number {
         return this.BaseEffect.templateMethod();
     }
+}
 
+export class RemoveBleedingItem implements IItem{
+    private Texture : string;
+    private BaseEffect : BaseEffect;
+    private Visitor : IVisitor;
+
+    constructor(texture : string, baseEffect : BaseEffect, visitor : IVisitor){
+        this.Texture = texture;
+        this.BaseEffect = baseEffect;
+        this.Visitor = visitor;
+    }
+    getTexture(): string {
+        return this.Texture;
+    }
+    
+    public use(): void {
+        this.Visitor.useRemoveBleedingItem(this);
+    }
+
+    public useEffect(): number {
+        return this.BaseEffect.templateMethod();
+    }
+}
+
+export class TimeTravelItem implements IItem{
+    private Texture : string;
+    private BaseEffect : BaseEffect;
+    private Visitor : IVisitor;
+
+    constructor(texture : string, baseEffect : BaseEffect, visitor : IVisitor){
+        this.Texture = texture;
+        this.BaseEffect = baseEffect;
+        this.Visitor = visitor;
+    }
+    getTexture(): string {
+        return this.Texture;
+    }
+    
+    public use(): void {
+        this.Visitor.useTimeTravelItem(this);
+    }
+
+    public useEffect(): string {
+        return this.BaseEffect.templateMethod();
+    }
 }

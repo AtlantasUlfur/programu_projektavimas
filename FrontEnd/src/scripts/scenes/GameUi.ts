@@ -60,6 +60,7 @@ export default class GameUI extends Phaser.Scene {
     this.load.spritesheet('broken_bone', '../../assets/broken_bone.png', { frameWidth: 128, frameHeight: 128 })
     this.load.spritesheet('bleeding', '../../assets/bleeding.png', { frameWidth: 128, frameHeight: 128 })
     this.load.spritesheet('health-potion', '../../assets/health-potion.png', { frameWidth: 32, frameHeight: 32 })
+    this.load.spritesheet('clock', '../../assets/clock.png', { frameWidth: 120, frameHeight: 120 })
   }
   init(data) {
     this.commandCounter = 1
@@ -374,20 +375,20 @@ export default class GameUI extends Phaser.Scene {
       this.commandDown.clearTint()
     })
 
-    this.Undo= this.add.sprite(0, 0, 'arrowright')
-    this.Undo.displayHeight = 24
-    this.Undo.displayWidth = 24
-    this.Undo.setOrigin(1, 0)
-    this.Undo.setPosition(885, 550)
-    this.Undo.setInteractive()
-    this.Undo.on('pointerdown', event => {
-      this.Undo.tint = 12
-    console.log("pressed")
-      sceneEvents.emit('Undo')
-    })
-    this.Undo.on('pointerup', event => {
-      this.hotbarOne.clearTint()
-    })
+    // this.Undo= this.add.sprite(0, 0, 'arrowright')
+    // this.Undo.displayHeight = 24
+    // this.Undo.displayWidth = 24
+    // this.Undo.setOrigin(1, 0)
+    // this.Undo.setPosition(885, 550)
+    // this.Undo.setInteractive()
+    // this.Undo.on('pointerdown', event => {
+    //   this.Undo.tint = 12
+    // console.log("pressed")
+    //   sceneEvents.emit('Undo')
+    // })
+    // this.Undo.on('pointerup', event => {
+    //   this.hotbarOne.clearTint()
+    // })
 
     this.MenuGroup = this.add.group()
     this.MenuGroup.add(this.baseSprite)
