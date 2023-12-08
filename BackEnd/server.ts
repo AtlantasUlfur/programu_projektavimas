@@ -1,5 +1,12 @@
 import { Socket } from "socket.io";
-import { Tile, Entity, Session, GameMap, Player, PlayerMemento } from "./models";
+import {
+  Tile,
+  Entity,
+  Session,
+  GameMap,
+  Player,
+  PlayerMemento,
+} from "./models";
 const { uuid } = require("uuidv4");
 const express = require("express");
 const _ = require("lodash");
@@ -62,6 +69,27 @@ const maps: GameMap[] = [];
 const players: Player[] = [];
 const sockets: { [key: string]: Socket } = {};
 
+class Mediator {
+  public sendToGamePlayers(senderId: string, name: string, message: any) {
+    const player = getPlayerById(senderId);
+    const sessionId = player.sessionId;
+
+    const sessionPlayers = getSessionPlayers(sessionId);
+
+    _.forEach(sessionPlayers, function (currentPlayer: Player) {
+      const playerSocket = sockets[currentPlayer.socketId];
+      playerSocket.emit(name, message);
+    });
+  }
+
+  public sendToRequester(senderId: string, name: string, message: any) {
+    const playerSocket = sockets[senderId];
+    playerSocket.emit(name, message);
+  }
+}
+
+const mediator = new Mediator();
+
 io.on("connection", function (socket: Socket) {
   sockets[socket.id] = socket;
 
@@ -100,30 +128,19 @@ io.on("connection", function (socket: Socket) {
       sessionId,
       currentHP: 100,
       name: payload.name,
-      memento: null
+      memento: null,
     });
 
-    socket.emit("playerCount", 1);
+    mediator.sendToRequester(socket.id, "playerCount", 1);
   });
 
-  socket.on("destroyedWall", function (payload)
-  {
+  socket.on("destroyedWall", function (payload) {
     const x = payload.x;
     const y = payload.y;
 
-    const player = getPlayerBySocketId(socket.id);
-    const sessionId = player.sessionId;
-    const sessionPlayers = getSessionPlayers(sessionId);
-
-    _.forEach(sessionPlayers, function (playerCurrent: Player) {
-      const playerSocket = sockets[playerCurrent.socketId];
-      playerSocket.emit("destroyWall", {
-        x: x,
-        y: y
-      });
-    });
-    socket.emit("destroyWall", {x, y});
+    mediator.sendToGamePlayers(socket.id, "destroyWall", { x: x, y: y });
   });
+
   socket.on("joinLobby", function (payload) {
     console.log("Join lobby");
     console.log(payload);
@@ -132,31 +149,25 @@ io.on("connection", function (socket: Socket) {
     const session = getSession(name);
 
     if (!session) {
-      socket.emit("lobbyStatus", 3);
+      mediator.sendToRequester(socket.id, "lobbyStatus", 3);
       return;
     }
 
-    socket.emit("lobbyStatus", 1);
+    mediator.sendToRequester(socket.id, "lobbyStatus", 1);
     players.push({
       id: "player",
       socketId: socket.id,
       sessionId: session.id,
       currentHP: 100,
       name: payload.playerName,
-      memento: null
+      memento: null,
     });
 
-    //NOTE(HB) collect players in updated session
     const sessionPlayers = getSessionPlayers(session.id);
 
-    //NOTE(HB) find player count in current session
     const playerCount = sessionPlayers.length;
 
-    //NOTE(HB) emit player count to all connected players
-    _.forEach(sessionPlayers, function (player: Player) {
-      const playerSocket = sockets[player.socketId];
-      playerSocket.emit("playerCount", playerCount);
-    });
+    mediator.sendToGamePlayers(socket.id, "playerCount", playerCount);
   });
 
   socket.on("startGame", function (payload) {
@@ -166,7 +177,7 @@ io.on("connection", function (socket: Socket) {
 
     const session = getSession(name);
     if (!session) {
-      socket.emit("lobbyStatus", 3);
+      mediator.sendToRequester(socket.id, "lobbyStatus", 3);
       return;
     }
     const sessionId = session.id;
@@ -252,13 +263,14 @@ io.on("connection", function (socket: Socket) {
 
   socket.on("changeGun", function (payload) {
     console.log("changeGun");
-    socket.broadcast.emit("gunChange", socket.id);
+    mediator.sendToGamePlayers(socket.id, "gunChange", socket.id);
   });
+
   socket.on("endTurn", function () {
     console.log("End Turn");
 
     const player = getPlayerBySocketId(socket.id);
-    
+
     const sessionId = player.sessionId; //ZaidimoID
     let moveOrder = player.moveOrder ?? 0;
 
@@ -288,34 +300,27 @@ io.on("connection", function (socket: Socket) {
 
     player.isTurn = false;
     nextPlayer.isTurn = true;
-
-    _.forEach(sessionPlayers, function (player: Player) {
-      const playerSocket = sockets[player.socketId];
-      playerSocket.emit("turn", nextPlayer.socketId);
-    });
-    
-    
-    console.log("memento")
+    mediator.sendToGamePlayers(socket.id, "turn", nextPlayer.socketId);
+    console.log("memento");
   });
 
   socket.on("movePlayer", function (x: number, y: number) {
     console.log("Move");
 
     const player = getPlayerBySocketId(socket.id);
-    player.memento = new PlayerMemento({ x: player.x, y: player.y }, player.currentHP || 0, player.isTurn || false, player.moveOrder || 0);
+    player.memento = new PlayerMemento(
+      { x: player.x, y: player.y },
+      player.currentHP || 0,
+      player.isTurn || false,
+      player.moveOrder || 0
+    );
     player.x = x;
     player.y = y;
-    const sessionId = player.sessionId;
 
-    const sessionPlayers = getSessionPlayers(sessionId);
-
-    _.forEach(sessionPlayers, function (playerCurrent: Player) {
-      const playerSocket = sockets[playerCurrent.socketId];
-      playerSocket.emit("playerMove", {
-        player: socket.id,
-        x: player.x,
-        y: player.y,
-      });
+    mediator.sendToGamePlayers(socket.id, "playerMove", {
+      player: socket.id,
+      x: player.x,
+      y: player.y,
     });
   });
   socket.on("damagePlayer", function (damage: number, targetId: string) {
@@ -329,12 +334,15 @@ io.on("connection", function (socket: Socket) {
         if (player.currentHP !== undefined) {
           player.memento.health = player.currentHP;
         } else {
-       
         }
       }
       const playerSocket = getPlayerBySocketId(socket.id);
-      playerSocket.memento = new PlayerMemento({ x: playerSocket.x, y: playerSocket.y }, playerSocket.currentHP || 0, playerSocket.isTurn || false, playerSocket.moveOrder || 0);
-
+      playerSocket.memento = new PlayerMemento(
+        { x: playerSocket.x, y: playerSocket.y },
+        playerSocket.currentHP || 0,
+        playerSocket.isTurn || false,
+        playerSocket.moveOrder || 0
+      );
 
       console.log("BEFORE HP", player.currentHP);
       player.currentHP =
@@ -343,42 +351,32 @@ io.on("connection", function (socket: Socket) {
         player.currentHP = 0;
       }
       console.log("AFTER HP", player.currentHP);
-      const sessionId = player.sessionId;
-
-      const sessionPlayers = getSessionPlayers(sessionId);
-
-      _.forEach(sessionPlayers, function (currentPlayer: Player) {
-        const playerSocket = sockets[currentPlayer.socketId];
-        playerSocket.emit("playerDamage", {
-          player: targetId,
-          currentHP: player.currentHP,
-        });
+      mediator.sendToGamePlayers(socket.id, "playerDamage", {
+        player: targetId,
+        currentHP: player.currentHP,
       });
     }
   });
 
   socket.on("getAttackAmount", function () {
     console.log("Getting attack amount");
-
-    const player = getPlayerBySocketId(socket.id);
     const randomNumber = 10;
 
-    const playerSocket = sockets[player.socketId];
-    playerSocket.emit("attackAmount", {
+    mediator.sendToRequester(socket.id, "attackAmount", {
       player: socket.id,
       currentAttack: randomNumber,
     });
   });
+
   socket.on("loadState", function () {
-    console.log("loadState")
+    console.log("loadState");
     const player = getPlayerBySocketId(socket.id);
     const sessionId = player.sessionId; //ZaidimoID
     let moveOrder = player.moveOrder ?? 0;
 
     const sessionPlayers = getSessionPlayers(sessionId);
-  
+
     _.forEach(sessionPlayers, function (player: Player) {
-      
       player.x = player.memento?.getPosition().x;
       player.y = player.memento?.getPosition().y;
       player.currentHP = player.memento?.getHealth();
@@ -386,22 +384,17 @@ io.on("connection", function (socket: Socket) {
       player.isTurn = player.memento?.getTurnStatus();
       //player.memento = null;
 
-      console.log(player)
+      console.log(player);
     });
     _.forEach(sessionPlayers, function (player: Player) {
-      
       _.forEach(sessionPlayers, function (sessionPlayer: Player) {
         const playerSocket = sockets[sessionPlayer.socketId];
         playerSocket.emit("playersState", player);
-        console.log("emitting")
+        console.log("emitting");
       });
-      
-      
     });
-
-
-
   });
+
   socket.on("getLobbies", function () {
     console.log("Getting lobbies");
 
@@ -410,7 +403,7 @@ io.on("connection", function (socket: Socket) {
       const playerCount = sessionPlayers.length;
       session.playerCount = playerCount;
     });
-    socket.emit("lobbies", { sessions });
+    mediator.sendToRequester(socket.id, "lobbies", { sessions });
   });
 
   socket.on("healPlayer", function (healthIncrease: number) {
@@ -418,21 +411,16 @@ io.on("connection", function (socket: Socket) {
 
     const player = getPlayerBySocketId(socket.id);
     player.currentHP =
-        player.currentHP == undefined ? 0 : player.currentHP + healthIncrease;
+      player.currentHP == undefined ? 0 : player.currentHP + healthIncrease;
     if (player.currentHP > 100) {
       player.currentHP = 100;
     }
 
-    const sessionId = player.sessionId;
-    const sessionPlayers = getSessionPlayers(sessionId);
-
-      _.forEach(sessionPlayers, function (currentPlayer: Player) {
-        const playerSocket = sockets[currentPlayer.socketId];
-        playerSocket.emit("playerDamage", { //devious usage
-          player: socket.id,
-          currentHP: player.currentHP,
-        });
-      });
+    mediator.sendToGamePlayers(socket.id, "playerDamage", {
+      //devious usage
+      player: socket.id,
+      currentHP: player.currentHP,
+    });
   });
 });
 
@@ -442,6 +430,10 @@ server.listen(8081, function () {
 
 function getSession(name: string): Session {
   return _.find(sessions, (session: Session) => session.name === name);
+}
+
+function getPlayerById(id: string): Player {
+  return _.find(players, (player: Player) => player.socketId === id);
 }
 
 function getSessionPlayers(sessionId: string): Player[] {
