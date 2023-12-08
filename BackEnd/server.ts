@@ -263,7 +263,7 @@ io.on("connection", function (socket: Socket) {
 
   socket.on("changeGun", function (payload) {
     console.log("changeGun");
-    mediator.sendToGamePlayers(socket.id, "gunChange", socket.id);
+    mediator.sendToGamePlayers(socket.id, "gunChange", {player: socket.id, command: payload});
   });
 
   socket.on("endTurn", function () {

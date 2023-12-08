@@ -23,7 +23,8 @@ export default class GameUI extends Phaser.Scene {
   hotbarFour: Phaser.GameObjects.Sprite
   mainGunHotbar: Phaser.GameObjects.Sprite
   mainGunIcon: Phaser.GameObjects.Image
-  switchWeaponBtn: Phaser.GameObjects.Sprite
+  switchWeaponBtnUp: Phaser.GameObjects.Sprite
+  switchWeaponBtnDown: Phaser.GameObjects.Sprite
   switchWeaponCommand: PlayerChangeWeapon
   sideGunHotbar: Phaser.GameObjects.Sprite
   sideGunIcon: Phaser.GameObjects.Image
@@ -227,20 +228,34 @@ export default class GameUI extends Phaser.Scene {
     })
 
     //Switch Weapon
-    this.switchWeaponBtn = this.add.sprite(0, 0, 'gun-switch')
-    this.switchWeaponBtn.displayHeight = 40
-    this.switchWeaponBtn.displayWidth = 40
-    this.switchWeaponBtn.setOrigin(1, 0)
-    this.switchWeaponBtn.setPosition(940, 160)
-    this.switchWeaponBtn.setInteractive()
-    this.switchWeaponBtn.on('pointerdown', event => {
-      this.switchWeaponBtn.setTint(0xeaebe7)
-      sceneEvents.emit('changeGun')
-      if (this.player.selectedGun == this.player.mainGun) this.switchWeaponCommand.execute()
-      else this.switchWeaponCommand.undo()
+    this.switchWeaponBtnUp = this.add.sprite(0, 0, 'gun-switch')
+    this.switchWeaponBtnUp.displayHeight = 40
+    this.switchWeaponBtnUp.displayWidth = 40
+    this.switchWeaponBtnUp.setOrigin(1, 0)
+    this.switchWeaponBtnUp.setPosition(940, 160)
+    this.switchWeaponBtnUp.setInteractive()
+    this.switchWeaponBtnUp.on('pointerdown', event => {
+      this.switchWeaponBtnUp.setTint(0xeaebe7)
+      sceneEvents.emit('changeGun', "execute")
+      this.switchWeaponCommand.execute();
     })
-    this.switchWeaponBtn.on('pointerup', event => {
-      this.switchWeaponBtn.clearTint()
+    this.switchWeaponBtnUp.on('pointerup', event => {
+      this.switchWeaponBtnUp.clearTint()
+    })
+    //
+    this.switchWeaponBtnDown = this.add.sprite(0, 0, 'gun-switch')
+    this.switchWeaponBtnDown.displayHeight = 40
+    this.switchWeaponBtnDown.displayWidth = 40
+    this.switchWeaponBtnDown.setOrigin(1, 0)
+    this.switchWeaponBtnDown.setPosition(985, 160)
+    this.switchWeaponBtnDown.setInteractive()
+    this.switchWeaponBtnDown.on('pointerdown', event => {
+      this.switchWeaponBtnDown.setTint(0xeaebe7)
+      sceneEvents.emit('changeGun', "undo")
+      this.switchWeaponCommand.undo();
+    })
+    this.switchWeaponBtnDown.on('pointerup', event => {
+      this.switchWeaponBtnDown.clearTint()
     })
 
     //Broken bone status
@@ -401,7 +416,8 @@ export default class GameUI extends Phaser.Scene {
     this.MenuGroup.add(this.hotbarTwo)
     this.MenuGroup.add(this.hotbarThree)
     this.MenuGroup.add(this.hotbarFour)
-    this.MenuGroup.add(this.switchWeaponBtn)
+    this.MenuGroup.add(this.switchWeaponBtnUp)
+    this.MenuGroup.add(this.switchWeaponBtnDown)
     this.MenuGroup.add(this.arrowUp)
     this.MenuGroup.add(this.arrowDown)
     this.MenuGroup.add(this.arrowLeft)

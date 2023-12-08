@@ -5,6 +5,7 @@ import { IRifle } from '../../Interfaces/Guns/IRifle'
 import { IItem } from '../../Interfaces/IItem'
 import { SizeEnum } from '../../Models/Enums'
 import { Player } from '../../Models/Player'
+import GunsArray from '../Iterator/GunsArray'
 
 interface PlayerBuilderInterface {
   setPosition(tilePos: Phaser.Math.Vector2): void
@@ -13,8 +14,8 @@ interface PlayerBuilderInterface {
   setFrame(frame: number): void
   setColor(color: string): void
   setSocketId(socketId: string): void
-  setMainGun(gun: IRifle | IGrenadeLauncher): void
-  setSecondaryGun(gun: IPistol): void
+  setSelectedGun(gun: IRifle | IGrenadeLauncher | IPistol): void
+  setAllGuns(guns: GunsArray): void
   build(): Player
 }
 
@@ -71,8 +72,7 @@ export default class PlayerBuilder implements PlayerBuilderInterface {
     this.player.id = socketId
   }
 
-  setMainGun(gun: IRifle | IGrenadeLauncher) {
-    this.player.mainGun = gun
+  setSelectedGun(gun: IRifle | IGrenadeLauncher | IPistol) {
     this.player.selectedGun = gun
     this.player.gunImage = this.scene.add.image(0, 0, 'guns', this.player.selectedGun.gunFrame).setScale(0.2)
 
@@ -82,8 +82,9 @@ export default class PlayerBuilder implements PlayerBuilderInterface {
     this.player.showChosenGun()
   }
 
-  setSecondaryGun(gun: IPistol) {
-    this.player.secondaryGun = gun
+  setAllGuns(guns: GunsArray)
+  {
+    this.player.allGuns = guns;
   }
 
   setItems(items: Array<IItem>) {

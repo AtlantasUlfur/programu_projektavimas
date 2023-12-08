@@ -121,17 +121,17 @@ export default class SocketController {
 
       
       this.socket.on('gunChange', payload => { 
-        console.log(payload);
         const mainScene = this.scene as MainScene;
  
         if (payload !== null) {
-          let player = _.find(mainScene.playerList, (player: Player) => player.id === payload);
-          if (player !== undefined) {
+          let player = _.find(mainScene.playerList, (player: Player) => player.id === payload.player);
+          if (player !== undefined && player != mainScene.player) {
             var switchWeaponCommand = new PlayerChangeWeapon(player);
-            if (player.selectedGun == player.mainGun)
+            if(payload.command == "execute"){
               switchWeaponCommand.execute();
-            else
+            }else{
               switchWeaponCommand.undo();
+            }
           }
         }
       });
@@ -184,9 +184,12 @@ export default class SocketController {
   public removeTurn() {
     this.socket?.emit('disconnect')
   }
+  
 
-  public changeGun() {
-    this.socket?.emit('changeGun')
+  public changeGun(commandType) {
+    this.socket?.emit('changeGun', commandType)
+    console.log("emitin changin gun in socket controller: ")
+    console.log(commandType)
   }
 
   public healPlayer(healthIncrease : number){
