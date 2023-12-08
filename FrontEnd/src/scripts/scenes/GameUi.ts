@@ -374,20 +374,20 @@ export default class GameUI extends Phaser.Scene {
       this.commandDown.clearTint()
     })
 
-    this.Undo= this.add.sprite(0, 0, 'arrowright')
-    this.Undo.displayHeight = 24
-    this.Undo.displayWidth = 24
-    this.Undo.setOrigin(1, 0)
-    this.Undo.setPosition(885, 550)
-    this.Undo.setInteractive()
-    this.Undo.on('pointerdown', event => {
-      this.Undo.tint = 12
-    console.log("pressed")
-      sceneEvents.emit('Undo')
-    })
-    this.Undo.on('pointerup', event => {
-      this.hotbarOne.clearTint()
-    })
+    // this.Undo= this.add.sprite(0, 0, 'arrowright')
+    // this.Undo.displayHeight = 24
+    // this.Undo.displayWidth = 24
+    // this.Undo.setOrigin(1, 0)
+    // this.Undo.setPosition(885, 550)
+    // this.Undo.setInteractive()
+    // this.Undo.on('pointerdown', event => {
+    //   this.Undo.tint = 12
+    // console.log("pressed")
+    //   sceneEvents.emit('Undo')
+    // })
+    // this.Undo.on('pointerup', event => {
+    //   this.hotbarOne.clearTint()
+    // })
 
     this.MenuGroup = this.add.group()
     this.MenuGroup.add(this.baseSprite)

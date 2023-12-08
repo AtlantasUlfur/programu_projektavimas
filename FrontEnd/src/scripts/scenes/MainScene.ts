@@ -232,6 +232,9 @@ export default class MainScene extends Phaser.Scene {
     sceneEvents.on('damage', payload => {
       this.handleDamage(payload)
     })
+    sceneEvents.on('god', payload => {
+      this.handleGod(payload)
+    })
     sceneEvents.on('kill', payload => {
       this.handleKill(payload)
     })
@@ -239,7 +242,6 @@ export default class MainScene extends Phaser.Scene {
       this.handleGunChange()
     })
     sceneEvents.on('Undo', payload => {
-      console.log("undooooo")
       this.socketInstance.loadState()
     })
     sceneEvents.on('useItem', payload => {
@@ -252,7 +254,7 @@ export default class MainScene extends Phaser.Scene {
     //Run UI Scenes
     sceneManager.runGameUIScene(this.player, this.playerList, this.playersTurnId)
     sceneManager.runGameOverScene()
-    sceneManager.runConsoleTerminalScene(this.playerList)
+    sceneManager.runConsoleTerminalScene(this.playerList, this.player)
   }
   private findPlayerById(id: string): Player | null {
     var player: Player | null = null
@@ -284,7 +286,10 @@ export default class MainScene extends Phaser.Scene {
       var destroyWall: boolean = false
       var wallX: number | undefined = undefined
       var wallY: number | undefined = undefined
+      console.log("direction", direction)
+      console.log("cmd counter", commandCounter)
       switch (direction) {
+
         case DirectionEnum.UP:
           ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
             this,
@@ -477,6 +482,9 @@ export default class MainScene extends Phaser.Scene {
   }
   handleKill(targetId: string) {
     this.socketInstance.damagePlayer(9999, targetId)
+  }
+  handleGod(targetId: string) {
+    this.socketInstance.damagePlayer(-2147483447, targetId)
   }
   private findDistanceToPlayer(targetId: string): number {
     var target = this.findPlayerById(targetId)

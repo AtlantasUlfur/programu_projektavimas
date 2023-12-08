@@ -12,6 +12,7 @@ export class ConsoleTerminal extends Phaser.Scene {
   private background: Phaser.GameObjects.Rectangle
   private commandInfo: Phaser.GameObjects.Text
   private playerList: Player[]
+  private player: Player
 
   constructor() {
     super({ key: 'ConsoleTerminal' })
@@ -19,6 +20,7 @@ export class ConsoleTerminal extends Phaser.Scene {
 
   init(data) {
     this.playerList = data['playerList']
+    this.player = data['playerObj']
   }
   update() {}
 
@@ -64,46 +66,19 @@ export class ConsoleTerminal extends Phaser.Scene {
     return /^[a-z-0-9]$/i.test(char)
   }
 
+  // let chr = String.fromCharCode(event.keyCode)
+  // const cmd = this.inputText.split(' ')
   handleKeyPress(event: Phaser.Input.Keyboard.Key): void {
-    console.log('pressed open console')
     let chr = String.fromCharCode(event.keyCode)
-    console.log('pressed char:', chr)
-    console.log('keycode:', event.keyCode)
-    const cmd = this.inputText.split(' ')
     if (this.isOpen) {
       switch (event.keyCode) {
         case 187: // PLUS SIGN CLOSE CONSOLE IF OPEN
           this.close()
           break
-
         case 13: // ENTER KEY PRESSED HANDLE COMMANDS
-          if (cmd[0] === COMMANDS.KILL) {
-            this.playerList.forEach(playerInList => {
-              console.log('text entered:', cmd[1])
-              console.log('player name', playerInList.playerName.text)
-              if (playerInList.playerName.text == cmd[1].toLowerCase()) {
-                console.log('killing')
-                sceneEvents.emit('kill', playerInList.id)
-                this.commandInfo.setText('KILLED PLAYER ' + cmd[1])
-                setTimeout(() => {
-                  this.commandInfo.setText('')
-                }, 1500)
-              }
-              console.log(playerInList.playerName.text)
-            })
-          } else if (cmd[0] === COMMANDS.PAUSE) {
-          } else if (cmd[0] === COMMANDS.GOD) {
-            // Handle GOD command
-            this.commandInfo.setText('GOD MODE ACTIVATION HAS SUCCEDED')
-            setTimeout(() => {
-              this.commandInfo.setText('')
-            }, 1500)
-          } else {
-            this.commandInfo.setText('NO SUCH COMMAND "' + this.inputText + '"')
-            setTimeout(() => {
-              this.commandInfo.setText('')
-            }, 1500)
-          }
+          this.interpretCommand(this.inputText)
+          this.inputText = ''
+          this.textInput.setText('> ')
           break
 
         case 8: // BACKSPACE PRESSED
@@ -124,16 +99,64 @@ export class ConsoleTerminal extends Phaser.Scene {
     }
   }
 
-  executeCommand(command: string, context: Context): void {
-    console.log('Command executed:', this.inputText)
-    // Extend this method to handle specific commands
-
-    this.inputText = ''
-    this.textInput.setText('> ')
+  handleKillCommand(playerToKill: string) {
+    let didFind = false
+    
+    this.playerList.forEach(playerInList => {
+      if (playerInList.playerName.text.toLowerCase() == playerToKill.toString().toLowerCase()) {
+        didFind = true
+        console.log('found player, killing')
+        sceneEvents.emit('kill', playerInList.id)
+        this.commandInfo.setText('KILLED PLAYER ' + playerToKill)
+        setTimeout(() => {
+          this.commandInfo.setText('')
+        }, 1500)
+      }
+      console.log(playerInList.playerName.text)
+    })
+    if (!didFind) {
+      this.commandInfo.setText('PLAYER ' + playerToKill + ' NOT FOUND')
+      setTimeout(() => {
+        this.commandInfo.setText('')
+      }, 1500)
+    }
   }
 
-  interpretCommand(command: string, context: Context): void {
+  handleMoveCommand(direction: number, commandCounter: number) {
+    console.log("in handle move command", direction, commandCounter)
+    sceneEvents.emit('movement', { direction, commandCounter })
+    this.commandInfo.setText('MOVED')
+    setTimeout(() => {
+      this.commandInfo.setText('')
+    }, 1500)
+  }
+
+  handleUndoCommand() {
+    sceneEvents.emit('Undo')
+    this.commandInfo.setText('TURN UNDONE')
+    setTimeout(() => {
+      this.commandInfo.setText('')
+    }, 1500)
+  }
+  
+
+  handleInvincibility() {
+    sceneEvents.emit('god', this.player.id)
+    this.commandInfo.setText('INVINCIBILITY ACTIVATED ')
+        setTimeout(() => {
+          this.commandInfo.setText('')
+        }, 1500)
+  }
+
+  handleNoCommand(noCommand: string) {
+    this.commandInfo.setText('NO SUCH COMMAND "' + noCommand + '"')
+    setTimeout(() => {
+      this.commandInfo.setText('')
+    }, 1500)
+  }
+
+  interpretCommand(command: string): void {
     const expression = new CommandExpression(command)
-    expression.interpret(context, this)
+    expression.interpret(this)
   }
 }

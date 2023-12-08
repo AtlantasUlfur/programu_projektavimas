@@ -40,9 +40,9 @@ export class SceneManagerFacade {
     console.log("run ui scene")
     this.scene.run('UIScene', { playerObj: player, players: playerList, playersTurnId: playersTurnId })
   }
-  runConsoleTerminalScene(playerList) {
+  runConsoleTerminalScene(playerList, playerObj) {
     console.log("running console scene")
-    this.scene.run('ConsoleTerminal', { playerList })
+    this.scene.run('ConsoleTerminal', { playerList, playerObj })
   }
 
   restartCurrentScene() {
