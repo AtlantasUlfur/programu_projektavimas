@@ -38,8 +38,7 @@ export default class MainScene extends Phaser.Scene {
   public player: Player
   public playersTurnId: string = ''
   private allGuns: IGun[]
-  public theme: string
-  private consoleTerminal: ConsoleTerminal  
+  public theme: string 
   public socketInstance: SocketController
   private turretCount = 1
   private turretPositions: Array<{ x: integer; y: integer }> = []

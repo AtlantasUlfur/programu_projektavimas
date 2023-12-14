@@ -1,7 +1,5 @@
-import { i } from 'mathjs'
 import { Player } from '../../Models/Player'
 import { CommandExpression } from './CommandExpression'
-import { COMMANDS } from './Commands'
 import { sceneEvents } from '../../Events/EventsController'
 
 export class ConsoleTerminal extends Phaser.Scene {

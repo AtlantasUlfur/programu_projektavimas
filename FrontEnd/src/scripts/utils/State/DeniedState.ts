@@ -4,7 +4,6 @@ import { MainMenuState } from './State'
 
 export class DeniedState implements MainMenuState {
   handleInput(mainMenu: MainMenuScene): void {
-    // Handle input for the denied state
   }
   createInput(mainMenu: MainMenuScene): void {}
 

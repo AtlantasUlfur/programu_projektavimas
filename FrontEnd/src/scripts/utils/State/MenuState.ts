@@ -2,7 +2,7 @@ import { Button } from '../../Models/Button'
 import { MainMenuScene } from '../../scenes/MainMenuScene'
 import { MainMenuState } from './State'
 
-// Concrete implementation of MenuState
+// Concrete implementation
 export class MenuState implements MainMenuState {
   createInput(mainMenu: MainMenuScene): void {
     mainMenu.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {

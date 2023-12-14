@@ -28,7 +28,6 @@ export class InLobbyState implements MainMenuState {
 
       mainMenu.buttons.push(new Button(startGameButtonImage, startGameButtonText))
       mainMenu.selectButton(0)
-      mainMenu.buttonSelector.visible = true
 
       startGameButtonImage.on('selected', () => {
         console.log('Start game pressed')
@@ -92,6 +91,18 @@ export class InLobbyState implements MainMenuState {
   }
   createInput(mainMenu: MainMenuScene): void {}
   update(mainMenu: MainMenuScene): void {
+    if (mainMenu.playerCount < 2) {
+      var boton = mainMenu.buttons.find(button => button.Text.text == 'Start Game')
+      boton?.Image.setVisible(false)
+      boton?.Text.setVisible(false)
+      mainMenu.buttonSelector.visible = false
+    }
+    if (mainMenu.playerCount >= 2 && mainMenu.playerCount <= 4) {
+      var boton = mainMenu.buttons.find(button => button.Text.text == 'Start Game')
+      boton?.Image.setVisible(true)
+      boton?.Text.setVisible(true)
+      mainMenu.buttonSelector.visible = true
+    }
     mainMenu.playerCountText?.setText(`Waiting for players... ${mainMenu.playerCount}/4`)
   }
 }
