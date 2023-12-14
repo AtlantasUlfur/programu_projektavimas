@@ -15,7 +15,7 @@ import { MediumRangeGunStrategy } from '../utils/Strategy/GunStrategy'
 import MathAdapter from '../utils/Adapter/MathAdapter'
 import { Turret } from '../Models/Turret'
 import Flyweight from '../utils/Flyweight/Flyweight'
-import { Map } from '../Models/Map';
+import { Map } from '../Models/Map'
 import { Tile } from '../utils/Composite/Tile'
 import { GroundTileHandler, PlayerTileHandler, TileHandler, WallTileHandler } from '../utils/Chain/Handler'
 import { ConsoleTerminal } from '../utils/Interpreter/ConsoleTerminal'
@@ -23,13 +23,15 @@ import { IItem } from '../Interfaces/IItem'
 import { HealthItem, TimeTravelItem } from '../Models/Items'
 import { HealthEffect, TimeTravelEffect } from '../utils/Template/ConcreteEffects'
 import { BoostedItemVisitor, ItemVisitor, SuperBoostedItemVisitor } from '../utils/Visitor/Visitor'
+import GunsArray from '../utils/Iterator/GunsArray'
+import { DamageProxy, MovementProxy } from '../utils/Proxy/Proxy'
 
 export default class MainScene extends Phaser.Scene {
   //Init Data
   private mapData
   private currentPlayerData: PlayerServer
   private allPlayerData: PlayerServer[]
-  private flyweight_: Flyweight = new Flyweight();
+  private flyweight_: Flyweight = new Flyweight()
   //Map
   public map: Map
   //Players
@@ -37,14 +39,17 @@ export default class MainScene extends Phaser.Scene {
   public alivePlayerCount: number = 0
   public player: Player
   public playersTurnId: string = ''
-  private allGuns: IGun[]
-  public theme: string 
+  private allGuns: GunsArray
+  public theme: string
+  private consoleTerminal: ConsoleTerminal
   public socketInstance: SocketController
   private turretCount = 1
   private turretPositions: Array<{ x: integer; y: integer }> = []
   private turrets: Array<Turret> = []
   public mathAdapter: MathAdapter = new MathAdapter()
   private tileHandler: TileHandler
+  private damageProxy: DamageProxy = new DamageProxy(this)
+  private movementProxy: MovementProxy = new MovementProxy(this)
   constructor() {
     super('MainScene')
 
@@ -105,15 +110,27 @@ export default class MainScene extends Phaser.Scene {
       frameHeight: 254
     })
     //Load texturesW
-    this.flyweight_.load('player', 'spritesheet', '../../assets/characters.png', {
-      frameWidth: 26,
-      frameHeight: 36
-    }, this);
+    this.flyweight_.load(
+      'player',
+      'spritesheet',
+      '../../assets/characters.png',
+      {
+        frameWidth: 26,
+        frameHeight: 36
+      },
+      this
+    )
 
-    this.flyweight_.load('dead', 'spritesheet', '../../assets/cloud_tileset.png', {
-      frameWidth: 16,
-      frameHeight: 16
-    }, this);
+    this.flyweight_.load(
+      'dead',
+      'spritesheet',
+      '../../assets/cloud_tileset.png',
+      {
+        frameWidth: 16,
+        frameHeight: 16
+      },
+      this
+    )
 
     switch (this.theme) {
       case 'cloud_background':
@@ -137,20 +154,38 @@ export default class MainScene extends Phaser.Scene {
         this.load.image('cloud_background', '../../assets/cloud_backround.png')
         break
     }
-    this.flyweight_.load('guns', 'spritesheet', '../../assets/guns.png', {
-      frameWidth: 160,
-      frameHeight: 160
-    }, this);
+    this.flyweight_.load(
+      'guns',
+      'spritesheet',
+      '../../assets/guns.png',
+      {
+        frameWidth: 160,
+        frameHeight: 160
+      },
+      this
+    )
 
-    this.flyweight_.load('health-potion', 'spritesheet', '../../assets/health-potion.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    }, this);
+    this.flyweight_.load(
+      'health-potion',
+      'spritesheet',
+      '../../assets/health-potion.png',
+      {
+        frameWidth: 32,
+        frameHeight: 32
+      },
+      this
+    )
 
-    this.flyweight_.load('clock', 'spritesheet', '../../assets/clock.png', {
-      frameWidth: 120,
-      frameHeight: 120
-    }, this);
+    this.flyweight_.load(
+      'clock',
+      'spritesheet',
+      '../../assets/clock.png',
+      {
+        frameWidth: 120,
+        frameHeight: 120
+      },
+      this
+    )
   }
 
   create() {
@@ -180,8 +215,8 @@ export default class MainScene extends Phaser.Scene {
       return a.socketId.localeCompare(b.socketId)
     })
     const texture_frames = [49, 52, 55, 10]
-    var pistol = this.allGuns[0] as IPistol
-    var rifle = this.allGuns[4] as IRifle
+    var pistol = this.allGuns.items[0] as IPistol
+    var rifle = this.allGuns.items[4] as IRifle
     var deepPistol = pistol.deepCopy()
     var shallowPistol = pistol.shallowCopy() as IPistol
     console.log('original pistol', pistol)
@@ -208,8 +243,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('#008000')
         builder.setHP(playerData.currentHP)
         builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(pistol.deepCopy())
-        builder.setMainGun(rifle.deepCopy() as IRifle)
+        //builder.setSecondaryGun(pistol.deepCopy())
+        //builder.setMainGun(rifle.deepCopy() as IRifle)
+        builder.setAllGuns(this.allGuns)
+        builder.setSelectedGun(this.allGuns.items[0])
         builder.setItems(this.generateItems())
         this.player = builder.build()
         scene.playerList.push(this.player)
@@ -226,9 +263,10 @@ export default class MainScene extends Phaser.Scene {
         builder.setColor('red')
         builder.setHP(playerData.currentHP)
         builder.setSocketId(playerData.socketId)
-        builder.setSecondaryGun(pistol.deepCopy())
-        builder.setMainGun(rifle.deepCopy() as IRifle)
-
+        //builder.setSecondaryGun(pistol.deepCopy())
+        //builder.setMainGun(rifle.deepCopy() as IRifle)
+        builder.setAllGuns(this.allGuns)
+        builder.setSelectedGun(this.allGuns.items[0])
         let otherPlayer = builder.build()
         scene.playerList.push(otherPlayer)
       }
@@ -236,10 +274,12 @@ export default class MainScene extends Phaser.Scene {
 
     //Handle player events
     sceneEvents.on('movement', payload => {
-      this.handleMovement(payload.direction, payload.commandCounter)
+      this.movementProxy.run(payload.direction, payload.commandCounter)
+      //this.handleMovement(payload.direction, payload.commandCounter)
     })
     sceneEvents.on('damage', payload => {
-      this.handleDamage(payload)
+      this.damageProxy.run(payload);
+      //this.handleDamage(payload)
     })
     sceneEvents.on('god', payload => {
       this.handleGod(payload)
@@ -248,16 +288,16 @@ export default class MainScene extends Phaser.Scene {
       this.handleKill(payload)
     })
     sceneEvents.on('changeGun', payload => {
-      this.handleGunChange()
+      this.handleGunChange(payload)
     })
     sceneEvents.on('Undo', payload => {
       this.socketInstance.loadState()
     })
     sceneEvents.on('useItem', payload => {
-      console.log("ItemUsed",payload);
-      this.player.getItem(payload).use();
-      this.player.removeItem(payload);
-      this.socketInstance.endTurn();
+      console.log('ItemUsed', payload)
+      this.player.getItem(payload).use()
+      this.player.removeItem(payload)
+      this.socketInstance.endTurn()
     })
 
     //Run UI Scenes
@@ -275,8 +315,8 @@ export default class MainScene extends Phaser.Scene {
     })
     return player
   }
-  handleGunChange() {
-    this.socketInstance.changeGun()
+  handleGunChange(payload) {
+    this.socketInstance.changeGun(payload)
   }
 
   update(time: number, delta: number) {
@@ -290,108 +330,105 @@ export default class MainScene extends Phaser.Scene {
   }
 
   handleMovement(direction: DirectionEnum, commandCounter: number) {
-    if (this.playersTurnId == this.player.id && !this.player.isDead()) {
-      var distance = 0
-      var destroyWall: boolean = false
-      var wallX: number | undefined = undefined
-      var wallY: number | undefined = undefined
-      console.log("direction", direction)
-      console.log("cmd counter", commandCounter)
-      switch (direction) {
-
-        case DirectionEnum.UP:
-          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
-            this,
-            this.map.tileMap,
-            this.player,
-            this.player.tilePos.x,
-            this.player.tilePos.y - commandCounter,
-            DirectionEnum.UP
-          )
-          console.log(distance)
-          if (distance != 0) {
-            if (destroyWall) {
-              this.map.tryDestroyTile(wallX, wallY)
-              this.socketInstance.destroyWall(wallX, wallY)
-            }
-            this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - distance)
-            this.player.move(DirectionEnum.UP, distance)
-            if (this.player.isBleeding) {
-              this.socketInstance.damagePlayer(distance, this.player.id)
-            }
-            this.socketInstance.endTurn()
+    var distance = 0
+    var destroyWall: boolean = false
+    var wallX: number | undefined = undefined
+    var wallY: number | undefined = undefined
+    console.log('direction', direction)
+    console.log('cmd counter', commandCounter)
+    switch (direction) {
+      case DirectionEnum.UP:
+        ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          this,
+          this.map.tileMap,
+          this.player,
+          this.player.tilePos.x,
+          this.player.tilePos.y - commandCounter,
+          DirectionEnum.UP
+        )
+        console.log(distance)
+        if (distance != 0) {
+          if (destroyWall) {
+            this.map.tryDestroyTile(wallX, wallY)
+            this.socketInstance.destroyWall(wallX, wallY)
           }
-          break
-        case DirectionEnum.DOWN:
-          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
-            this,
-            this.map.tileMap,
-            this.player,
-            this.player.tilePos.x,
-            this.player.tilePos.y + commandCounter,
-            DirectionEnum.DOWN
-          )
-          if (distance != 0) {
-            if (destroyWall) {
-              this.map.tryDestroyTile(wallX, wallY)
-              this.socketInstance.destroyWall(wallX, wallY)
-            }
-            this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + distance)
-            this.player.move(DirectionEnum.DOWN, distance)
-            if (this.player.isBleeding) {
-              this.socketInstance.damagePlayer(distance, this.player.id)
-            }
-            this.socketInstance.endTurn()
+          this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y - distance)
+          this.player.move(DirectionEnum.UP, distance)
+          if (this.player.isBleeding) {
+            this.socketInstance.damagePlayer(distance, this.player.id)
           }
-          break
-        case DirectionEnum.LEFT:
-          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
-            this,
-            this.map.tileMap,
-            this.player,
-            this.player.tilePos.x - commandCounter,
-            this.player.tilePos.y,
-            DirectionEnum.LEFT
-          )
-          if (distance != 0) {
-            if (destroyWall) {
-              this.map.tryDestroyTile(wallX, wallY)
-              this.socketInstance.destroyWall(wallX, wallY)
-            }
-            this.socketInstance.movePlayer(this.player.tilePos.x - distance, this.player.tilePos.y)
-            this.player.move(DirectionEnum.LEFT, distance)
-            if (this.player.isBleeding) {
-              this.socketInstance.damagePlayer(distance, this.player.id)
-            }
-            this.socketInstance.endTurn()
+          this.socketInstance.endTurn()
+        }
+        break
+      case DirectionEnum.DOWN:
+        ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          this,
+          this.map.tileMap,
+          this.player,
+          this.player.tilePos.x,
+          this.player.tilePos.y + commandCounter,
+          DirectionEnum.DOWN
+        )
+        if (distance != 0) {
+          if (destroyWall) {
+            this.map.tryDestroyTile(wallX, wallY)
+            this.socketInstance.destroyWall(wallX, wallY)
           }
-          break
-        case DirectionEnum.RIGHT:
-          ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
-            this,
-            this.map.tileMap,
-            this.player,
-            this.player.tilePos.x + commandCounter,
-            this.player.tilePos.y,
-            DirectionEnum.RIGHT
-          )
-          if (distance != 0) {
-            if (destroyWall) {
-              this.map.tryDestroyTile(wallX, wallY)
-              this.socketInstance.destroyWall(wallX, wallY)
-            }
-            this.socketInstance.movePlayer(this.player.tilePos.x + distance, this.player.tilePos.y)
-            this.player.move(DirectionEnum.RIGHT, distance)
-            if (this.player.isBleeding) {
-              this.socketInstance.damagePlayer(distance, this.player.id)
-            }
-            this.socketInstance.endTurn()
+          this.socketInstance.movePlayer(this.player.tilePos.x, this.player.tilePos.y + distance)
+          this.player.move(DirectionEnum.DOWN, distance)
+          if (this.player.isBleeding) {
+            this.socketInstance.damagePlayer(distance, this.player.id)
           }
-          break
-        default:
-          console.log('Somethings wrong...')
-          break
-      }
+          this.socketInstance.endTurn()
+        }
+        break
+      case DirectionEnum.LEFT:
+        ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          this,
+          this.map.tileMap,
+          this.player,
+          this.player.tilePos.x - commandCounter,
+          this.player.tilePos.y,
+          DirectionEnum.LEFT
+        )
+        if (distance != 0) {
+          if (destroyWall) {
+            this.map.tryDestroyTile(wallX, wallY)
+            this.socketInstance.destroyWall(wallX, wallY)
+          }
+          this.socketInstance.movePlayer(this.player.tilePos.x - distance, this.player.tilePos.y)
+          this.player.move(DirectionEnum.LEFT, distance)
+          if (this.player.isBleeding) {
+            this.socketInstance.damagePlayer(distance, this.player.id)
+          }
+          this.socketInstance.endTurn()
+        }
+        break
+      case DirectionEnum.RIGHT:
+        ;[distance, destroyWall, wallX, wallY] = this.canPlayerMove(
+          this,
+          this.map.tileMap,
+          this.player,
+          this.player.tilePos.x + commandCounter,
+          this.player.tilePos.y,
+          DirectionEnum.RIGHT
+        )
+        if (distance != 0) {
+          if (destroyWall) {
+            this.map.tryDestroyTile(wallX, wallY)
+            this.socketInstance.destroyWall(wallX, wallY)
+          }
+          this.socketInstance.movePlayer(this.player.tilePos.x + distance, this.player.tilePos.y)
+          this.player.move(DirectionEnum.RIGHT, distance)
+          if (this.player.isBleeding) {
+            this.socketInstance.damagePlayer(distance, this.player.id)
+          }
+          this.socketInstance.endTurn()
+        }
+        break
+      default:
+        console.log('Somethings wrong...')
+        break
     }
   }
 
@@ -482,12 +519,10 @@ export default class MainScene extends Phaser.Scene {
     }
   }
   handleDamage(targetId: string) {
-    if (this.playersTurnId == this.player.id && !this.player.isDead()) {
-      console.log('player shoot', this.player)
-      var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId))
-      this.socketInstance.damagePlayer(damage, targetId)
-      this.socketInstance.endTurn()
-    }
+    console.log('player shoot', this.player)
+    var damage = this.player.selectedGun.shoot(this.findDistanceToPlayer(targetId))
+    this.socketInstance.damagePlayer(damage, targetId)
+    this.socketInstance.endTurn()
   }
   handleKill(targetId: string) {
     this.socketInstance.damagePlayer(9999, targetId)
@@ -503,11 +538,13 @@ export default class MainScene extends Phaser.Scene {
     return this.mathAdapter.calculateEuclidean(this.player.tilePos, target.tilePos) // <- Distance
   }
 
-  private generateItems() : Array<IItem> {
-    var items : Array<IItem> = [new TimeTravelItem("clock", new TimeTravelEffect(), new ItemVisitor(this.socketInstance, sceneEvents)),
-                                new HealthItem("health-potion", new HealthEffect(), new BoostedItemVisitor(this.socketInstance, sceneEvents)),
-                                new HealthItem("health-potion", new HealthEffect(), new ItemVisitor(this.socketInstance, sceneEvents)),
-                                new HealthItem("health-potion", new HealthEffect(), new SuperBoostedItemVisitor(this.socketInstance, sceneEvents))];
-    return items;
+  private generateItems(): Array<IItem> {
+    var items: Array<IItem> = [
+      new TimeTravelItem('clock', new TimeTravelEffect(), new ItemVisitor(this.socketInstance, sceneEvents)),
+      new HealthItem('health-potion', new HealthEffect(), new BoostedItemVisitor(this.socketInstance, sceneEvents)),
+      new HealthItem('health-potion', new HealthEffect(), new ItemVisitor(this.socketInstance, sceneEvents)),
+      new HealthItem('health-potion', new HealthEffect(), new SuperBoostedItemVisitor(this.socketInstance, sceneEvents))
+    ]
+    return items
   }
 }
