@@ -274,7 +274,7 @@ export default class MainScene extends Phaser.Scene {
 
     //Handle player events
     sceneEvents.on('movement', payload => {
-      this.movementProxy.run(payload.direction, payload.commandCounter)
+      this.movementProxy.run(payload)
       //this.handleMovement(payload.direction, payload.commandCounter)
     })
     sceneEvents.on('damage', payload => {
