@@ -12,6 +12,7 @@ const io = require("socket.io")(server, {
         origin: "*",
     },
 });
+const CareTaker_ = new models_1.CareTaker();
 const MAX_PLAYERS_IN_SESSION = 4;
 const MAP_DIMENSIONS = 20;
 app.use(cors({
@@ -80,7 +81,6 @@ const mediator = new Mediator();
 io.on("connection", function (socket) {
     sockets[socket.id] = socket;
     socket.on("disconnect", function () {
-        console.log("user disconnected");
         try {
             // remove this player from our players object
             const removedPlayer = _.remove(players, (player) => player.socketId === socket.id);
@@ -95,11 +95,9 @@ io.on("connection", function (socket) {
             });
         }
         catch (error) {
-            console.log(error);
         }
     });
     socket.on("createLobby", function (payload) {
-        console.log("New lobby");
         const sessionId = uuid();
         sessions.push({ id: sessionId, name: payload.name, playerCount: 1 });
         players.push({
@@ -108,7 +106,18 @@ io.on("connection", function (socket) {
             sessionId,
             currentHP: 100,
             name: payload.name,
-            memento: null,
+            createMemento() {
+                console.log(this.currentHP);
+                return new models_1.PlayerMemento(this.socketId, { x: this.x, y: this.y }, this.currentHP || 0, this.isTurn || false, this.moveOrder || 0);
+            },
+            restoreMemento() {
+                console.log("RESTORING:" + this.socketId);
+                const snap = CareTaker_.undo(this.socketId);
+                this.x = snap === null || snap === void 0 ? void 0 : snap.getPosition().x;
+                this.y = snap === null || snap === void 0 ? void 0 : snap.getPosition().y;
+                this.currentHP = snap === null || snap === void 0 ? void 0 : snap.getHealth();
+                this.isTurn = snap === null || snap === void 0 ? void 0 : snap.getTurnStatus();
+            }
         });
         mediator.sendToRequester(socket.id, "playerCount", 1);
     });
@@ -118,8 +127,6 @@ io.on("connection", function (socket) {
         mediator.sendToGamePlayers(socket.id, "destroyWall", { x: x, y: y });
     });
     socket.on("joinLobby", function (payload) {
-        console.log("Join lobby");
-        console.log(payload);
         const name = payload.name;
         const session = getSession(name);
         if (!session) {
@@ -133,14 +140,23 @@ io.on("connection", function (socket) {
             sessionId: session.id,
             currentHP: 100,
             name: payload.playerName,
-            memento: null,
+            createMemento() {
+                return new models_1.PlayerMemento(this.socketId, { x: this.x, y: this.y }, this.currentHP || 0, this.isTurn || false, this.moveOrder || 0);
+            },
+            restoreMemento() {
+                const snap = CareTaker_.undo(this.socketId);
+                console.log("SNAP RESTORE: " + snap);
+                this.x = snap === null || snap === void 0 ? void 0 : snap.position.x;
+                this.y = snap === null || snap === void 0 ? void 0 : snap.position.y;
+                this.currentHP = snap === null || snap === void 0 ? void 0 : snap.health;
+                this.isTurn = snap === null || snap === void 0 ? void 0 : snap.isTurn;
+            }
         });
         const sessionPlayers = getSessionPlayers(session.id);
         const playerCount = sessionPlayers.length;
         mediator.sendToGamePlayers(socket.id, "playerCount", playerCount);
     });
     socket.on("startGame", function (payload) {
-        console.log("Start game");
         const name = payload.name;
         const theme = payload.theme;
         const session = getSession(name);
@@ -213,12 +229,10 @@ io.on("connection", function (socket) {
         });
     });
     socket.on("changeGun", function (payload) {
-        console.log("changeGun");
         mediator.sendToGamePlayers(socket.id, "gunChange", { player: socket.id, command: payload });
     });
     socket.on("endTurn", function () {
         var _a;
-        console.log("End Turn");
         const player = getPlayerBySocketId(socket.id);
         const sessionId = player.sessionId; //ZaidimoID
         let moveOrder = (_a = player.moveOrder) !== null && _a !== void 0 ? _a : 0;
@@ -238,12 +252,17 @@ io.on("connection", function (socket) {
         player.isTurn = false;
         nextPlayer.isTurn = true;
         mediator.sendToGamePlayers(socket.id, "turn", nextPlayer.socketId);
-        console.log("memento");
     });
     socket.on("movePlayer", function (x, y) {
-        console.log("Move");
         const player = getPlayerBySocketId(socket.id);
-        player.memento = new models_1.PlayerMemento({ x: player.x, y: player.y }, player.currentHP || 0, player.isTurn || false, player.moveOrder || 0);
+        const snap = player.createMemento();
+        CareTaker_.save(snap);
+        // player.memento = new PlayerMemento(
+        //   { x: player.x, y: player.y },
+        //   player.currentHP || 0,
+        //   player.isTurn || false,
+        //   player.moveOrder || 0
+        // );
         player.x = x;
         player.y = y;
         mediator.sendToGamePlayers(socket.id, "playerMove", {
@@ -253,27 +272,28 @@ io.on("connection", function (socket) {
         });
     });
     socket.on("damagePlayer", function (damage, targetId) {
-        console.log("Damaged");
-        console.log("DMG", damage);
-        console.log(targetId);
         if (damage != 0) {
             const player = getPlayerBySocketId(targetId);
-            if (player.memento) {
-                if (player.currentHP !== undefined) {
-                    player.memento.health = player.currentHP;
-                }
-                else {
-                }
-            }
+            // if (player.memento) {
+            //   if (player.currentHP !== undefined) {
+            //     player.memento.health = player.currentHP;
+            //   } else {
+            //   }
+            // }
             const playerSocket = getPlayerBySocketId(socket.id);
-            playerSocket.memento = new models_1.PlayerMemento({ x: playerSocket.x, y: playerSocket.y }, playerSocket.currentHP || 0, playerSocket.isTurn || false, playerSocket.moveOrder || 0);
-            console.log("BEFORE HP", player.currentHP);
+            // playerSocket.memento = new PlayerMemento(
+            //   { x: playerSocket.x, y: playerSocket.y },
+            //   playerSocket.currentHP || 0,
+            //   playerSocket.isTurn || false,
+            //   playerSocket.moveOrder || 0
+            // );
+            const snap = player.createMemento();
+            CareTaker_.save(snap);
             player.currentHP =
                 player.currentHP == undefined ? 0 : player.currentHP - damage;
             if (player.currentHP < 0) {
                 player.currentHP = 0;
             }
-            console.log("AFTER HP", player.currentHP);
             mediator.sendToGamePlayers(socket.id, "playerDamage", {
                 player: targetId,
                 currentHP: player.currentHP,
@@ -281,7 +301,6 @@ io.on("connection", function (socket) {
         }
     });
     socket.on("getAttackAmount", function () {
-        console.log("Getting attack amount");
         const randomNumber = 10;
         mediator.sendToRequester(socket.id, "attackAmount", {
             player: socket.id,
@@ -290,31 +309,27 @@ io.on("connection", function (socket) {
     });
     socket.on("loadState", function () {
         var _a;
-        console.log("loadState");
         const player = getPlayerBySocketId(socket.id);
         const sessionId = player.sessionId; //ZaidimoID
         let moveOrder = (_a = player.moveOrder) !== null && _a !== void 0 ? _a : 0;
         const sessionPlayers = getSessionPlayers(sessionId);
         _.forEach(sessionPlayers, function (player) {
-            var _a, _b, _c, _d;
-            player.x = (_a = player.memento) === null || _a === void 0 ? void 0 : _a.getPosition().x;
-            player.y = (_b = player.memento) === null || _b === void 0 ? void 0 : _b.getPosition().y;
-            player.currentHP = (_c = player.memento) === null || _c === void 0 ? void 0 : _c.getHealth();
+            player.restoreMemento();
+            //player.x = player.memento?.getPosition().x;
+            //player.y = player.memento?.getPosition().y;
+            //player.currentHP = player.memento?.getHealth();
             //player.currentMoveCount = player.currentMoveCount === undefined ? undefined : player.currentMoveCount - 1;
-            player.isTurn = (_d = player.memento) === null || _d === void 0 ? void 0 : _d.getTurnStatus();
+            //player.isTurn = player.memento?.getTurnStatus();
             //player.memento = null;
-            console.log(player);
         });
         _.forEach(sessionPlayers, function (player) {
             _.forEach(sessionPlayers, function (sessionPlayer) {
                 const playerSocket = sockets[sessionPlayer.socketId];
                 playerSocket.emit("playersState", player);
-                console.log("emitting");
             });
         });
     });
     socket.on("getLobbies", function () {
-        console.log("Getting lobbies");
         _.forEach(sessions, function (session) {
             const sessionPlayers = getSessionPlayers(session.id);
             const playerCount = sessionPlayers.length;
@@ -323,7 +338,6 @@ io.on("connection", function (socket) {
         mediator.sendToRequester(socket.id, "lobbies", { sessions });
     });
     socket.on("healPlayer", function (healthIncrease) {
-        console.log("HealingPlayer ", socket.id, " by ", healthIncrease);
         const player = getPlayerBySocketId(socket.id);
         player.currentHP =
             player.currentHP == undefined ? 0 : player.currentHP + healthIncrease;
@@ -338,7 +352,6 @@ io.on("connection", function (socket) {
     });
 });
 server.listen(8081, function () {
-    console.log(`Listening on ${server.address().port}`);
 });
 function getSession(name) {
     return _.find(sessions, (session) => session.name === name);
@@ -353,6 +366,16 @@ function getSessionPlayers(sessionId) {
         }
         return sessionPlayers;
     }, []);
+}
+function saveMemento(player) {
+    return new models_1.PlayerMemento(player.socketId, { x: player.x, y: player.y }, player.currentHP || 0, player.isTurn || false, player.moveOrder || 0);
+}
+function restoreMemento_(player) {
+    const snap = CareTaker_.undo(player.socketId);
+    player.x = snap === null || snap === void 0 ? void 0 : snap.getPosition().x;
+    player.y = snap === null || snap === void 0 ? void 0 : snap.getPosition().y;
+    player.currentHP = snap === null || snap === void 0 ? void 0 : snap.getHealth();
+    player.isTurn = snap === null || snap === void 0 ? void 0 : snap.getTurnStatus();
 }
 function getPlayerBySocketId(socketId) {
     return _.find(players, (player) => player.socketId === socketId);

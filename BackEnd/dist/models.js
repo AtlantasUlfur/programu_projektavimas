@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PlayerMemento = void 0;
+exports.CareTaker = exports.PlayerMemento = void 0;
 class PlayerMemento {
-    constructor(position, health, isTurn, moveOrder) {
+    constructor(state, position, health, isTurn, moveOrder) {
         this.position = Object.assign({}, position);
         this.health = health;
         this.isTurn = isTurn;
         this.moveOrder = moveOrder;
+        this.state = state;
     }
     getPosition() {
         return this.position;
@@ -22,3 +23,31 @@ class PlayerMemento {
     }
 }
 exports.PlayerMemento = PlayerMemento;
+class CareTaker {
+    constructor() {
+        this.history = [];
+    }
+    save(momento) {
+        console.log(this.history[0]);
+        let found = false;
+        for (let i = 0; i < this.history.length; i++) {
+            if (this.history[i].state === momento.state) {
+                this.history[i] = momento;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            this.history.push(momento);
+        }
+    }
+    undo(state) {
+        for (const element of this.history) {
+            if (element.state === state) {
+                return element;
+            }
+        }
+        return null;
+    }
+}
+exports.CareTaker = CareTaker;

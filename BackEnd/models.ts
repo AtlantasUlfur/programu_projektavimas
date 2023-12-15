@@ -21,7 +21,10 @@ export type Player = Entity & {
   isTurn?: Boolean;
   isWinner?: Boolean;
   moveOrder?: number;
-  memento: PlayerMemento | null;
+
+  createMemento: (this: Player) => PlayerMemento;
+  restoreMemento: (this: Player) => void;
+
 };
 
 export type Tile = {
@@ -29,7 +32,6 @@ export type Tile = {
   x: Number;
   y: Number;
 };
-
 export type GameMap = {
   sessionId: string;
   tileMap: Tile[];
@@ -41,16 +43,18 @@ export type Session = {
   playerCount: Number;
 };
 export class PlayerMemento {
+   state: string;
    position: { x: Number | undefined; y: Number | undefined };
    health: number;
    isTurn: Boolean;
    moveOrder: number;
 
-  constructor(position: { x: Number | undefined; y: Number | undefined }, health: number, isTurn: Boolean, moveOrder: number) {
+  constructor(state: string, position: { x: Number | undefined; y: Number | undefined }, health: number, isTurn: Boolean, moveOrder: number) {
     this.position = { ...position };
     this.health = health;
     this.isTurn = isTurn;
     this.moveOrder = moveOrder;
+    this.state = state;
   }
 
   getPosition(): { x: Number | undefined; y: Number | undefined } {
@@ -68,4 +72,37 @@ export class PlayerMemento {
     return this.moveOrder;
   }
   
+}
+
+export class CareTaker{
+private history: PlayerMemento[]
+
+constructor(){
+  this.history = []
+}
+save(momento: PlayerMemento){
+  console.log(this.history[0]);
+  let found = false;
+
+  for (let i = 0; i < this.history.length; i++) {
+      if (this.history[i].state === momento.state) {
+          this.history[i] = momento; 
+          found = true;
+          break; 
+      }
+  }
+
+  if (!found) {
+      this.history.push(momento); 
+  }
+}
+undo(state: string): PlayerMemento | null{
+  for (const element of this.history) {
+    if (element.state === state) {
+        return element; 
+    }
+}
+return null;
+
+}
 }
