@@ -2,14 +2,18 @@ import { DirectionEnum } from '../../Models/Enums'
 import { Player } from '../../Models/Player'
 import MainScene from '../../scenes/MainScene'
 
-export class MovementProxy {
+export interface Proxy {
+  run(payload: any);
+  validate();
+}
+export class MovementProxy implements Proxy {
   private mainScene: MainScene
   constructor(mainScene: MainScene) {
     this.mainScene = mainScene
   }
-  public run(direction: DirectionEnum, commandCounter: number) {
+  public run(payload: {direction: DirectionEnum, commandCounter: number}) {
     if (this.validate()) {
-      this.mainScene.handleMovement(direction, commandCounter)
+      this.mainScene.handleMovement(payload.direction, payload.commandCounter)
     }
   }
   public validate() {
@@ -20,7 +24,7 @@ export class MovementProxy {
   }
 }
 
-export class DamageProxy {
+export class DamageProxy implements Proxy{
   private mainScene: MainScene
   constructor(mainScene: MainScene) {
     this.mainScene = mainScene
